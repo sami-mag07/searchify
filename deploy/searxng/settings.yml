@@ -1,0 +1,44 @@
+# SearXNG-Konfiguration fuer den RAG-Such-Dienst.
+# Wichtig: JSON-Ausgabe ist aktiviert (search.formats enthaelt 'json'),
+# damit app/search.py die Ergebnisse maschinell lesen kann.
+#
+# Das Secret steht NICHT hier: der Platzhalter "ultrasecretkey" wird vom
+# offiziellen searxng/searxng-Docker-Entrypoint durch den Wert der
+# Umgebungsvariable SEARXNG_SECRET ersetzt (siehe docker-compose.yml / .env).
+
+use_default_settings: true
+
+general:
+  instance_name: "RAG Search Backend"
+  # Keine oeffentliche Instanz - nur interner Konsum durch den Dienst.
+  donation_url: false
+  contact_url: false
+
+server:
+  secret_key: "ultrasecretkey"   # Platzhalter, wird via SEARXNG_SECRET ersetzt
+  limiter: false                 # kein Rate-Limiter noetig, da nur intern
+  image_proxy: false
+  method: "GET"
+
+search:
+  # JSON zwingend, damit der Client die Ergebnisse parsen kann.
+  formats:
+    - html
+    - json
+  safe_search: 1
+  autocomplete: ""
+  default_lang: "auto"
+
+ui:
+  static_use_hash: true
+
+# Nur ergebnisstarke, RAG-taugliche Engines. Bei Bedarf anpassen.
+engines:
+  - name: duckduckgo
+    disabled: false
+  - name: bing
+    disabled: false
+  - name: wikipedia
+    disabled: false
+  - name: brave
+    disabled: false
