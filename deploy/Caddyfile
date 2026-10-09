@@ -1,0 +1,16 @@
+# Caddy als Reverse-Proxy vor den Dienst.
+# Domain anpassen. Caddy holt und erneuert TLS-Zertifikate automatisch.
+# Fuer rein lokalen Test genuegt der Dienst direkt auf Port 8000 ohne Caddy.
+
+rag.example.com {
+	encode zstd gzip
+	reverse_proxy service:8000
+
+	# Grundlegende Sicherheits-Header.
+	header {
+		Strict-Transport-Security "max-age=31536000;"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+}
