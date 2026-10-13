@@ -15,6 +15,51 @@ nicht im Repo).
 
 ---
 
+## Ergebnisse auf einen Blick (Stand 13.10.2026)
+
+Farben in allen Grafiken: **gelb** = Original-Anbieter, **rot** = Nachbau alt (11.10.),
+**grün** = Nachbau neu (13.10.). Bei den Punkt-Grafiken ist jeder Punkt eine einzelne
+Frage oder Aufgabe, der schwarze Strich ist der Durchschnitt.
+
+| | Original | Nachbau neu | Kurz gesagt |
+|---|---|---|---|
+| Quellen-Vertrauen (Blindtest, 1 bis 5) | 3,56 | 3,51 | fast gleichauf, vorher 3,14 |
+| SEO-/Werbeseiten in 90 Top-Treffern | 15 | 23 | vorher 36 |
+| Antwortzeit Tavily-Suche | 1,33 s | 0,84 s | 37 % schneller |
+| Antwortzeit Jina-Reader | 3,79 s | 0,45 s | rund 8-mal schneller |
+| Recherche-Ranking Serper (MRR) | 0,27 | 0,31 | besser als das Original |
+| Recherche-Ranking Tavily (MRR) | 0,28 | 0,22 | hier liegt das Original noch vorn |
+| Serverfehler im Normalbetrieb | | 0 von 194 | vorher 3 von 160 |
+
+### Quellen-Qualität
+
+![Blindtest Vertrauen](docs/img/blindtest.svg)
+
+![SEO- und Werbeseiten](docs/img/seo.svg)
+
+### Echte Recherchen
+
+![Recherche-Ranking je Aufgabe](docs/img/recherche.svg)
+
+![Themenfremde Treffer](docs/img/themenfremd.svg)
+
+### Tempo, Zuverlässigkeit, Gesamtnote
+
+![Antwortzeit](docs/img/tempo.svg)
+
+![Fehler und Ausfälle](docs/img/zuverlaessigkeit.svg)
+
+![Gesamtnote je Tool](docs/img/noten.svg)
+
+Die Grafiken baut `eval/readme_charts.py` aus den Messdateien in `eval/private/`
+(nicht im Repo). Einschränkungen: Der SEO-Filter wurde mit Urteilen zu denselben
+30 Blindtest-Fragen eingestellt, der Blindtest ist darum leicht zugunsten des
+Nachbaus verzerrt. Die Original-Werte stammen aus gespeicherten Antworten, neue
+Anfragen an Tavily, Serper und Exa gab es nicht. Diese Vergleiche gehören nicht
+in die Öffentlichkeit (Tavily-Nutzungsbedingungen), das Repo bleibt privat.
+
+---
+
 ## Architektur
 
 ```
@@ -28,7 +73,7 @@ Query
   -> JSON                          app/main.py       SearchResponse (+ usage.timings_ms)
 ```
 
-### Tempo und Qualitaet (Stand 11.10.2026)
+### Tempo und Qualitaet (erster Stand 11.10.2026)
 
 Gemessen mit `eval/bench.py`, eigene Seite ueber lokales SearXNG (kostenlos),
 Tavily aus gecachten Antworten (`search_depth=basic`, ohne answer), 30 Fragen DE/EN:
@@ -81,7 +126,7 @@ http://127.0.0.1:8000, SearXNG auf :8888. Sprachen: en, de, es, fr (automatisch
 erkannt). Key-Check fuer alle Endpunkte ueber SERVICE_API_KEY (Bearer, x-api-key,
 X-API-KEY oder api_key im Body).
 
-| Original | Endpunkt | Messung gegen die Historie bzw. das Original (11.10.2026) |
+| Original | Endpunkt | Messung (11.10.2026, neuer Stand oben) |
 |---|---|---|
 | Tavily Search | POST /search | Faktenfragen: Top-1 100 % (Tavily 97 %), 0,94 s (1,33 s); Recherche-Historie: mrr 0,24-0,27 (0,28), Gold-Domains 0,11 (0,15) |
 | Tavily Extract | POST /extract | Text-Abdeckung 81 % / Sauberkeit 94 % gegen Original-Jina-Reader, 0,3 s |
@@ -89,11 +134,8 @@ X-API-KEY oder api_key im Body).
 | Serper | POST /serper/search, /serper/news | Recherche-Historie mrr 0,32 (Serper 0,27), 0,8 s (1,6 s) |
 | Jina Reader / Search | GET /jina/r/{url}, /jina/s/{q} | Reader: Erfolg 90 % (90 %), Abdeckung 80 %, 0,2 s (3,8 s) |
 
-Blindtest Quellenqualitaet (eval/blind_prepare.py, 30 Faktenfragen, Top 3 je System,
-anonym bewertet von einem Agenten ohne Zugriff auf die Ranking-Listen): Tavily
-Vertrauen 3,50 von 5, Nachbau 3,14; Antwort enthalten beide 84 %. Der Nachbau
-liefert fast doppelt so viele SEO-/Kommerzseiten (36 gegen 19 von 90). Dashboard
-mit allen Benchmarks: https://claude.ai/artifact/QTKWLgwqMnCRzBHtvvhNv8
+Blindtest, Recherche-Ranking und Zuverlaessigkeit: siehe "Ergebnisse auf einen Blick" oben.
+Dashboard mit allen Benchmarks: https://claude.ai/artifact/QTKWLgwqMnCRzBHtvvhNv8
 
 Grenzen: kein eigener Web-Index (Exa-Neural, Breite bei Nischenrecherche unter
 Tavily), kein JS-Rendering, kein Umgehen von Bot-Schutz. Verlauf: docs/loop-log.md.
