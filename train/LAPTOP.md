@@ -4,6 +4,8 @@ Stand 14.10.2026. Dieses Dokument ist der ganze Kontext fuer die Arbeit auf dem 
 (i7-12900, RTX 3070 Ti Laptop mit 8 GB). Es reicht allein. Eine Claude-Code-Sitzung auf dem
 Laptop liest zuerst diese Datei, dann bei Bedarf `docs/handoff.md` und `docs/finetuning-plan.md`.
 
+Ganz ohne Rumtippen: [START.md](START.md), ein Auftrag für Claude Code, der alles allein einrichtet.
+
 ## Schnellstart (nur Training, 3 Befehle)
 
 Voraussetzung: Python 3.12, Git, NVIDIA-Treiber. Einrichtung im Detail in Abschnitt 6.
