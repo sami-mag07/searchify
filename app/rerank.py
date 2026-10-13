@@ -504,3 +504,15 @@ def diversify(results: List[Dict], per_domain: int) -> List[Dict]:
         seen[site] = seen.get(site, 0) + 1
         (front if seen[site] <= per_domain else back).append(r)
     return front + back
+
+
+def drop_weak(results: List[Dict], min_score: float, keep: int) -> List[Dict]:
+    """Treffer unter min_score (ausgegebener score) weglassen, aber nie unter `keep`
+    Treffer fallen. Lieber weniger Treffer als themenfremde (Woerterbuch fuer ein
+    einzelnes Wort der Anfrage, Shop mit gleichem Kuerzel)."""
+    if min_score <= 0:
+        return results
+    strong = [r for r in results if (r.get("score") or 0.0) >= min_score]
+    if len(strong) >= keep:
+        return strong
+    return results[:max(keep, len(strong))] if len(results) > keep else results

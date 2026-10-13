@@ -93,6 +93,8 @@ class Settings:
     quality_prior: bool
     quality_prior_weight: float
     quality_prior_compat: bool
+    min_result_score: float
+    min_results_kept: int
 
 
 def get_settings() -> Settings:
@@ -140,4 +142,7 @@ def get_settings() -> Settings:
         quality_prior_weight=_get_float("QUALITY_PRIOR_WEIGHT", 1.0),
         # Blindtest 13.10.: hilft /search, kostet Serper/Exa im Testteil -> dort aus
         quality_prior_compat=_get_bool("QUALITY_PRIOR_COMPAT", False),
+        # Echte Aufgabe 13.10.: Woerterbuecher/Shops mit gleichem Wort lagen bei score ~0.07-0.11
+        min_result_score=_get_float("MIN_RESULT_SCORE", 0.12),
+        min_results_kept=_get_int("MIN_RESULTS_KEPT", 3),
     )

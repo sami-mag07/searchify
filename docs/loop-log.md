@@ -73,3 +73,11 @@ Eine Zeile je Runde: Datum Uhrzeit | Bereich | Aenderung | Messwerte vorher -> n
 - Fix: app/main.py _raise_fd_limit() hebt beim Start auf 8192 (bis hartes Limit), Test tests/test_fd_limit.py. 223 Tests gruen.
 - Nachprobe direkt nach Neustart: 8 Offshore-Suchen x 2 Endpunkte = 16/16 mit 200, keine neuen Fehler im Log.
 - Vergleichsseite (Artifact 55c4c7ZnMcW9p6WZsNWuUM) hat jetzt Abschnitt "Echte Aufgaben" (Daten eval/private/real-tasks/).
+
+## 13.10.2026 ~16:30 Fix: themenfremde Treffer + 2 Sicherheitsfunde
+- MIN_RESULT_SCORE=0.12 (/search, auch Exa): Treffer mit score < 0.12 fallen weg, mind. MIN_RESULTS_KEPT=3 bleiben (rerank.drop_weak).
+  Replay Kern dev 0.9461 (vorher 0.9355), test 0.8651 gleich; Exa 0.956/0.9508 gleich.
+- Serper: Logit < SERPER_WEAK_CE=-8 ans Ende (Trefferzahl bleibt fuer Folgeseiten). Replay 0.8338/0.7058 (vorher 0.8331/0.7048).
+- Echte Aufgabe (8 Offshore-Suchen): bekannte Muell-Seiten /search 18/77 -> 1/61, /serper 17/80 -> 2/80 (eval/private/real-tasks/muell-nach-fix.json).
+- Sicherheit (Commit-Review): Serper-Batch-Schaetzung zaehlt jetzt Rerank-Fenster/Nachladen (_max_pages, REFILL_PAGES=2 als harte Grenze);
+  curl-Abruf nur fuer eindeutige URLs (_plain_url) plus CURLOPT_CONNECT_TO auf die gepruefte IP. 226 Tests gruen.

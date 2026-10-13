@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import threading
 import time
@@ -49,6 +50,7 @@ MAX_NUM = 100
 MAX_BATCH = 100
 MAX_BATCH_UPSTREAM_PAGES = 50
 MAX_UPSTREAM_PAGES = 10  # SearXNG-Seiten je Anfrage (~10 Treffer je Seite)
+REFILL_PAGES = 2  # Nachlade-Seiten, wenn Engines weniger als 10 je Seite liefern
 LINK_EXTRAS_TOP = 3
 GENERAL_ENGINES = "bing,yahoo,wikipedia"  # mit engines KEIN categories senden (README, Punkt 5)
 # Rerank-Fenster: liegen die angefragten Treffer in den ersten RERANK_WINDOW Plaetzen,
@@ -82,6 +84,8 @@ EXPLORE_WEIGHT = 8.0
 # Anbieters (Ausschreibung, Anmeldung) sind oft genau die gesuchte Seite.
 # tool_objective dev (offline, Sweep Logit 0-6): Recherche page@30 0.016 -> 0.02.
 DUP_CE_MIN = 6.0
+# Logit unter diesem Wert (score ~0.12 bei T=4): themenfremd, ans Ende (echte Aufgabe 13.10.)
+WEAK_CE = float(os.environ.get("SERPER_WEAK_CE", "-8.0"))
 # Engine-Vertrauen (rerank.engine_trust): ein Treffer zaehlt fuer seine Engine erst ab
 # Cross-Encoder-Logit TRUST_MIN als passend. Fuer die SERP strenger als im Kern (0.0):
 # Titel + Snippet allein erreichen bei themennahen Fehltreffern leicht Logit 0-1.
@@ -274,7 +278,8 @@ def _collect(p: Dict, news: bool) -> Tuple[List[Dict], Dict]:
         add(d.get("results") or [], n)
     # Liefern Engines weniger als 10 je Seite, einzeln nachladen, bis num reicht.
     nxt = pagenos[-1] + 1
-    while len(results) < skip + p["num"] and nxt <= MAX_UPSTREAM_PAGES:
+    last = min(MAX_UPSTREAM_PAGES, pagenos[-1] + REFILL_PAGES)
+    while len(results) < skip + p["num"] and nxt <= last:
         if not add(_upstream(p, nxt, news).get("results") or [], nxt):
             break
         nxt += 1
@@ -376,14 +381,17 @@ def _reorder(query: str, results: List[Dict]) -> List[Dict]:
     w = ENGINE_WEIGHT if question else EXPLORE_WEIGHT
     fused = sorted(range(len(results)),
                    key=lambda i: -(1 / (RRF_K + ce_rank[i]) + w / (RRF_K + i)))
-    head, tail, seen = [], [], {}
+    head, tail, weak, seen = [], [], [], {}
     for i in fused:
+        if scores[i] < WEAK_CE:  # themenfremd (Woerterbuch, Shop mit gleichem Kuerzel): ans Ende
+            weak.append(results[i])
+            continue
         host = urlparse(results[i]["url"]).hostname
         n = seen.get(host, 0)
         seen[host] = n + 1
         keep = n == 0 or (not question and n == 1 and scores[i] >= DUP_CE_MIN)
         (head if keep else tail).append(results[i])
-    return head + tail
+    return head + tail + weak
 
 
 # ---------------------------------------------------------------- Umformung
@@ -631,6 +639,14 @@ def _build(p: Dict, news: bool) -> Dict:
     return out
 
 
+def _max_pages(p: Dict) -> int:
+    """Obergrenze der SearXNG-Seiten, die _collect fuer eine Anfrage holen kann
+    (Folgeseiten, Rerank-Fenster ab Platz 1, Extraseite, Nachladen)."""
+    offset = (p["page"] - 1) * p["num"]
+    span = offset + p["num"] if offset + p["num"] <= RERANK_WINDOW else offset % 10 + p["num"]
+    return min(-(-span // 10) + 1 + REFILL_PAGES, MAX_UPSTREAM_PAGES)
+
+
 def _error(status: int, message: str) -> JSONResponse:
     return JSONResponse({"message": message, "statusCode": status}, status_code=status)
 
@@ -648,7 +664,7 @@ def _handle(request: Request, body: Any, kind: str):
             parsed = [parse_body(b) for b in body]
             # Upstream schonen: Summe der SearXNG-Seiten je Request begrenzen, sonst
             # loest ein Batch hunderte Anfragen aus und provoziert CAPTCHA-Sperren.
-            pages = sum(min(-(-q["num"] // 10) + 1, MAX_UPSTREAM_PAGES) for q in parsed)
+            pages = sum(_max_pages(q) for q in parsed)
             if pages > MAX_BATCH_UPSTREAM_PAGES:
                 raise BadRequest(
                     f"Batch too large: needs ~{pages} upstream pages, max {MAX_BATCH_UPSTREAM_PAGES}"

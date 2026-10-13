@@ -246,6 +246,7 @@ def _run_search(req: SearchRequest, _relaxed: bool = False) -> "tuple[SearchResp
         ranked, chunks_per_source=req.chunks_per_source, max_results=req.max_results,
         candidates=candidates,
     )
+    merged = rerank_mod.drop_weak(merged, settings.min_result_score, settings.min_results_kept)
 
     # 5) LLM-answer (optional)
     answer_text = None

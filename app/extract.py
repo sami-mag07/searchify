@@ -472,6 +472,20 @@ def _curl_session():
     return sess
 
 
+def _plain_url(url: str) -> bool:
+    """Nur eindeutige http(s)-URLs fuer curl: kein Backslash, keine Leer-/Steuerzeichen,
+    keine Zugangsdaten vor dem Host. Sonst koennten urlparse und curl verschiedene
+    Hosts lesen (geprueft wird der eine, verbunden der andere)."""
+    if any(c == "\\" or ord(c) <= 0x20 or ord(c) == 0x7F for c in url):
+        return False
+    try:
+        parts = urlparse(url)
+        parts.port  # noqa: B018 - wirft bei ungueltigem Port
+    except ValueError:
+        return False
+    return parts.scheme in ("http", "https") and bool(parts.hostname) and "@" not in parts.netloc
+
+
 def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Optional[str]:
     """Wie fetch_url, aber mit Chrome-TLS-Fingerprint (curl_cffi): weniger 403 von
     Bot-Schutz. Redirects werden selbst verfolgt, damit jeder Sprung den
@@ -481,8 +495,10 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
     deadline = time.monotonic() + timeout
     try:
         for _ in range(5):
+            if not _plain_url(url):
+                return None
             parts = urlparse(url)
-            ips = _public_ips(parts.hostname or "") if parts.scheme in ("http", "https") else []
+            ips = _public_ips(parts.hostname or "")
             if not ips:
                 return None
             # Geprueften Host auf die gepruefte IP festnageln (CURLOPT_RESOLVE), damit
@@ -490,7 +506,13 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
             port = parts.port or (443 if parts.scheme == "https" else 80)
             sess = _curl_session()
             pinned = ",".join(f"[{ip}]" if ":" in ip else ip for ip in ips)
-            sess.curl_options = {CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"]}
+            # CONNECT_TO ohne Host/Port gilt fuer jede Verbindung: selbst wenn curl die URL
+            # anders liest als urlparse, verbindet es nur zur geprueften IP.
+            first = f"[{ips[0]}]" if ":" in ips[0] else ips[0]
+            sess.curl_options = {
+                CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"],
+                CurlOpt.CONNECT_TO: [f"::{first}:{port}"],
+            }
             resp = sess.get(
                 url, timeout=max(0.1, deadline - time.monotonic()), allow_redirects=False, stream=True
             )
