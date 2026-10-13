@@ -39,37 +39,75 @@ Prüffall (darf nie ins Training), damit wir sehen, ob ein Modell ihn wirklich l
 3. Ergebnis: Lohnt ein größeres Modell schon ohne Training? Wenn keins besser ist,
    bringt Training eines größeren Modells vermutlich auch nichts, dann direkt Phase 2 mit mehr Daten.
 
-## Phase 2: Trainingsdaten (Mac, ca. 1 Tag Rechenzeit, nebenbei)
+## Phase 2: Viele Trainingsdaten (öffentliche Daten lädt der Laptop, eigene baut der Mac)
 
-1. Deine Problemfälle aus Phase 0 als harte Prüfung.
-2. Harte Negative aus eigenen Läufen: SEO-Seiten, Shopping-Sender, Wörterbücher, Namensgleichheit.
-3. Bewertungen durch Claude: für ca. 2.000 echte Recherche-Anfragen die Top 30 bewerten lassen
-   (über claude-code-api, kostet nur Max-Kontingent, läuft gedrosselt über Nacht).
-4. Offene Datensätze nur mit passender Lizenz: MS MARCO und mMARCO sind nur nicht-kommerziell.
-   Solange der Dienst privat bleibt ok, für ein Produkt brauchen wir andere Quellen.
-5. Ziel: 20.000 bis 50.000 bewertete Paare, sauber getrennt in Training, Übung, Prüfung.
+Nutzung ist privat und nicht kommerziell, damit sind auch Datensätze mit
+Forschungslizenz erlaubt. Ziel: 1 bis 2 Millionen bewertete Paare statt ein paar Hundert.
 
-## Phase 3: Training auf deinem Laptop (11 GB frei)
-
-| Modell | Speicher beim Training | Erwartete Dauer* | Antwortzeit danach |
+| Quelle | Sprache | Menge (genutzt) | Lizenz |
 |---|---|---|---|
-| mMiniLM (jetzt) | ca. 3 GB | 1 bis 2 h | gleich |
-| bge-reranker-base | ca. 5 GB | 3 bis 5 h | ca. 1,5x |
-| bge-reranker-v2-m3 mit LoRA | ca. 8 GB | 6 bis 10 h | ca. 3x, nur mit kürzeren Abschnitten tragbar |
+| MS MARCO Passage mit harten Negativen und Lehrer-Scores (sentence-transformers) | en | ca. 500.000 | nur nicht-kommerziell |
+| mMARCO (MS MARCO übersetzt) | de, es, fr | je ca. 200.000 | nur nicht-kommerziell |
+| GermanQuAD / GermanDPR | de | ca. 15.000 | CC BY 4.0 |
+| MIRACL (Wikipedia-Suche, Fragen von Menschen bewertet) | de, es, fr, en | ca. 30.000 | Apache 2.0 |
+| Natural Questions / HotpotQA (mehrstufige Fragen) | en | ca. 100.000 | CC BY-SA |
+| Claude bewertet echte Anfragen (Top 30 je Anfrage) | de, en | ca. 2.000 Anfragen = 60.000 Paare | eigene Daten |
+| Harte Negative aus eigenen Läufen (SEO, Shopping, Wörterbücher, Namensgleichheit) | de, en | ca. 20.000 | eigene Daten |
 
-*grobe Schätzung, hängt von Chip und Grafikkarte ab, die ich noch nicht kenne.
+Regeln: Nichts aus den Prüfungen (Phase 2b) darf ins Training, Abgleich über Anfrage
+und URL. Eigene Daten werden im Training stärker gewichtet als die öffentlichen.
 
-Ablauf: Repo auf den Laptop klonen, `train/train_reranker.py` (wird gebaut) mit dem
-Datensatz starten, Abbruch sobald die Übungsfragen nicht mehr steigen. Fertiges Modell
-nach `models/<name>-<datum>/` auf den Mac kopieren. Gemessen wird nur auf dem Mac,
-sonst sind die Zeiten nicht vergleichbar.
+## Phase 2b: Prüfung an großen echten Aufgaben
+
+Kleine Faktenfragen reichen nicht, entscheidend ist der echte Einsatz: eine ganze
+Recherche mit vielen Suchen. Jede große Aufgabe hat eine Liste von Funden, die du
+schon bestätigt hast (Gold).
+
+| Aufgabe | Gold vorhanden | Gemessen wird |
+|---|---|---|
+| 9 Recherchen aus dem Programm-Tracker (research-agent tasks.json) | ja, Gold-Links | Gold-Seiten in Top 10/30, Platz des ersten Golds |
+| Offshore-Kontakte (8 Suchen, Vergleich mit Claude-Websuche) | ja, Handbewertung | gefundene Personen, themenfremde Treffer |
+| Deepwater-Markt (10 Teilbereiche, 161 Firmen) | ja, Firmenliste | Firmen-Abdeckung je Suche |
+| Hackathon-Radar Herbst 2026 (95 Hackathons) | ja, Board | Abdeckung, Anmeldeseite statt Startseite |
+| Meta Reality Labs (94 Personen) und NVIDIA GTC (28 Leads) | ja, Obsidian | gefundene Personen mit Rolle |
+| deine Problemliste (Phase 0) | kommt von dir | Fall gelöst ja/nein |
+
+Pro Aufgabe laufen alle Suchen gegen das alte und das neue Modell, Ergebnis ist eine
+Zahl pro Aufgabe plus ein Gesamtwert. Ein Modell muss bei mindestens 4 von 6 Aufgaben
+besser und bei keiner deutlich schlechter sein.
+
+## Phase 3: Training auf deinem Laptop (RTX 3070 Ti Laptop, 8 GB Grafikspeicher)
+
+Begrenzung ist der Grafikspeicher (8 GB), nicht der Arbeitsspeicher. Der i7-12900
+bereitet nur die Daten vor.
+
+| Modell | Grafikspeicher beim Training | Dauer für 1 Mio. Paare* | Antwortzeit danach |
+|---|---|---|---|
+| mMiniLM (jetzt, 118 Mio. Parameter) | ca. 3 GB | 2 bis 3 h | gleich |
+| bge-reranker-base (278 Mio.) | ca. 6 GB, fp16 | 6 bis 9 h | ca. 1,5x |
+| bge-reranker-v2-m3 (568 Mio.) | ca. 7 GB, nur mit LoRA und fp16 | 12 bis 20 h | ca. 3x |
+
+*grobe Schätzung, Abschnitte mit 256 Token, eine Epoche.
+
+Empfehlung: Erst mMiniLM mit allen Daten (eine Nacht). Bringt das die großen Aufgaben
+nach vorn, bleibt die Suche gleich schnell. Nur wenn nicht, bge-reranker-base.
+
+Ablauf:
+1. Auf dem Laptop: Python 3.12, PyTorch mit CUDA, Repo klonen (unter Windows am
+   einfachsten in WSL2).
+2. Öffentliche Datensätze lädt der Laptop selbst (ca. 2 bis 4 GB, der Mac-Speicher ist knapp).
+   Vom Mac kommt nur das kleine Paket mit den eigenen Daten (Claude-Bewertungen, harte Negative).
+3. `train/train_reranker.py` starten (wird gebaut): speichert jede Stunde einen
+   Zwischenstand, misst nebenbei auf den Übungsfragen, hört auf, wenn die nicht mehr steigen.
+4. Fertiges Modell nach `models/<name>-<datum>/` auf den Mac kopieren, gemessen wird nur hier.
 
 ## Phase 4: Freigabe-Regeln (automatisch)
 
 Ein neues Modell geht nur live, wenn alles gleichzeitig stimmt:
 
 - Prüffragen aller vier Tools nicht schlechter (Toleranz 0,002)
-- Recherche-Ranking und deine Problemfälle besser
+- große Aufgaben (Phase 2b): mindestens 4 von 6 besser, keine deutlich schlechter
+- deine Problemfälle besser
 - typische Antwortzeit hoechstens +0,2 s, langsamste 5 % hoechstens +0,5 s
 - 0 Serverfehler in 150 Live-Anfragen
 - Blindtest nicht schlechter
@@ -93,14 +131,20 @@ Ein neues Modell geht nur live, wenn alles gleichzeitig stimmt:
 | Wann | Was | Wer |
 |---|---|---|
 | sofort | Phase 1 (A/B-Test, drei Modelle vergleichen) | ich, Mac |
+| sofort | Phase 2b große Aufgaben als Prüfung bauen | ich, Mac |
 | sofort | Phase 5.1, 5.4, 5.5 (CI, Zeitlimit, Health) | ich, Mac |
+| parallel | Phase 2 eigene Daten und Claude-Bewertungen über Nacht | ich, Mac |
 | wenn du lieferst | Phase 0 einsortieren | du, dann ich |
-| danach | Phase 2 Daten, Nacht-Läufe | ich, Mac |
-| danach | Phase 3 Training | dein Laptop |
+| danach | Phase 3 Training, erste Nacht mMiniLM | dein Laptop |
 | danach | Phase 4 Freigabe, 5.2, 5.3, 5.6 | ich, Mac |
 
-## Offene Fragen an dich
+## Geklärt (13.10.2026)
 
-1. Welcher Laptop (Chip, Grafikkarte)? Davon hängen Modellwahl und Dauer ab.
-2. Soll der Dienst irgendwann kommerziell laufen? Dann fallen MS MARCO und mMARCO weg.
-3. Darf Claude über Nacht ca. 2.000 Anfragen bewerten (Max-Kontingent)?
+- Laptop: i7-12900, RTX 3070 Ti Laptop (8 GB Grafikspeicher).
+- Nicht kommerziell, MS MARCO und mMARCO sind erlaubt.
+- Viele Trainingsdaten, Prüfung an großen echten Aufgaben.
+
+## Noch offen
+
+1. Darf Claude über Nacht ca. 2.000 Anfragen bewerten (Max-Kontingent)?
+2. Laptop: Windows oder Linux? Davon hängt die Einrichtung ab.
