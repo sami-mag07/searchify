@@ -86,3 +86,9 @@ Eine Zeile je Runde: Datum Uhrzeit | Bereich | Aenderung | Messwerte vorher -> n
 
 - `eval/readme_charts.py` baut 7 SVGs nach `docs/img/` (Blindtest und Recherche als Punktdiagramm mit Durchschnitt, dazu SEO-Seiten, themenfremde Treffer, Tempo, Fehler, Noten). Farben: gelb Original, rot alt, gruen neu.
 - README hat oben den Abschnitt "Ergebnisse auf einen Blick". Repo bleibt privat (Tavily-Nutzungsbedingungen).
+
+## 13.10.2026 19:30: README neu (Englisch), Workflows, Feinjustierung gemessen
+
+- README komplett neu auf Englisch: ein Absatz was es ist, Endpunkt-Tabelle, 6 fertige Workflows in examples/ mit echten Ausgaben, Grafiken mit 4 Staenden (Original gelb, vorher rot, jetzt gruen, feinjustiert blau), Mermaid-Architektur. Alte deutsche Notizen in docs/technical-notes-de.md.
+- Feinjustiert gemessen: Recherche-MRR own-tavily 0.253 (vorher 0.219), own-serper 0.312, own-exa 0.262 (history-score-2026-10-13_1911). Live-Tempo 15 je Tool: /search 0.98 s, /serper 1.05 s, /exa 1.42 s, /jina/r 0.22 s (live-tempo-2026-10-13-tuned.json).
+- 1 Fehler in 141 Anfragen: /search 32 s, SearXNG und ddgs-Rueckfall beide Timeout. Offen: Gesamt-Zeitlimit pro Anfrage.
