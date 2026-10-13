@@ -75,6 +75,7 @@ class Settings:
     chunk_overlap: int
     fetch_timeout: int
     fetch_client: str
+    fetch_fallback: bool
     extract_workers: int
     fetch_budget_ms: int
     fetch_budget_advanced_ms: int
@@ -123,6 +124,7 @@ def get_settings() -> Settings:
         chunk_overlap=_get_int("CHUNK_OVERLAP", 12),
         fetch_timeout=_get_int("FETCH_TIMEOUT", 5),
         fetch_client=_get("FETCH_CLIENT", "httpx").strip().lower(),
+        fetch_fallback=_get_bool("FETCH_FALLBACK", True),
         extract_workers=_get_int("EXTRACT_WORKERS", 0),
         fetch_budget_ms=_get_int("FETCH_BUDGET_MS", 500),
         fetch_budget_advanced_ms=_get_int("FETCH_BUDGET_ADVANCED_MS", 1500),

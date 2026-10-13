@@ -147,6 +147,7 @@ def test_fetch_url_bricht_tropfenden_download_ab(monkeypatch):
     class Tropf:
         headers = {"content-type": "text/html"}
         encoding = "utf-8"
+        status_code = 200
 
         def raise_for_status(self):
             pass
@@ -584,3 +585,39 @@ def test_cross_scores_caps_overlong_query(monkeypatch):
     assert seen["q"] == 128
     rr._cross_scores("kurze frage", ["text"], 256)
     assert seen["q"] == 2
+
+
+def _fake_httpx(monkeypatch, status):
+    import httpx
+
+    def handler(request):
+        return httpx.Response(status, headers={"content-type": "text/html"}, text="<html>nein</html>")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    monkeypatch.setattr(extract_mod, "_client", lambda: client)
+
+
+def test_fetch_laedt_bei_403_mit_chrome_profil_nach(monkeypatch):
+    from types import SimpleNamespace
+
+    _fake_httpx(monkeypatch, 403)
+    calls = []
+    monkeypatch.setattr(extract_mod, "_fetch_url_curl",
+                        lambda url, t, lim: calls.append(url) or "<html>da</html>")
+    settings = SimpleNamespace(fetch_client="httpx", fetch_fallback=True)
+    assert extract_mod._fetch_live("https://example.org/", 2.0, 1000, settings) == "<html>da</html>"
+    assert calls == ["https://example.org/"]
+
+
+def test_fetch_kein_nachladen_bei_404_oder_ausgeschaltet(monkeypatch):
+    from types import SimpleNamespace
+
+    calls = []
+    monkeypatch.setattr(extract_mod, "_fetch_url_curl", lambda *a: calls.append(a) or "x")
+    _fake_httpx(monkeypatch, 404)
+    on = SimpleNamespace(fetch_client="httpx", fetch_fallback=True)
+    assert extract_mod._fetch_live("https://example.org/", 2.0, 1000, on) is None
+    _fake_httpx(monkeypatch, 403)
+    off = SimpleNamespace(fetch_client="httpx", fetch_fallback=False)
+    assert extract_mod._fetch_live("https://example.org/", 2.0, 1000, off) is None
+    assert calls == []
