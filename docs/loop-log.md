@@ -81,3 +81,8 @@ Eine Zeile je Runde: Datum Uhrzeit | Bereich | Aenderung | Messwerte vorher -> n
 - Echte Aufgabe (8 Offshore-Suchen): bekannte Muell-Seiten /search 18/77 -> 1/61, /serper 17/80 -> 2/80 (eval/private/real-tasks/muell-nach-fix.json).
 - Sicherheit (Commit-Review): Serper-Batch-Schaetzung zaehlt jetzt Rerank-Fenster/Nachladen (_max_pages, REFILL_PAGES=2 als harte Grenze);
   curl-Abruf nur fuer eindeutige URLs (_plain_url) plus CURLOPT_CONNECT_TO auf die gepruefte IP. 226 Tests gruen.
+
+## 13.10.2026 abends: README mit Grafiken
+
+- `eval/readme_charts.py` baut 7 SVGs nach `docs/img/` (Blindtest und Recherche als Punktdiagramm mit Durchschnitt, dazu SEO-Seiten, themenfremde Treffer, Tempo, Fehler, Noten). Farben: gelb Original, rot alt, gruen neu.
+- README hat oben den Abschnitt "Ergebnisse auf einen Blick". Repo bleibt privat (Tavily-Nutzungsbedingungen).
