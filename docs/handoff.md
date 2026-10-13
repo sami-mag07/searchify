@@ -2,6 +2,7 @@
 
 Fuer eine frische Session: Alles, was man wissen muss, um am lokalen Such-Dienst
 weiterzuarbeiten. Details in README.md, docs/loop-plan.md, docs/loop-log.md.
+Arbeit auf dem Gaming-Laptop (Training, Offline-Messung, Auftrag fuer Claude Code): train/LAPTOP.md.
 
 ## Was es ist
 
@@ -136,3 +137,9 @@ Zuverlaessigkeits-Lauf: Run wf_0944d022-74e, Ablage eval/private/zuverl-2026-10-
 - QUALITY_PRIOR (app/quality.py) an, aber nur fuer /search; QUALITY_PRIOR_COMPAT=1 schaltet ihn auch fuer Serper/Exa ein (kostet dort test-Punkte).
 - Blindtest 13.10.: Tavily 3,56, Nachbau 3,51 (ohne Filter 3,32). Leichte Zirkularitaet: Filter mit frueherem Richter auf denselben 30 Fragen kalibriert.
 - Aktuelle Werte: eval/private/stand-2026-10-13/. Offen: SearXNG-Ausfall-Rueckfall, Konstanz kalter Laeufe, Serper-Recall, Mozilla Readability, VPS READER_RENDER=0, Emil-Umzug.
+
+## Laptop-Paket 14.10.2026
+- train/LAPTOP.md ist der vollstaendige Bericht fuer den Laptop: Dienst, Regeln, Stand, Ziele, Messung, Einrichtung,
+  Training (prepare_data.py, train_reranker.py, run_night.ps1/.sh) und ein Auftrag fuer Claude Code.
+- Messdaten: train/make_bundle.sh <ziel.zip> auf dem Mac (nur USB/AirDrop/lokales Netz), train/unpack_bundle.py auf dem Laptop.
+- Ergebnis kommt als models/reranker-mminilm-<datum>/ zurueck, gemessen wird nur auf dem Mac.

@@ -177,6 +177,8 @@ docker compose -f deploy/docker-compose.yml up -d searxng
   without the answer.
 - `SERVICE_API_KEY` turns on a key check for every endpoint.
 - The reranker model (about 470 MB) downloads on the first request.
+- Training the reranker on a separate GPU machine, plus everything needed to measure
+  offline there: [`train/LAPTOP.md`](train/LAPTOP.md) (German).
 
 ## Tests and benchmarks
 

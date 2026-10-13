@@ -21,3 +21,10 @@ models/
 
 # OS
 .DS_Store
+
+# Training auf dem Laptop (train/LAPTOP.md): Daten, Logs, Zwischenstaende, Pakete
+train/data/
+train/logs/
+train/checkpoints/
+.venv-train/
+*.zip
