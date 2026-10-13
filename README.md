@@ -116,7 +116,9 @@ the average.
 | Off-topic results in 8 real searches (Tavily clone) | | | 18 of 77 | 1 of 61 |
 | Good source near the top, Serper (0 to 1) | 0.27 | 0.32 | 0.31 | 0.31 |
 | Good source near the top, Tavily (0 to 1) | 0.28 | 0.24 | 0.22 | 0.25 |
-| Typical response time, Tavily search | 1.33 s | 1.11 s | 0.82 s | 0.98 s |
+| Typical response time, Tavily search | 1.33 s | 1.25 s | | 0.93 s |
+| Typical response time, Serper | 1.60 s | 0.90 s | | 0.91 s |
+| Typical response time, Exa | | 2.83 s | | 1.44 s |
 | Typical response time, Jina Reader | 3.79 s | 1.00 s | 0.45 s | 0.22 s |
 
 ![Blind test trust](docs/img/blindtest.svg)

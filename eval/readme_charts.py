@@ -170,7 +170,7 @@ def main():
     sec = lambda v: (v, num(v, 2) + " s")
     research = research_rows()
     avg = {r["l"]: mean(r["v"]) for r in research}
-    now_tempo, tuned_tempo = load("live-tempo-2026-10-13.json"), load(TUNED_TEMPO)
+    tuned_tempo = load(TUNED_TEMPO)
     t = lambda d, k: sec(d[k]["median_s"])
     # 81 research requests (0 errors, history-score-2026-10-13_1911) plus the live tempo run
     tuned_ok = sum(v["ok"] for v in tuned_tempo.values()) + 81
@@ -211,20 +211,24 @@ def main():
         ["orig", "before", "now", "tuned"],
         note="Fine-tuning only drops weak results below the top 3, so this count stays the same.")
 
+    # Before and fine-tuned measured in one run (Oct 14): Oct 11 code on :8003 and the
+    # current service on :8000, 30 fresh questions, order alternating per question.
+    ab = load("live-tempo-ab-2026-10-14.json")
+    m = lambda port, ep: sec(ab[f"{port}{ep}"]["median"])
     charts["tempo"] = bars(
         "How long does a typical request take?",
-        "Our clone is faster than the original for every tool.",
+        "Fine-tuned is not slower: faster for Tavily search and Exa, equal for Serper.",
         "Typical response time in seconds (median). Shorter is better.",
-        [{"l": "Tavily search", "v": {"orig": sec(1.33), "before": sec(1.11),
-                                      "now": t(now_tempo, "/search"), "tuned": t(tuned_tempo, "/search")}},
-         {"l": "Serper", "v": {"orig": sec(1.6), "before": sec(0.97),
-                               "now": t(now_tempo, "/serper/search"), "tuned": t(tuned_tempo, "/serper/search")}},
-         {"l": "Exa", "v": {"before": sec(2.25), "now": t(now_tempo, "/exa/search"),
-                            "tuned": t(tuned_tempo, "/exa/search")}},
+        [{"l": "Tavily search", "v": {"orig": sec(1.33), "before": m(8003, "/search"),
+                                      "tuned": m(8000, "/search")}},
+         {"l": "Serper", "v": {"orig": sec(1.6), "before": m(8003, "/serper/search"),
+                               "tuned": m(8000, "/serper/search")}},
+         {"l": "Exa", "v": {"before": m(8003, "/exa/search"), "tuned": m(8000, "/exa/search")}},
          {"l": "Jina Reader", "v": {"orig": sec(3.79), "before": sec(1.0),
-                                    "now": t(now_tempo, "/jina/r"), "tuned": t(tuned_tempo, "/jina/r")}}],
-        ["orig", "before", "now", "tuned"],
-        note="Now and fine-tuned: one live run of 15 requests per tool, single runs vary. Exa original: no valid key.")
+                                    "tuned": t(tuned_tempo, "/jina/r")}}],
+        ["orig", "before", "tuned"],
+        note="Before and fine-tuned ran side by side: 30 fresh questions, alternating order. "
+             "Reader: separate runs. Exa original: no valid key.")
 
     charts["zuverlaessigkeit"] = bars(
         "How often does a request fail?",
