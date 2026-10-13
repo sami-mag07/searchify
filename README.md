@@ -17,19 +17,20 @@ nicht im Repo).
 
 ## Ergebnisse auf einen Blick (Stand 13.10.2026)
 
-Farben in allen Grafiken: **gelb** = Original-Anbieter, **rot** = Nachbau alt (11.10.),
-**grün** = Nachbau neu (13.10.). Bei den Punkt-Grafiken ist jeder Punkt eine einzelne
-Frage oder Aufgabe, der schwarze Strich ist der Durchschnitt.
+Farben in allen Grafiken: **gelb** = Original-Anbieter, **rot** = unser Nachbau vorher (11.10.),
+**grün** = unser Nachbau jetzt (13.10.). Jede Grafik sagt oben in Grün, was herauskommt.
+Bei den Punkt-Grafiken ist jeder Punkt eine einzelne Frage oder Aufgabe, der schwarze
+Strich ist der Durchschnitt, rechts steht er als Zahl.
 
-| | Original | Nachbau neu | Kurz gesagt |
+| | Original | Unser Nachbau jetzt | Kurz gesagt |
 |---|---|---|---|
 | Quellen-Vertrauen (Blindtest, 1 bis 5) | 3,56 | 3,51 | fast gleichauf, vorher 3,14 |
 | SEO-/Werbeseiten in 90 Top-Treffern | 15 | 23 | vorher 36 |
 | Antwortzeit Tavily-Suche | 1,33 s | 0,84 s | 37 % schneller |
 | Antwortzeit Jina-Reader | 3,79 s | 0,45 s | rund 8-mal schneller |
-| Recherche-Ranking Serper (MRR) | 0,27 | 0,31 | besser als das Original |
-| Recherche-Ranking Tavily (MRR) | 0,28 | 0,22 | hier liegt das Original noch vorn |
-| Serverfehler im Normalbetrieb | | 0 von 194 | vorher 3 von 160 |
+| Gute Quelle weit oben, Serper (0 bis 1) | 0,27 | 0,31 | besser als das Original |
+| Gute Quelle weit oben, Tavily (0 bis 1) | 0,28 | 0,22 | hier liegt das Original noch vorn |
+| Fehler im Normalbetrieb | nicht gemessen | 0 von 194 | vorher 3 von 160 |
 
 ### Quellen-Qualität
 

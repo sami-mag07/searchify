@@ -13,10 +13,11 @@ PRIV = ROOT / "eval" / "private"
 OUT = ROOT / "docs" / "img"
 
 COL = {"orig": "#E0A100", "alt": "#D64545", "neu": "#2E9E5B"}
-NAME = {"orig": "Original", "alt": "Nachbau alt (11.10.)", "neu": "Nachbau neu (13.10.)"}
-INK, MUTED, GRID, BG = "#1F2328", "#59636E", "#E6E8EB", "#FFFFFF"
+NAME = {"orig": "Original-Anbieter", "alt": "Unser Nachbau vorher (11.10.)", "neu": "Unser Nachbau jetzt (13.10.)"}
+INK, MUTED, GRID, BG, GOOD = "#1F2328", "#59636E", "#E6E8EB", "#FFFFFF", "#1A7F45"
 FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 W = 760
+TOP = 128  # Beginn der Zeichenflaeche unter Titel, Ergebnis, Lesehilfe und Legende
 
 
 def load(name):
@@ -36,34 +37,40 @@ def legend(keys, y):
     parts, x = [], 24
     for k in keys:
         parts.append(f'<circle cx="{x + 6}" cy="{y - 4}" r="6" fill="{COL[k]}"/>')
-        parts.append(text(x + 18, y, NAME[k], 12, MUTED))
-        x += 34 + 6.3 * len(NAME[k])
+        parts.append(text(x + 18, y, NAME[k], 12, INK))
+        x += 36 + 6.2 * len(NAME[k])
     return parts
 
 
-def frame(title, sub, body, h):
+def frame(title, result, howto, body, h):
+    """Kopf jeder Grafik: Frage, Ergebnis in einem Satz, Lesehilfe."""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{h}" viewBox="0 0 {W} {h}" '
             f'font-family="{FONT}">'
             f'<rect width="{W}" height="{h}" rx="12" fill="{BG}" stroke="{GRID}"/>'
-            + text(24, 34, title, 17, INK, weight=650) + text(24, 56, sub, 12.5, MUTED)
+            + text(24, 34, title, 17, INK, weight=650)
+            + text(24, 58, "Ergebnis: " + result, 13.5, GOOD, weight=650)
+            + text(24, 80, howto, 12, MUTED)
             + "".join(body) + "</svg>")
 
 
-def dots(title, sub, rows, lo, hi, ticks, fmt, note=None, label_w=200):
-    """Punktdiagramm: jede Zeile hat viele Einzelwerte (Punkte) und einen Schnitt (Strich)."""
-    top, row_h = 96, 46
-    x0, x1 = 24 + label_w, W - 110
+def dots(title, result, howto, rows, lo, hi, ticks, fmt, ends, note=None, label_w=200):
+    """Punktdiagramm: jede Zeile hat viele Einzelwerte (Punkte) und einen Schnitt (Strich mit Zahl)."""
+    row_h = 46
+    x0, x1 = 24 + label_w, W - 120
     sx = lambda v: x0 + (v - lo) / (hi - lo) * (x1 - x0)
-    h = top + row_h * len(rows) + 40 + (22 if note else 0)
-    b = legend(sorted({r["c"] for r in rows}, key=list(COL).index), 80)
-    b.append(text(W - 24, 80, "größer ist besser", 12, MUTED, "end"))
+    bottom = TOP + row_h * len(rows)
+    h = bottom + 58 + (22 if note else 0)
+    b = legend(sorted({r["c"] for r in rows}, key=list(COL).index), 108)
+    b.append(text(W - 24, TOP - 4, "Durchschnitt", 11.5, MUTED, "end"))
     for t in ticks:
-        b.append(f'<line x1="{sx(t):.1f}" x2="{sx(t):.1f}" y1="{top - 6}" y2="{top + row_h * len(rows)}" stroke="{GRID}"/>')
-        b.append(text(sx(t), top + row_h * len(rows) + 16, fmt(t), 11, MUTED, "middle"))
+        b.append(f'<line x1="{sx(t):.1f}" x2="{sx(t):.1f}" y1="{TOP}" y2="{bottom}" stroke="{GRID}"/>')
+        b.append(text(sx(t), bottom + 16, fmt(t), 11, MUTED, "middle"))
+    b.append(text(x0, bottom + 34, ends[0], 11.5, MUTED, "start"))
+    b.append(text(x1, bottom + 34, ends[1] + "  →  besser", 11.5, INK, "end", 600))
     for i, r in enumerate(rows):
-        cy = top + row_h * i + row_h / 2
+        cy = TOP + row_h * i + row_h / 2
         if r.get("gap"):
-            b.append(f'<line x1="24" x2="{W - 24}" y1="{top + row_h * i}" y2="{top + row_h * i}" stroke="{GRID}"/>')
+            b.append(f'<line x1="24" x2="{W - 24}" y1="{TOP + row_h * i}" y2="{TOP + row_h * i}" stroke="{GRID}"/>')
         b.append(text(24, cy + 4, r["l"], 13))
         seen = defaultdict(int)
         for v in r["v"]:
@@ -73,35 +80,34 @@ def dots(title, sub, rows, lo, hi, ticks, fmt, note=None, label_w=200):
             b.append(f'<circle cx="{sx(v):.1f}" cy="{cy + off:.1f}" r="5" fill="{COL[r["c"]]}" fill-opacity="0.45"/>')
         m = sum(r["v"]) / len(r["v"])
         b.append(f'<rect x="{sx(m) - 2:.1f}" y="{cy - 15}" width="4" height="30" rx="2" fill="{INK}"/>')
-        b.append(text(W - 24, cy + 5, "Ø " + fmt(m), 13, INK, "end", 650))
+        b.append(text(W - 24, cy + 5, fmt(m), 15, INK, "end", 700))
     if note:
         b.append(text(24, h - 14, note, 11.5, MUTED))
-    return frame(title, sub, b, h)
+    return frame(title, result, howto, b, h)
 
 
-def bars(title, sub, groups, fmt, keys, note=None, label_w=200, better="kleiner ist besser"):
-    """Balken je Gruppe, ein Balken pro Stand (Original / alt / neu)."""
-    top, bar_h, gap = 96, 18, 16
-    x0, x1 = 24 + label_w, W - 90
-    hi = max(v for g in groups for k, v in g["v"].items() if v is not None) * 1.05
+def bars(title, result, howto, groups, keys, note=None, label_w=200):
+    """Balken je Gruppe, ein Balken pro Stand. Werte als (zahl, beschriftung)."""
+    bar_h, gap = 20, 16
+    x0, x1 = 24 + label_w, W - 150
+    hi = max(v[0] for g in groups for v in g["v"].values() if v is not None) or 1
     rows_h = sum(len([k for k in keys if g["v"].get(k) is not None]) * (bar_h + 4) + gap for g in groups)
-    h = top + rows_h + 14 + (22 if note else 0)
-    b = legend(keys, 80)
-    b.append(text(W - 24, 80, better, 12, MUTED, "end"))
-    y = top
+    h = TOP + rows_h + 6 + (22 if note else 0)
+    b = legend(keys, 108)
+    y = TOP
     for g in groups:
         ks = [k for k in keys if g["v"].get(k) is not None]
-        b.append(text(24, y + len(ks) * (bar_h + 4) / 2 + 3, g["l"], 13))
+        b.append(text(24, y + len(ks) * (bar_h + 4) / 2 + 3, g["l"], 13.5, INK, weight=600))
         for k in ks:
-            v = g["v"][k]
-            wv = max(2, (v / hi) * (x1 - x0))
+            v, lab = g["v"][k]
+            wv = max(3, (v / hi) * (x1 - x0))
             b.append(f'<rect x="{x0}" y="{y}" width="{wv:.1f}" height="{bar_h}" rx="4" fill="{COL[k]}"/>')
-            b.append(text(x0 + wv + 8, y + 13.5, fmt(v), 12.5, INK, weight=600))
+            b.append(text(x0 + wv + 8, y + 15, lab, 13, INK, weight=650))
             y += bar_h + 4
         y += gap
     if note:
         b.append(text(24, h - 14, note, 11.5, MUTED))
-    return frame(title, sub, b, h)
+    return frame(title, result, howto, b, h)
 
 
 def blind_rows():
@@ -117,8 +123,8 @@ def blind_rows():
     new = per_question("zuverl-2026-10-13/blind", {"tavily": "orig", "b": "neu"})
     return [
         {"l": "Tavily (Original)", "c": "orig", "v": new["orig"]},
-        {"l": "Nachbau alt", "c": "alt", "v": old["alt"]},
-        {"l": "Nachbau neu", "c": "neu", "v": new["neu"]},
+        {"l": "Nachbau vorher", "c": "alt", "v": old["alt"]},
+        {"l": "Nachbau jetzt", "c": "neu", "v": new["neu"]},
     ]
 
 
@@ -130,72 +136,84 @@ def research_rows():
     old, new = per_task("history-score-2026-10-11_1706.json"), per_task("history-score-2026-10-13_1040.json")
     return [
         {"l": "Tavily (Original)", "c": "orig", "v": new["tavily"]},
-        {"l": "Tavily-Nachbau alt", "c": "alt", "v": old["own-tavily"]},
-        {"l": "Tavily-Nachbau neu", "c": "neu", "v": new["own-tavily"]},
+        {"l": "Tavily-Nachbau vorher", "c": "alt", "v": old["own-tavily"]},
+        {"l": "Tavily-Nachbau jetzt", "c": "neu", "v": new["own-tavily"]},
         {"l": "Serper (Original)", "c": "orig", "v": new["serper"], "gap": True},
-        {"l": "Serper-Nachbau alt", "c": "alt", "v": old["own-serper"]},
-        {"l": "Serper-Nachbau neu", "c": "neu", "v": new["own-serper"]},
-        {"l": "Exa-Nachbau alt", "c": "alt", "v": old["own-exa"], "gap": True},
-        {"l": "Exa-Nachbau neu", "c": "neu", "v": new["own-exa"]},
+        {"l": "Serper-Nachbau vorher", "c": "alt", "v": old["own-serper"]},
+        {"l": "Serper-Nachbau jetzt", "c": "neu", "v": new["own-serper"]},
+        {"l": "Exa-Nachbau vorher", "c": "alt", "v": old["own-exa"], "gap": True},
+        {"l": "Exa-Nachbau jetzt", "c": "neu", "v": new["own-exa"]},
     ]
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     charts = {}
+    sek = lambda v: (v, de(v, 2) + " s")
 
     charts["blindtest"] = dots(
-        "Wie vertrauenswürdig sind die Quellen?",
-        "Blindtest, 30 Faktenfragen. Jeder Punkt = eine Frage (Schnitt der Top 3), Strich = Durchschnitt.",
+        "Wie seriös sind die Quellen, die die Suche liefert?",
+        "Unser Nachbau ist fast so gut wie Tavily (3,51 zu 3,56), vorher 3,14.",
+        "30 Faktenfragen, blind bewertet. Jeder Punkt = eine Frage, schwarzer Strich = Durchschnitt.",
         blind_rows(), 1, 5, [1, 2, 3, 4, 5], lambda v: de(v, 2) if v % 1 else str(int(v)),
-        note="Bewertet von einem Agenten, der nicht wusste, welche Quelle von wem kommt. 1 = unseriös, 5 = sehr seriös.")
+        ("1 = unseriös", "5 = sehr seriös"),
+        note="Der Bewerter wusste nicht, welche Quelle von welchem System kommt.")
 
     charts["recherche"] = dots(
-        "Wie weit oben stehen die guten Quellen bei echten Recherchen?",
-        "9 Recherche-Aufgaben aus der Historie. Jeder Punkt = eine Aufgabe (MRR), Strich = Durchschnitt.",
+        "Steht bei echten Recherchen eine gute Quelle weit oben?",
+        "Serper-Nachbau schlägt Serper (0,31 zu 0,27), Tavily ist noch vorn (0,28 zu 0,22).",
+        "9 echte Recherche-Aufgaben. Jeder Punkt = eine Aufgabe, schwarzer Strich = Durchschnitt.",
         research_rows(), 0, 1, [0, 0.25, 0.5, 0.75, 1], lambda v: de(v, 2),
-        note="MRR 1 = die erste gute Quelle steht auf Platz 1. Exa-Original ist ohne gültigen Key nicht messbar.")
+        ("0 = keine gute Quelle", "1 = gute Quelle auf Platz 1"),
+        note="0,5 heißt: die erste gute Quelle steht im Schnitt auf Platz 2. Exa-Original ohne gültigen Key nicht messbar.")
 
     charts["themenfremd"] = bars(
-        "Themenfremde Treffer bei einer echten Aufgabe",
-        "8 Suchen nach Offshore-Kontakten. Gezählt: Shopping-Sender HSE, Wörterbücher, Banken mit ähnlichem Namen.",
-        [{"l": "Tavily-Nachbau", "v": {"alt": 18, "neu": 1}},
-         {"l": "Serper-Nachbau", "v": {"alt": 17, "neu": 2}}],
-        lambda v: str(int(v)), ["alt", "neu"],
-        note="Tavily-Nachbau: 18 von 77 Treffern vorher, 1 von 61 nachher. Serper-Nachbau: 17 von 80, dann 2 von 80.")
+        "Wie viele Treffer haben nichts mit der Frage zu tun?",
+        "Fast alle themenfremden Treffer sind weg: 18 auf 1 und 17 auf 2.",
+        "8 Suchen nach Offshore-Kontakten. Themenfremd: Shopping-Sender HSE, Wörterbücher, Banken. Weniger ist besser.",
+        [{"l": "Tavily-Nachbau", "v": {"alt": (18, "18 von 77 Treffern"), "neu": (1, "1 von 61 Treffern")}},
+         {"l": "Serper-Nachbau", "v": {"alt": (17, "17 von 80 Treffern"), "neu": (2, "2 von 80 Treffern")}}],
+        ["alt", "neu"])
 
     charts["seo"] = bars(
-        "SEO- und Werbeseiten unter den Top-Treffern",
-        "Blindtest, 30 Fragen mal 3 Treffer = 90 Treffer je System.",
-        [{"l": "Tavily-Suche", "v": {"orig": 15, "alt": 36, "neu": 23}}],
-        lambda v: f"{int(v)} von 90", ["orig", "alt", "neu"])
+        "Wie viele SEO- und Werbeseiten sind unter den Top-Treffern?",
+        "Von 36 auf 23 gesenkt, Tavily liegt mit 15 noch besser.",
+        "30 Fragen mal 3 Top-Treffer = 90 Treffer je System. Weniger ist besser.",
+        [{"l": "Tavily-Suche", "v": {"orig": (15, "15 von 90"), "alt": (36, "36 von 90"), "neu": (23, "23 von 90")}}],
+        ["orig", "alt", "neu"])
 
     charts["tempo"] = bars(
-        "Typische Antwortzeit",
-        "Median in Sekunden. Original-Werte aus gespeicherten Antworten, Nachbau live auf dem Mac.",
-        [{"l": "Tavily-Suche", "v": {"orig": 1.33, "alt": 1.11, "neu": 0.84}},
-         {"l": "Serper", "v": {"orig": 1.6, "alt": 0.97, "neu": 0.79}},
-         {"l": "Exa", "v": {"alt": 2.25, "neu": 1.69}},
-         {"l": "Jina-Reader", "v": {"orig": 3.79, "alt": 1.0, "neu": 0.45}}],
-        lambda v: de(v, 2) + " s", ["orig", "alt", "neu"],
-        note="Exa-Original: kein gültiger Key, darum ohne Vergleich.")
+        "Wie lange dauert eine typische Anfrage?",
+        "Unser Nachbau ist bei jedem Tool schneller als das Original.",
+        "Typische Antwortzeit in Sekunden (Median). Kürzer ist besser.",
+        [{"l": "Tavily-Suche", "v": {"orig": sek(1.33), "alt": sek(1.11), "neu": sek(0.84)}},
+         {"l": "Serper", "v": {"orig": sek(1.6), "alt": sek(0.97), "neu": sek(0.79)}},
+         {"l": "Exa", "v": {"alt": sek(2.25), "neu": sek(1.69)}},
+         {"l": "Jina-Reader", "v": {"orig": sek(3.79), "alt": sek(1.0), "neu": sek(0.45)}}],
+        ["orig", "alt", "neu"],
+        note="Exa-Original: kein gültiger Key, darum ohne gelben Balken.")
 
     charts["zuverlaessigkeit"] = bars(
-        "Fehler und Ausfälle",
-        "Anteil der Anfragen, die mit Fehler oder ohne Treffer enden.",
-        [{"l": "Normalbetrieb", "v": {"alt": 3 / 160 * 100, "neu": 0.0}},
-         {"l": "Suchmaschine fällt aus", "v": {"alt": 25 / 49 * 100, "neu": 13 / 49 * 100}}],
-        lambda v: de(v, 1) + " %", ["alt", "neu"],
-        note="Normalbetrieb: 3 von 160 Anfragen vorher, 0 von 194 nachher. Ausfall: 25 von 49, dann 13 von 49.")
+        "Wie oft geht eine Anfrage schief?",
+        "Im Normalbetrieb kein einziger Fehler mehr, beim Ausfall halb so viele.",
+        "Anfragen, die mit Fehler oder ohne Treffer enden. Weniger ist besser.",
+        [{"l": "Normalbetrieb", "v": {"alt": (3 / 160 * 100, "3 von 160 (1,9 %)"), "neu": (0, "0 von 194 (0 %)")}},
+         {"l": "Eigene Suchmaschine aus", "v": {"alt": (25 / 49 * 100, "25 von 49 (51 %)"),
+                                                "neu": (13 / 49 * 100, "13 von 49 (27 %)")}}],
+        ["alt", "neu"],
+        note="„Eigene Suchmaschine aus“: SearXNG absichtlich abgeschaltet, um den Notfall zu testen.")
 
+    pkt = lambda v: (v, de(v * 100, 1) + " von 100")
     charts["noten"] = bars(
-        "Gesamtnote je Tool (Prüffragen)",
-        "Eigene Prüffragen, die beim Bauen nie benutzt wurden. 1 = perfekt.",
-        [{"l": "Tavily-Suche", "v": {"alt": 0.835, "neu": 0.865}},
-         {"l": "Serper", "v": {"alt": 0.639, "neu": 0.705}},
-         {"l": "Exa", "v": {"alt": 0.951, "neu": 0.951}},
-         {"l": "Jina-Reader", "v": {"alt": 0.870, "neu": 0.885}}],
-        lambda v: de(v, 3), ["alt", "neu"], better="größer ist besser")
+        "Wie gut beantwortet jedes Tool unsere Prüffragen?",
+        "Drei Tools besser als vorher, Exa war schon sehr gut und blieb gleich.",
+        "Gesamtnote aus Prüffragen, die beim Bauen nie benutzt wurden. Mehr ist besser.",
+        [{"l": "Tavily-Suche", "v": {"alt": pkt(0.835), "neu": pkt(0.865)}},
+         {"l": "Serper", "v": {"alt": pkt(0.639), "neu": pkt(0.705)}},
+         {"l": "Exa", "v": {"alt": pkt(0.951), "neu": pkt(0.951)}},
+         {"l": "Jina-Reader", "v": {"alt": pkt(0.870), "neu": pkt(0.885)}}],
+        ["alt", "neu"],
+        note="Die Original-Anbieter wurden mit diesen Prüffragen nicht gemessen.")
 
     for name, svg in charts.items():
         (OUT / f"{name}.svg").write_text(svg)
