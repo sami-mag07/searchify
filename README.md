@@ -112,7 +112,7 @@ the average.
 | | Original | Before | Now | Fine-tuned |
 |---|---|---|---|---|
 | Source trust, blind test (1 to 5) | 3.56 | 3.14 | 3.51 | 3.51 |
-| SEO and ad pages in 90 top results | 15 | 36 | 23 | 23 |
+| SEO and ad pages in 90 top results | 15 | 36 | 23 | 15 |
 | Off-topic results in 8 real searches (Tavily clone) | | | 18 of 77 | 1 of 61 |
 | Good source near the top, Serper (0 to 1) | 0.27 | 0.32 | 0.31 | 0.31 |
 | Good source near the top, Tavily (0 to 1) | 0.28 | 0.24 | 0.22 | 0.25 |

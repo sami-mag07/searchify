@@ -204,12 +204,12 @@ def main():
 
     charts["seo"] = bars(
         "How many SEO and ad pages are among the top results?",
-        "Down from 36 to 23, Tavily is still better with 15.",
+        "Down from 36 to 15, level with Tavily.",
         "30 questions times top 3 results = 90 results per system. Fewer is better.",
         [{"l": "Tavily search", "v": {"orig": (15, "15 of 90"), "before": (36, "36 of 90"),
-                                      "now": (23, "23 of 90"), "tuned": (23, "23 of 90")}}],
+                                      "now": (23, "23 of 90"), "tuned": (15, "15 of 90")}}],
         ["orig", "before", "now", "tuned"],
-        note="Fine-tuning only drops weak results below the top 3, so this count stays the same.")
+        note="Fine-tuned (Oct 14): at most one answer-farm page near the top. Replayed searches; 13 new pages judged by a second judge.")
 
     # Before and fine-tuned measured in one run (Oct 14): Oct 11 code on :8003 and the
     # current service on :8000, 30 fresh questions, order alternating per question.
