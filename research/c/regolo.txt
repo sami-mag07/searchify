@@ -1,0 +1,263 @@
+Title: Self-Hosted Web Search for AI Agents: Replace Tavily, Cut Costs 80%, and Keep Every Token Private
+
+URL Source: https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/
+
+Published Time: 2026-08-07T06:30:00+00:00
+
+Markdown Content:
+If you have ever built an autonomous AI research agent using LangGraph, Deep Agents, or custom loops, you know the excitement of watching it browse the web. Then the monthly cloud bill arrives. And worse, your infosec team flags your outbound data flows.
+
+This tutorial walks you through building a production-ready, sovereign web research engine from scratch. By the end of this guide, you will have a self-hosted search and extraction pipeline powered by **SearXNG**, a concurrent fleet of **6 specialized subagents**, **spatial context chunking**, and **Regolo.ai (`brick-v1-beta`)** for grounded synthesis and sentiment analysis.
+
+[Video 3](https://www.youtube.com/watch?v=p6Tvh75DO_A)
+
+## Table of Contents
+
+*   [Why Build a Private Research Stack?](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#why-build-a-private-research-stack)
+*   [Two Hidden Taxes on Agent Web Search](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#two-hidden-taxes-on-agent-web-search)
+*   [Architecture Overview: 6 Subagents & Spatial Chunking](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#architecture-overview-6-subagents--spatial-chunking)
+*   [Getting Started: Step-by-Step Tutorial](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#getting-started-step-by-step-tutorial)
+*   [Under the Hood: Spatial Chunking & Factual Density Scoring](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#under-the-hood-spatial-chunking--factual-density-scoring)
+*   [Per-Result Summaries & Sentiment Analysis with Regolo (`brick-v1-beta`)](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#per-result-summaries--sentiment-analysis-with-regolo-brick-v1-beta)
+*   [Production Benchmarks & Enterprise Compliance](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#production-benchmarks--enterprise-compliance)
+*   [Code](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#github-code)
+*   [FAQ](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/#faq)
+
+* * *
+
+Commercial search APIs for autonomous AI agents charge between $0.008 and $0.012 per individual call. That looks negligible in a notebook prototype. In production, it is not.
+
+Scale an autonomous research agent to 10,000 monthly active users, and a single deep-research workflow executes 80 to 150 search sub-queries to cross-verify facts. Across 100,000 research sessions per month, your search bill alone reaches $40,000 to $100,000 — every month, before paying for model tokens or vector database hosting. **That is the first tax.**
+
+**The second one is quieter** and, for European companies, worse: when your agent routes search queries through proprietary US-based APIs, raw user prompts, internal domain context, and confidential research vectors cross public networks to third-party endpoints. Under GDPR and the EU AI Act — which allows fines up to 7% of global turnover — that outbound flow is a compliance failure.
+
+* * *
+
+## Architecture Overview: 6 Subagents & Spatial Chunking
+
+Instead of relying on a single monolithic query, our backend (`src/regolo_private_search/app.py`) dispatches **6 specialized subagents** concurrently via `asyncio.gather`:
+
+1.   **[SUBAGENT-1] Primary Discovery Agent**: Broad foundational search.
+2.   **[SUBAGENT-2] Technical Specs Agent**: Architectural specifications & RFCs.
+3.   **[SUBAGENT-3] Regulatory Compliance Agent**: GDPR & EU AI Act frameworks.
+4.   **[SUBAGENT-4] Market & Trend Analysis Agent**: Adoption and market metrics.
+5.   **[SUBAGENT-5] Academic / Research Papers Agent**: Whitepapers & studies.
+6.   **[SUBAGENT-6] Security & Vulnerability Agent**: CVEs & threat models.
+
+Retrieved pages are filtered to remove DOM noise (`clean_html`), partitioned into 300-word blocks (`spatial_chunks`), scored by factual density, and analyzed via Regolo (`brick-v1-beta`).
+
+* * *
+
+## Getting Started: Step-by-Step Tutorial
+
+### Step 1: Clone and Configure Your Environment
+
+First, ensure you have Python 3.11+ and Docker installed on your machine. Clone the repository and navigate into the project directory:
+
+`cd "/Users/alexgenovese/Desktop/scraper SEARXNG"`Code language:JavaScript(javascript)
+Copy the example environment configuration file:
+
+`cp .env.example .env`Code language:CSS(css)
+Open `.env` and add your Regolo API key (required only if you want AI summarization and sentiment analysis):
+
+```
+REGOLO_API_KEY=sk-your-regolo-api-key
+REGOLO_BASE_URL=https://api.regolo.ai/v1
+REGOLO_MODEL=brick-v1-beta
+SEARXNG_URL=http://localhost:8080
+APP_HOST=0.0.0.0
+APP_PORT=8000
+```
+Code language:JavaScript(javascript)
+
+* * *
+
+### Step 2: Initialize the System with `./setup.sh`
+
+We provide an interactive TUI shell script (`setup.sh`) that manages everything from Docker containers to virtual environments.
+
+Run the setup script:
+
+`./setup.sh`
+You will be greeted with an interactive ASCII banner and menu:
+
+```
+██████╗ ███████╗ ██████╗  ██████╗ ██╗      ██████╗ 
+  ██╔══██╗██╔════╝██╔════╝ ██╔═══██╗██║     ██╔═══██╗
+  ██████╔╝█████╗  ██║  ███╗██║   ██║██║     ██║   ██║
+  ██╔══██╗██╔══╝  ██║   ██║██║   ██║██║     ██║   ██║
+  ██║  ██║███████╗╚██████╔╝╚██████╔╝███████╗╚██████╔╝
+  ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═════╝ 
+
+Please select an option:
+  [1] Setup environment (SearXNG container, venv, dependencies)
+  [2] Run demo query (default: 'EU AI Act compliance')
+  [3] Run interactive custom search query
+  [0] Exit
+
+Choice [0-3]:
+```
+Code language:Bash(bash)
+Press **`1`** and hit Enter. This will:
+
+1.   Check and remove any existing `searxng` container.
+2.   Pull the official `searxng/searxng:latest` Docker image.
+3.   Start SearXNG on port `8080` using `searxng-settings.yml`.
+4.   Create a Python virtual environment (`.venv`).
+5.   Install all required dependencies (`httpx`, `fastapi`, `uvicorn`, `beautifulsoup4`, `pydantic`, etc.) in editable mode.
+
+* * *
+
+### Step 3: Execute a Demo Query (Option 2)
+
+Once setup is complete, reopen `./setup.sh` and press **`2`**.
+
+This runs the demo query (`"EU AI Act compliance"`) and displays the subagent fleet initialization, live per-second execution timer, structured metrics log, main research report, and per-result sentiment analysis.
+
+* * *
+
+### Step 4: Run an Interactive Custom Query (Option 3)
+
+Press **`3`** in the menu to enter your own custom research query (e.g., `Kubernetes 1.29 security best practices`).
+
+Alternatively, you can run the query directly via the command line:
+
+```
+export PYTHONPATH=src
+python3 src/regolo_private_search/app.py --query "Kubernetes security hardening"
+```
+Code language:Bash(bash)
+**What happens in your terminal:**
+
+```
+┌────────────────────────────────────────────────────────┐
+  │         REGOLO PRIVATE SEARCH - SUBAGENT FLEET         │
+  └────────────────────────────────────────────────────────┘
+[*] Target Query: 'Kubernetes security hardening'
+[*] Spawning Subagent Fleet (6 specialized workers)...
+    [SUBAGENT-1] <mark style="background-color:rgba(0, 0, 0, 0);color:#abb8c3" class="has-inline-color">Created [Role: Primary Discovery Agent</mark> | Target: 'Kubernetes security hardening']
+    [SUBAGENT-2] <mark style="background-color:rgba(0, 0, 0, 0);color:#abb8c3" class="has-inline-color">Created [Role: Technical Specs Agent</mark> | Target: 'Kubernetes security hardening technical specifications']
+    [SUBAGENT-3] <mark style="background-color:rgba(0, 0, 0, 0);color:#abb8c3" class="has-inline-color">Created [Role: Regulatory Compliance Agent</mark> | Target: 'Kubernetes security hardening regulatory compliance']
+    [SUBAGENT-4] <mark style="background-color:rgba(0, 0, 0, 0);color:#abb8c3" class="has-inline-color">Created [Role: Market & Trend Analysis Agent</mark> | Target: 'Kubernetes security hardening market trends adoption']
+    [SUBAGENT-5] <mark style="background-color:rgba(0, 0, 0, 0);color:#abb8c3" class="has-inline-color">Created [Role: Academic / Research Papers Agent</mark> | Target: 'Kubernetes security hardening research papers whitepaper']
+    [SUBAGENT-6] <mark style="background-color:rgba(0, 0, 0, 0);color:#abb8c3" class="has-inline-color">Created [Role: Security & Vulnerability Agent </mark>| Target: 'Kubernetes security hardening security vulnerabilities risks']
+
+[*] Launching concurrent web execution against SearXNG...
+   [1s elapsed] Querying SearXNG across subagent nodes...
+   [2s elapsed] Parsing JSON/HTML search results & handling fallback parser...
+[METRICS LOG] query='Kubernetes security hardening' sub_queries=6 total_results=134 total_chunks=42
+   [3s elapsed] Scraping source URLs & applying clean_html DOM noise removal...
+   [4s elapsed] Generating spatial chunks and computing factual density scores...
+   [5s elapsed] Deduplicating chunks by URL and spatial index...
+   [6s elapsed] Synthesizing findings and formatting citation report...
+
+[SUCCESS] Subagent research completed in 6.42s.
+```
+Code language:Bash(bash)
+
+* * *
+
+## Under the Hood: Spatial Chunking & Factual Density Scoring
+
+Standard search tools dump raw HTML into your agent, bloating token counts and triggering the “lost in the middle” phenomenon.
+
+Our engine (`src/regolo_private_search/app.py`) applies three rigorous steps:
+
+1.   **`clean_html()`**: Strips `<script>`, `<style>`, `<nav>`, `<footer>`, `<header>`, and `<aside>` elements.
+2.   **`spatial_chunks()`**: Partitions text into 300-word blocks with coordinate `spatial_index` numbers.
+3.   **`factual_density()`**: Computes a density score based on digits, uppercase acronyms, version numbers (`v1.2`), and technical tokens. Chunks are sorted by density descending, keeping only the highest-signal information.
+
+* * *
+
+## Per-Result Summaries & Sentiment Analysis with Regolo (`brick-v1-beta`)
+
+In addition to the main aggregated markdown report, the system independently analyzes each source result using Regolo (`brick-v1-beta`) and keyword heuristics, outputting a separate structured JSON block:
+
+```
+[
+  {
+    "source_title": "Kubernetes Security Best Practices",
+    "source_url": "https://kubernetes.io/docs/concepts/security/",
+    "summary": "Guide to securing Kubernetes clusters, preventing privilege escalation, configuring network policies, and managing RBAC...",
+    "sentiment_score": 0.8,
+    "sentiment": "positive",
+    "inferred_insights": [
+      "Factual density score: 0.5821",
+      "Model synthesized via: brick-v1-beta"
+    ]
+  }
+]
+```
+Code language:JavaScript(javascript)
+
+* * *
+
+## Production Benchmarks & Enterprise Compliance
+
+*   **Cost reduction**: 81% to 88% savings compared to commercial closed search APIs ($0.92 vs $5.00 per 1,000 queries).
+*   **Latency**: P99 search and extraction down from 1,420ms to 310ms.
+*   **Data Sovereignty**: 100% compliant with GDPR and EU AI Act requirements. No prompts or search vectors leave your private VPC or local infrastructure, and AI inference runs on sovereign European GPUs with zero data retention.
+
+* * *
+
+## Github Code
+
+In our repository you’ll find all tutorial codes and clicking below the full tested and working codes of this guide.
+
+* * *
+
+## Frequently Asked Questions
+
+**How do I start the system?**  
+Run `./setup.sh` and select option `1` to install everything, then option `2` or `3` to run searches.
+
+**Can I use this with LangChain or Deep Agents?**  
+Yes. You can import `research_endpoint` or call the `/v1/research` FastAPI endpoint as a custom agent tool.
+
+**What model is used for synthesis?**  
+Regolo.ai exposes `brick-v1-beta` via its OpenAI-compatible chat completions endpoint.
+
+* * *
+
+## Ship Private AI. Not Infrastructure.
+
+You have the private AI App architecture, bow give it an inference layer built for production.
+
+**Regolo** gives European teams fast, OpenAI-compatible access to Mistral, Llama, Qwen, DeepSeek, GLM, and more — with zero data retention, EU data residency, and no new SDK to learn.
+
+Change your `base_url`. Keep your LangChain code. Start shipping.
+
+### 🚀 [Start your 30-day free trial →](https://regolo.ai/?utm_source=blog&utm_medium=cta&utm_campaign=private-rag)
+
+Build, test, and deploy with no infrastructure to maintain.  
+**No credit card. No migration project. No compromise on data control.**
+
+### 💬 [Join the Regolo Discord →](https://discord.gg/bqGrVJHeF)
+
+Meet builders working on private RAG, local LLMs, LangChain, Ollama, and production AI systems. Share your setup, get feedback from the community, and speak directly with the Regolo team.
+
+### 🤝 [Talk to an AI Infrastructure Engineer →](https://regolo.ai/contact?utm_source=blog&utm_medium=cta&utm_campaign=private-rag)
+
+Running a sensitive workload, scaling beyond a proof of concept, or assessing a managed EU inference provider? Get a tailored architecture and commercial proposal for your team.
+
+### 📂 [Clone the GitHub repository →](https://github.com/regolo-ai/tutorials/)
+
+Get the full implementation from this guide: ingestion scripts, ChromaDB setup, hybrid retrieval, the **30-Question RAG Floor**, evaluation examples, and deployment configuration.
+
+> **Private AI should not require a private data center.**  
+> Regolo gives your team an EU-native path from local experimentation to production-grade inference.
+
+* * *
+
+### Build with Regolo
+
+*   **Discord:**[Join the community →](https://discord.gg/bqGrVJHeF)
+*   **GitHub:**[Explore open-source workflows →](https://github.com/regolo-ai/tutorials/)
+*   **X / Twitter:**[Follow @regolo_ai →](https://x.com/regolo_ai)
+*   **Reddit:**[Join the community →](https://www.reddit.com/r/regolo_ai/)
+*   **Documentation:**[Read the API docs →](https://docs.regolo.ai/)
+*   **Contact:**[Talk to the team →](https://regolo.ai/contact)
+
+* * *
+
+_Built with ❤️ by the Regolo team. Questions? [regolo.ai/contact](https://regolo.ai/contact)_ or chat with us on [Discord](https://discord.gg/bqGrVJHeF)

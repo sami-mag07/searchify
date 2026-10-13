@@ -1,0 +1,231 @@
+Title: Open-Source and Self-Hosted Search APIs for LLMs (2026)
+
+URL Source: https://grounder.dev/guides/open-source-search-api-llm
+
+Published Time: 2026-07-27
+
+Markdown Content:
+[Grounder](https://grounder.dev/) › [Guides](https://grounder.dev/guides) › Open-source and self-hosted search APIs for LLMs
+
+Published July 27, 2026 · Last updated August 2026
+
+If you want an open-source, self-hosted search API for LLMs, the real answer is **SearXNG** - a metasearch engine you run yourself, with no per-call fee and nothing leaving your infrastructure - paired with a scraper like **Firecrawl** (open-source edition) or **Crawl4AI** to read the pages. Watch one mix-up: **Meilisearch** and **OpenSearch** are open-source too, but they search a corpus _you_ index, not the live web. This page shows how to self-host web search for AI agents and RAG, and then, honestly, when a hosted flat option like **Grounder** - which is _not_ open-source - is the better trade.
+
+**Transparency note:** we build **Grounder**, a hosted (not open-source) tool mentioned on this page, so we have a commercial interest. We have aimed for accuracy and the only hard numbers here are our own Grounder-vs-Tavily benchmark - **a near-tie on hard-page coverage**, where each tool reads pages the other can't. Every open-source project below is described by category and license, not by numbers we did not measure. Always verify current licenses, limits, and any pricing against each project's official documentation.
+
+## Quick reference (Grounder, the hosted option)
+
+Open-source?No - hosted service. Self-host wants SearXNG, not this Free tier 1,500 pages/month (email only, no card)Pricing Flat monthly - $9 / $19 - not per-call metered Answers per context 30 / 37 in 65.7k chars (Tavily 26 / 37 in 76.6k)Privacy Stores a `domain` + billing count, never the query or who asked
+
+## What is an open-source or self-hosted search API for LLMs?
+
+An open-source search API for LLMs is software you can read, run, and modify yourself that answers a query with results an LLM can ground on. Two very different things get called that, and confusing them is the most common mistake in this area. The first is **live web search**: given a question, it queries the internet right now and returns fresh pages. Self-hosted, that is **SearXNG** for discovery plus a scraper to read the pages. The second is **search over a corpus you already have**: your documents, your database, your wiki, indexed once and queried with keyword, vector, or hybrid recall. That is **Meilisearch** or **OpenSearch**. Both are legitimate and both are open source, but they solve opposite problems. If your agent needs a fact that is only on a web page it has never seen, an index of your own documents cannot help; you need the live-web path. This guide is mostly about that live-web path, because it is the one people mean when they say "give my LLM web search", and it is the one the incumbents muddle.
+
+## Open-source and self-hosted search options for LLMs, at a glance
+
+| Tool | License / hosting | What it searches | Returns | Cited pack, fits a window? |
+| --- | --- | --- | --- | --- |
+| [SearXNG](https://github.com/searxng/searxng) | Open source, self-hosted | Live web (metasearch) | Search results / links | You build it |
+| [Firecrawl](https://github.com/firecrawl/firecrawl) (OSS edition) | Open source, self-host or cloud | A page you point it at | Clean page markdown | No (full-page markdown) |
+| [Crawl4AI](https://github.com/unclecode/crawl4ai) | Open source, self-hosted | A page you point it at | LLM-ready markdown | No (full-page markdown) |
+| [Meilisearch](https://www.meilisearch.com/) | Open source, self-host or cloud | **Your own indexed data** | Ranked documents | No (your corpus, not web) |
+| [OpenSearch](https://opensearch.org/) | Open source, self-hosted | **Your own indexed data** | Ranked documents / vectors | No (your corpus, not web) |
+| [Brave Search API](https://brave.com/search/api/) | Hosted (independent index) | Live web | Search results / links | No (links) |
+| [Grounder](https://grounder.dev/docs)_(ours, hosted)_ | **Hosted, not open source** | Live web | Real page + token-capped cited pack | **Yes (`max_tokens`)** |
+
+Read the "What it searches" column first. Only SearXNG, Brave, and Grounder go to the live web; Meilisearch and OpenSearch search a corpus you supply. Firecrawl and Crawl4AI do not discover at all - they read a URL you already have. A working self-hosted setup usually chains two or three of these.
+
+## Self-hosted search API for LLMs: what SearXNG actually gives you
+
+**SearXNG** is the open-source, self-hosted search API most people are actually looking for. It is a metasearch engine: it forwards your query to many upstream search services, aggregates the results, and hands them back with no user tracking and no per-call fee. You run it in Docker or on a box, point your agent at its JSON endpoint, and every query stays on your infrastructure.
+
+### What it does well
+
+Zero marginal cost per query, full privacy over the query itself, and no vendor lock-in - it is genuinely the answer when "nothing leaves my box" is a hard requirement. It has no index of its own; it relays other engines, which is why it is a "metasearch" engine rather than a crawler.
+
+### What it leaves to you
+
+SearXNG returns _links and snippets_, not page content and not an evidence pack. It is one leg of the pipeline. You still fetch each page, strip boilerplate, chunk, rank, and trim the result to your context window. You also own the operational tail: upstream engines change their markup and rate limits, and a self-hosted metasearch instance can start returning empty results until you fix a connector. That upkeep is the real price of the zero per-call fee.
+
+## Open-source search API for LLM apps, and the index-your-own-data mix-up
+
+Search "open source search API for LLM" and you will see **Meilisearch** and **OpenSearch** near the top. They are excellent, and they are open source, but they answer a different question than live web search, and picking them for the wrong job wastes a week.
+
+### Meilisearch
+
+**Meilisearch** is a fast, developer-friendly open-source search engine for _your own_ documents, with built-in vector and hybrid search aimed squarely at RAG over a corpus you control. **Best for** adding search or a RAG retrieval layer over content you already have - a product catalog, a docs site, a knowledge base. **Not for** fetching a page off the live internet; it only knows what you have indexed.
+
+### OpenSearch
+
+**OpenSearch** is the open-source search and analytics suite (an Elasticsearch fork) with vector search, hybrid recall, and a full RAG toolset over data you deploy into it. **Best for** large, self-hosted retrieval over your own data with heavy filtering and scale. **Not for** discovering new web pages.
+
+### The rule of thumb
+
+If the answer already lives in data you hold, index it with Meilisearch or OpenSearch. If the answer is on a web page your system has never seen, no index of your own content can produce it - you need the live-web path (SearXNG plus a scraper, or a hosted web API). Many production RAG systems use both: an internal index for owned content, and a live web tool for everything else.
+
+## Open-source web search tools for RAG
+
+For a RAG pipeline that has to reach the live web, the open-source stack is a small chain of single-purpose tools. Assemble it by job:
+
+*   **Discovery (find the pages):**[SearXNG](https://github.com/searxng/searxng), self-hosted, returns candidate URLs for a query.
+*   **Extraction (read a page cleanly):**[Firecrawl](https://github.com/firecrawl/firecrawl)'s open-source edition or [Crawl4AI](https://github.com/unclecode/crawl4ai) turn a URL into clean, LLM-ready markdown, including JavaScript-heavy pages.
+*   **Corpus index (search what you already collected):**[Meilisearch](https://www.meilisearch.com/) or [OpenSearch](https://opensearch.org/) for vector or hybrid recall over the pages once you have stored them.
+*   **Fit-to-window (the step everyone forgets):** your own code to chunk, rank, and cap the passages so they do not [overflow the model's context window](https://grounder.dev/guides/local-llm-context-window-overflow).
+
+Every box here is open source and free to run. The work is that you own the glue between them, and the fit-to-window leg - the one that decides whether a small local model returns an answer or returns nothing - is the piece none of these tools does for you.
+
+## How to self-host web search for AI agents
+
+To self-host web search for an AI agent end to end, you are standing up the full discovery-to-context pipeline yourself. The minimal working shape:
+
+1.   Run **SearXNG** (Docker is the common route) and confirm its JSON endpoint returns results for a test query.
+2.   On each agent query, call SearXNG, take the top N URLs, and pass them to a scraper (**Firecrawl** OSS or **Crawl4AI**) to get clean markdown.
+3.   Chunk the markdown, rank chunks against the query (keyword or embeddings), and keep only the top ones.
+4.   Cap the kept text to a token budget your model can hold, and hand that as context.
+
+This gives an agent live web search with no per-call fee and queries that never leave your network. The honest cost is maintenance: four moving parts, a scraper that fights anti-bot measures on hard pages, and a metasearch layer whose upstream connectors break on their own schedule. For a homelab or a privacy-first deployment that is a fair trade. For a small team that would rather ship the agent than operate a scraping stack, the trade often flips - which is the next section.
+
+## When a hosted flat option is worth it (and where it loses)
+
+Grounder is a **hosted** tool. If "nothing leaves my box" is the requirement, stop here and self-host SearXNG - that is the honest answer and Grounder is not it. Grounder is worth considering only when you have decided the self-hosting trade is not for you and you want the pipeline above collapsed into one API on a predictable bill. What it collapses: `web_search` returns links, `fetch` returns one page as clean markdown, `deep_search` reads up to about the top ten pages and returns a token-capped, MMR-ranked cited passage pack, and `research` runs a multi-step agentic loop - all capped to your window with `max_tokens`, over MCP or plain REST. It is flat-billed, so an agent loop that reads hundreds of pages does not move the bill, and it stores a `domain` plus a per-key page count on retrieval, never the query, the path, or who asked.
+
+Here is the honest head-to-head against Tavily, including the axis where a hosted incumbent is ahead. These are the only hard numbers on this page.
+
+|  | Hard pages read (of 19) | Answers found (of 37) | Context spent |
+| --- | --- | --- | --- |
+| **Tavily** | 12 | 26 | 76.6k chars |
+| **Grounder** | 11 | **30** | **65.7k chars** |
+
+**Hard-page coverage: a near-tie.** On 19 deliberately hard targets, Tavily read 12 and Grounder read 11, and each reads pages the other can't. `g2.com` and `capterra` are the clearest limit - unreadable by every tool, including Tavily. A self-hosted scraper with residential proxies can sometimes beat both on a given page, at the cost of you maintaining that scraper. **Answers per token: Grounder wins** - 30 of 37 answers survived into the returned passages in 65.7k characters, against Tavily's 26 in 76.6k - which matters most where a small window cannot afford navigation and boilerplate. A token-capped pack took a local 7B model from 3/8 to 7/8 correct with zero context overflows, the fit-to-window step the self-hosted stack leaves you to build.
+
+## Known limitations (honest, and several favor self-hosting)
+
+The section most vendor pages skip. Every one of these is a real reason to self-host or to pick a different tool:
+
+1.   **Grounder is not open-source or self-hostable.** If your requirement is that queries and pages never leave your infrastructure, a self-hosted SearXNG stack is the correct answer and Grounder is not.
+2.   **Self-hosting is genuinely cheaper per call.** SearXNG has no per-call fee at all; for tiny or occasional use it, or a low-cost SERP API, costs less than any flat plan.
+3.   **Hard-web reach is a near-tie** - Grounder 11/19, Tavily 12/19 on hard targets - and each reads pages the other can't (`g2.com` and `capterra` are unreadable by both, including Tavily). Review-site-heavy or bot-walled workloads can still do better with a proxied self-hosted scraper that beats both on a given page.
+4.   **Grounder resells a discovery vendor** - it does not run its own index like Brave or Tavily, so it inherits that vendor's coverage limits. SearXNG relaying many engines can reach queries a single index misses.
+5.   **Near-zero distribution** - Tavily has a large SDK ecosystem and many framework integrations; the open-source tools have big communities; Grounder has an MCP server and a REST API and little else.
+6.   **No neural/semantic recall** - if you need meaning-based retrieval, Exa is purpose-built for it, and Meilisearch or OpenSearch do vector search over your own corpus. Grounder does not do semantic recall.
+
+## Self-hosted or hosted: which to pick
+
+*   **Nothing can leave your infrastructure** → **SearXNG** for discovery plus **Firecrawl** OSS or **Crawl4AI** to read the pages, self-hosted.
+*   **Search over data you already hold** (docs, catalog, wiki) → **Meilisearch** or **OpenSearch** - not a web search tool.
+*   **Turn one known page into clean markdown** → **Firecrawl** or **Crawl4AI**.
+*   **Cheapest possible per call, and you like operating things** → self-hosted **SearXNG**.
+*   **You want the whole pipeline as one flat-billed API, storing no queries, and can accept a hosted service** → **Grounder**.
+
+## Calling a hosted web API: Python and Node
+
+If you land on the hosted side, the switch is your HTTP client and response parsing, not your agent's logic. Grounder is an MCP server and a plain REST API; a search-then-cited-pack flow is two calls - `/v1/search` for links and `/v1/deep_search` for the token-capped pack.
+
+**Python** (production-shaped: env key, timeout, error surface):
+
+```
+import os
+import requests
+
+BASE = "https://grounder.dev"
+HEADERS = {
+    "Authorization": f"Bearer {os.environ['GROUNDER_KEY']}",
+    "Content-Type": "application/json",
+}
+
+def search(query: str, timeout: float = 30.0) -> dict:
+    """Return live web results (links + snippets) for `query`."""
+    r = requests.post(
+        f"{BASE}/v1/search",
+        json={"query": query},
+        headers=HEADERS,
+        timeout=timeout,
+    )
+    r.raise_for_status()
+    return r.json()
+
+def deep_search(query: str, max_tokens: int = 600, timeout: float = 60.0) -> dict:
+    """Return a token-capped, cited evidence pack for `query`."""
+    r = requests.post(
+        f"{BASE}/v1/deep_search",
+        json={"query": query, "max_tokens": max_tokens},
+        headers=HEADERS,
+        timeout=timeout,
+    )
+    r.raise_for_status()          # 4xx/5xx -> exception, not silent bad data
+    return r.json()
+
+if __name__ == "__main__":
+    pack = deep_search("open source web search tools for rag")
+    for p in pack["passages"]:
+        print(f"[{p['score']}] {p['url']}\n{p['text']}\n")
+```
+
+**Node.js** (same flow, native `fetch`, explicit error on non-2xx):
+
+```
+const BASE = "https://grounder.dev";
+const HEADERS = {
+  "Authorization": `Bearer ${process.env.GROUNDER_KEY}`,
+  "Content-Type": "application/json",
+};
+
+async function post(path, body) {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: HEADERS,
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(`grounder ${res.status}: ${await res.text()}`);
+  }
+  return res.json();
+}
+
+const search = (query) => post("/v1/search", { query });
+const deepSearch = (query, maxTokens = 600) =>
+  post("/v1/deep_search", { query, max_tokens: maxTokens });
+
+const pack = await deepSearch("open source web search tools for rag");
+for (const p of pack.passages) {
+  console.log(`[${p.score}] ${p.url}\n${p.text}\n`);
+}
+```
+
+Over MCP, the same tools (`web_search`, `fetch`, `deep_search`, `research`) register in any MCP client. Full parameters are in the [docs](https://grounder.dev/docs).
+
+**The fit-to-window step is the axis the open-source stack leaves to you.** SearXNG hands back links; a scraper hands back a whole page. Whether you self-host or use a hosted API, something has to cap the passages to your window. Grounder caps the whole response with `max_tokens`; we [measured](https://grounder.dev/benchmark) what that is worth - a token-capped pack took a local 7B model from 3/8 to 7/8 correct with zero overflows.
+
+### Prefer the pipeline as one flat-billed API?
+
+Grounder returns a cited evidence pack sized to your context window, over MCP or REST, on a flat monthly bill, storing no queries. It is hosted, not open-source - if you need self-hosting, run SearXNG. Free tier: 1,500 pages a month, email only, no card.
+
+[Get a free key](https://grounder.dev/#start)
+
+## Related guides
+
+*   [Tavily alternatives for AI agents and RAG](https://grounder.dev/guides/tavily-alternatives)The hosted search APIs - Exa, Firecrawl, Linkup, Brave, Serper - and where each one fits.
+*   [MCP web search server: what it is and the options](https://grounder.dev/guides/mcp-web-search-server)The same options through the local-model lens, plus the no-API-key DIY servers.
+*   [Why your local LLM returns nothing on a web page](https://grounder.dev/guides/local-llm-context-window-overflow)The small-window overflow failure the fit-to-window step exists to fix, measured.
+
+## FAQ
+
+Is there an open-source search API for LLMs?
+For live web search, yes: **SearXNG** - open source, self-hosted, aggregates many engines, no per-call fee, nothing leaves your box. Beware the mix-up: Meilisearch and OpenSearch are open source too but search a corpus _you_ index, not the live web. For live web retrieval, self-host SearXNG for discovery and add a scraper (Firecrawl OSS or Crawl4AI) to read the pages.
+
+Can I self-host web search for AI agents?
+Yes. The stack is SearXNG for discovery, Firecrawl OSS or Crawl4AI for extraction, then your own chunk, rank, and fit-to-window steps. No per-call fee, queries stay on your network. The cost is that you build and maintain four moving parts and own the anti-bot and rate-limit breakage.
+
+What are the best open-source web search tools for RAG?
+Split by job. Live-web discovery: SearXNG. Read a page into markdown: Firecrawl OSS or Crawl4AI. Search documents you already collected: Meilisearch or OpenSearch. A full RAG pipeline chains a discovery tool, a scraper, and a vector store - each a separate open-source piece you wire together.
+
+Is Grounder open-source or self-hosted?
+No - Grounder is a hosted service, and we say so plainly. If "nothing leaves my box" is the requirement, self-host SearXNG; Grounder is not that. Grounder wins on a flat bill instead of a per-call meter and a token-capped cited pack you do not build yourself, and it stores a `domain` plus a page count, never the query or who asked.
+
+Do Meilisearch and OpenSearch do live web search?
+No. Both are open-source search engines over a corpus you index yourself - your documents, database, or knowledge base - with keyword, vector, or hybrid recall for RAG over that data. Neither crawls the live web. If you saw them listed as an open-source search API for LLMs, that is the mix-up.
+
+Is self-hosted SearXNG cheaper than a hosted API?
+Per call, yes - SearXNG has no per-call fee, so for tiny use it is cheapest. The cost moves to your time: hosting, keeping connectors working, and building the read, rank, and fit-to-window steps. A flat hosted plan trades that maintenance and per-call variance for a fixed bill. Cheapest-per-call and lowest-total-cost are different questions.
+
+Methodology: the Grounder-vs-Tavily figures are from `bench/hardweb.py` (hard-page access, re-run 2026-08-09) and a 37-page rerank corpus (answers per context, run 2026-07-22); hard-page coverage is a near-tie, with each tool reading pages the other can't. Open-source projects are described by category and license, verified to exist as of this date - confirm current licenses and limits on each project's own docs. Grounder is a young, hosted product reselling a discovery vendor, with near-zero distribution next to Tavily's ecosystem and the open-source communities - that gap is real and is the honest cost of picking it over self-hosting. Last updated July 2026 - see the [docs](https://grounder.dev/docs) for current parameters.

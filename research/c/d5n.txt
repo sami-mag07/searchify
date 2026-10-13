@@ -1,0 +1,260 @@
+Title: Search Solutions for AI Agents: SearXNG vs. Tavily vs. Custom
+
+URL Source: https://www.d5n.xyz/en/posts/openclaw-search-solutions-comparison/
+
+Published Time: 2026-02-24T20:53:00+08:00
+
+Markdown Content:
+## Why Search Matters for AI Agents
+
+AI models have knowledge cutoffs. To answer questions about current events, recent documentation, or real-time data, they need search capabilities.
+
+**Common use cases:**
+
+*   Current news and events
+*   Latest documentation
+*   Fact verification
+*   Research assistance
+
+* * *
+
+## Option 1: SearXNG (Self-Hosted)
+
+[SearXNG](https://github.com/searxng/searxng) is a privacy-respecting metasearch engine you host yourself.
+
+### How It Works
+
+Aggregates results from multiple search engines (Google, Bing, DuckDuckGo, etc.) without tracking users.
+
+### Setup
+
+```
+# Docker deployment
+docker run -d \
+  --name searxng \
+  -p 8888:8080 \
+  -v "${PWD}/searxng:/etc/searxng" \
+  searxng/searxng:latest
+```
+
+Or use the install script:
+
+```
+cd /usr/local
+sudo git clone https://github.com/searxng/searxng.git
+sudo searxng/utils/searxng.sh install all
+```
+
+### Pros
+
+*   ✅ Free (just server costs)
+*   ✅ Privacy-focused
+*   ✅ No API limits
+*   ✅ Aggregates multiple engines
+
+### Cons
+
+*   ❌ Self-hosted (you maintain it)
+*   ❌ Can be blocked by search engines
+*   ❌ Requires technical setup
+
+### Best For
+
+*   Privacy-conscious users
+*   Technical users comfortable with self-hosting
+*   High-volume search needs
+
+* * *
+
+## Option 2: Tavily (Managed)
+
+[Tavily](https://tavily.com/) is a search API specifically designed for AI agents.
+
+### Features
+
+*   Optimized for LLM context windows
+*   Includes relevant snippets
+*   Source credibility scoring
+*   Structured JSON responses
+
+### Pricing
+
+*   Free tier: 1,000 calls/month
+*   Pro: $0.025/call
+*   Enterprise: Custom
+
+### Integration
+
+```
+import requests
+
+response = requests.post(
+    "https://api.tavily.com/search",
+    json={
+        "api_key": "your-api-key",
+        "query": "latest AI developments",
+        "search_depth": "basic",
+        "include_answer": True
+    }
+)
+```
+
+### Pros
+
+*   ✅ Purpose-built for AI
+*   ✅ No infrastructure to maintain
+*   ✅ High-quality results
+*   ✅ Easy integration
+
+### Cons
+
+*   ❌ Paid for high volume
+*   ❌ External dependency
+*   ❌ Rate limits on free tier
+
+### Best For
+
+*   Production applications
+*   Teams without DevOps resources
+*   Quick prototyping
+
+* * *
+
+## Option 3: Custom Implementation
+
+Build your own search pipeline.
+
+### Architecture
+
+```
+User Query
+    ↓
+[Query Processing] → Expand keywords, detect intent
+    ↓
+[Multi-Source Search] → Google API, Bing API, News APIs
+    ↓
+[Result Aggregation] → Deduplicate, rank, filter
+    ↓
+[Content Extraction] → Fetch full pages, extract text
+    ↓
+[Response Generation] → Format for LLM context
+```
+
+### Components Needed
+
+1.   **Search APIs**
+
+    *   Google Custom Search API ($5/1000 queries)
+    *   Bing Search API ($7/1000 queries)
+    *   SerpAPI ($50/month unlimited)
+
+2.   **Content Extraction**
+
+    *   BeautifulSoup/Scrapy for HTML parsing
+    *   Newspaper3k for article extraction
+    *   Firecrawl for JavaScript-rendered pages
+
+3.   **Result Processing**
+
+    *   Deduplication (SimHash, MinHash)
+    *   Re-ranking (BM25, custom ML model)
+    *   Content summarization
+
+### Pros
+
+*   ✅ Full control
+*   ✅ Customizable ranking
+*   ✅ No vendor lock-in
+
+### Cons
+
+*   ❌ High development effort
+*   ❌ Maintenance overhead
+*   ❌ Multiple API integrations
+
+### Best For
+
+*   Large-scale applications
+*   Specific domain requirements
+*   Teams with dedicated resources
+
+* * *
+
+## Feature Comparison
+
+| Feature | SearXNG | Tavily | Custom |
+| --- | --- | --- | --- |
+| Setup Complexity | Medium | Low | High |
+| Ongoing Maintenance | Medium | None | High |
+| Cost | Server only | Per-query | API costs |
+| Privacy | Excellent | Good | Depends |
+| Result Quality | Good | Excellent | Configurable |
+| Rate Limits | None | Yes | API-dependent |
+| AI Optimization | Manual | Built-in | Custom |
+
+* * *
+
+## My Recommendation
+
+### For Personal/Experimentation
+
+**SearXNG** – Free, private, good enough for most needs.
+
+### For Production
+
+**Tavily** – Purpose-built, reliable, worth the cost for serious applications.
+
+### For Scale
+
+**Custom** – When you have specific needs and engineering resources.
+
+* * *
+
+## Implementation Example: SearXNG with OpenClaw
+
+```
+# Add to TOOLS.md
+curl -s "http://localhost:8888/search?q=QUERY&format=json" | \
+  jq -r '.results[] | "\(.title)\n\(.url)\n\(.content)\n---"'
+```
+
+```
+# search.py wrapper
+import requests
+import sys
+
+def search(query):
+    url = "http://localhost:8888/search"
+    params = {"q": query, "format": "json"}
+    
+    resp = requests.get(url, params=params)
+    data = resp.json()
+    
+    for result in data.get("results", [])[:5]:
+        print(f"**{result['title']}**")
+        print(f"{result['url']}")
+        print(f"{result['content'][:200]}...\n")
+
+if __name__ == "__main__":
+    search(" ".join(sys.argv[1:]))
+```
+
+* * *
+
+## Conclusion
+
+| Your Situation | Choose |
+| --- | --- |
+| Budget-conscious, technical | SearXNG |
+| Production, fast delivery | Tavily |
+| Scale, specific requirements | Custom |
+
+Start with SearXNG for experimentation. Move to Tavily when you need reliability without infrastructure work. Build custom only when you outgrow managed solutions.
+
+* * *
+
+**References:**
+
+*   [SearXNG GitHub](https://github.com/searxng/searxng)
+*   [Tavily Documentation](https://docs.tavily.com/)
+*   [Google Custom Search API](https://developers.google.com/custom-search)

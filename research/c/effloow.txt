@@ -1,0 +1,335 @@
+Title: Exa vs Tavily in 2026: Our Agent Web Search Benchmark
+
+URL Source: https://effloow.com/articles/exa-vs-tavily-agent-web-search-benchmark-2026
+
+Published Time: 2026-10-06
+
+Markdown Content:
+## Why We Compared Exa and Tavily
+
+Search latency was not the original problem. Grounding reliability was.
+
+Answer accuracy on 300 company-news questions
+
+Exa fast 99.3%/100
+
+Exa instant 97.7%/100
+
+Tavily advanced 93.0%/100
+
+Tavily basic 87.7%/100
+
+On the same fixed suite, Exa fast and instant beat Tavily advanced and basic on answer accuracy, with Exa fast at 99.3% versus 87.7% for Tavily basic.
+
+In agent traces, we kept finding steps that completed quickly but returned the wrong source type: a secondary blog instead of the original announcement, a directory instead of a company page, or an article mentioning a paper rather than the paper itself. The search call looked successful, yet the agent entered its next reasoning step with weak evidence.
+
+That failure mode is expensive because it does not necessarily throw an error. It consumes model tokens, produces a confident answer, and may survive superficial evaluation.
+
+We brought Exa and Tavily into our lab to answer four operational questions:
+
+1.   Which API puts an answer-bearing source in the first five results?
+2.   What latency should a multi-step agent budget for, especially beyond the median?
+3.   How much usable text reaches the model?
+4.   What does a correct answer cost after search and input-token charges?
+
+Both products expose agent-oriented search APIs, but they emphasize different retrieval and content-delivery features.
+
+Exa behaves like semantic retrieval infrastructure. Its search types include `instant`, `fast`, `auto`, and deeper research modes, while its category-specific retrieval is designed for entities such as people, companies, publications, and code. Its query-dependent highlights can return selected passages instead of an entire page.
+
+Tavily behaves more like a packaged research interface. It offers `basic`, `advanced`, and speed-oriented search modes, along with general, news, and finance topics. It can return result snippets, generated answers, and raw page content. That reduces integration work when an agent needs search and extraction in one transaction.
+
+Before running this harness against live services, we would verify its payloads against the [official Exa search reference](https://docs.exa.ai/reference/search) and [official Tavily search reference](https://docs.tavily.com/documentation/api-reference/endpoint/search), rather than relying on framework wrappers. Wrappers are convenient, but they can hide defaults, rename parameters, and make a provider migration look easier than it is.
+
+For the main relevance comparison, we fixed the workload at 300 company-news questions. Each question had one pre-established answer tied to an official newsroom or wire URL. Every provider received one natural-language query and could return up to ten results. The same answer extraction path evaluated whether those results contained enough evidence to recover the correct value.
+
+That suite measures practical grounding, not abstract semantic similarity. It also avoids letting an evaluator decide the expected answer after seeing a provider’s results.
+
+Our run records showed:
+
+*   Exa `fast`: 99.3% answer accuracy and 99.3% answer recall at five.
+*   Exa `instant`: 97.7% answer accuracy and 97.3% answer recall at five.
+*   Tavily `advanced`: 93.0% answer accuracy and 92.7% answer recall at five.
+*   Tavily `basic`: 87.7% answer accuracy and recall at five.
+
+We also inspected the larger entity-oriented evaluation behind [Exa’s 2026 comparison](https://exa.ai/versus/tavily). Under that test’s original conditions—Exa `fast`, Tavily `advanced`, consistent domain constraints, and model-based grading—Exa reached 75.5% versus 40.5% rank-one recall for people, 81.5% versus 61.3% for companies, and 63.3% versus 31.8% for publication retrieval. The sets contained 200 people queries, 200 company queries, and 597 publication queries.
+
+We treated those entity figures as vendor-originated evidence, not as a neutral replacement for our fixed factual suite. They are still useful because the workload matches what Exa is designed to do, but the provenance belongs in any purchasing decision.
+
+## Hands-On Walkthrough: Setup, Execution & Output
+
+We deliberately avoided SDKs for the first pass. Direct HTTP made the provider differences visible and kept dependency versions out of the result.
+
+We stored credentials as environment variables:
+
+```
+export EXA_API_KEY="replace-with-exa-key"
+export TAVILY_API_KEY="replace-with-tavily-key"
+
+python -m venv .venv
+source .venv/bin/activate
+pip install "httpx>=0.27,<1"
+```
+
+Our query fixture used one JSON object per line:
+
+```
+{"id":"q001","query":"How much did Example Corp say it would invest in its announced Ohio facility?","expected":"$2 billion"}
+{"id":"q002","query":"On what date did Example Labs announce its acquisition of Sample AI?","expected":"September 12, 2026"}
+```
+
+The following minimal harness is runnable. It measures wall-clock latency, retains normalized URLs for overlap analysis, and emits p50 and p95 for any suite you supply. The two-query fixture is not statistically meaningful; production runs should use the full pinned suite and preserve raw responses.
+
+```
+#!/usr/bin/env python3
+import asyncio
+import json
+import os
+import statistics
+import time
+from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
+
+import httpx
+
+EXA_KEY = os.environ["EXA_API_KEY"]
+TAVILY_KEY = os.environ["TAVILY_API_KEY"]
+
+def canonicalize(url: str) -> str:
+    parts = urlsplit(url)
+    return urlunsplit((
+        parts.scheme.lower(),
+        parts.netloc.lower().removeprefix("www."),
+        parts.path.rstrip("/"),
+        "",
+        ""
+    ))
+
+def percentile(values, p):
+    ordered = sorted(values)
+    index = round((len(ordered) - 1) * p)
+    return ordered[index]
+
+async def call_provider(client, provider, query):
+    if provider == "exa":
+        url = "https://api.exa.ai/search"
+        headers = {"x-api-key": EXA_KEY, "content-type": "application/json"}
+        payload = {
+            "query": query,
+            "type": "fast",
+            "numResults": 10,
+            "contents": {
+                "highlights": {"maxCharacters": 1000}
+            }
+        }
+    else:
+        url = "https://api.tavily.com/search"
+        headers = {
+            "Authorization": f"Bearer {TAVILY_KEY}",
+            "content-type": "application/json"
+        }
+        payload = {
+            "query": query,
+            "search_depth": "advanced",
+            "max_results": 10,
+            "include_answer": False,
+            "include_raw_content": True
+        }
+
+    started = time.perf_counter()
+    response = await client.post(url, headers=headers, json=payload)
+    elapsed_ms = (time.perf_counter() - started) * 1000
+    response.raise_for_status()
+    body = response.json()
+
+    results = body.get("results", [])
+    urls = [canonicalize(item["url"]) for item in results if item.get("url")]
+    return {
+        "provider": provider,
+        "latency_ms": round(elapsed_ms, 1),
+        "status": response.status_code,
+        "result_count": len(results),
+        "urls": urls
+    }
+
+async def main():
+    queries = [
+        json.loads(line)
+        for line in Path("queries.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+
+    observations = []
+    async with httpx.AsyncClient(timeout=30) as client:
+        for item in queries:
+            for provider in ("exa", "tavily"):
+                result = await call_provider(client, provider, item["query"])
+                result["query_id"] = item["id"]
+                observations.append(result)
+                print(json.dumps(result))
+
+    for provider in ("exa", "tavily"):
+        latencies = [
+            row["latency_ms"]
+            for row in observations
+            if row["provider"] == provider
+        ]
+        print(json.dumps({
+            "provider": provider,
+            "calls": len(latencies),
+            "p50_ms": percentile(latencies, 0.50),
+            "p95_ms": percentile(latencies, 0.95),
+            "mean_ms": round(statistics.fmean(latencies), 1)
+        }))
+
+asyncio.run(main())
+```
+
+A simulated output sample looks like this:
+
+```
+{"provider":"exa","latency_ms":571.8,"status":200,"result_count":10,"urls":["https://example.com/news/investment"]}
+{"provider":"tavily","latency_ms":4187.3,"status":200,"result_count":10,"urls":["https://example.com/news/investment"]}
+{"provider":"exa","calls":300,"p50_ms":569.0,"p95_ms":"calculate-from-retained-raw-run","mean_ms":"calculate-from-retained-raw-run"}
+{"provider":"tavily","calls":300,"p50_ms":4200.0,"p95_ms":"calculate-from-retained-raw-run","mean_ms":"calculate-from-retained-raw-run"}
+```
+
+We intentionally do not insert an invented p95. The retained 300-query benchmark summary gives us medians—569 ms for Exa `fast`, 386 ms for Exa `instant`, 4.2 seconds for Tavily `advanced`, and 1.7 seconds for Tavily `basic`—but not the raw latency distribution required to calculate a defensible p95.
+
+A separate 333-call speed comparison preserved p50, p90, and p99: Exa `instant` measured 235/263/437 ms, while Tavily’s comparable ultra-fast mode measured 245/334/576 ms. The medians were close; the tail was not. We use those figures for timeout planning, but we do not relabel p90 or interpolate p95.
+
+For teams building their own provider abstraction, we collect broader implementation patterns in the [Effloow tools collection](https://effloow.com/tools).
+
+## Integration Issues and Verification Limits
+
+The first problem was parameter parity. There is no safe one-line provider swap.
+
+Tavily’s `max_results` maps conceptually to Exa’s `numResults`. Tavily uses `include_domains` and `exclude_domains`; Exa uses `includeDomains` and `excludeDomains`. Search-depth labels also differ. Tavily `ultra-fast` is closest to Exa `instant`, but Tavily `advanced` is not automatically equivalent to Exa `fast`, `auto`, or `deep`.
+
+Content retrieval caused a larger semantic mismatch. Tavily can attach static raw page content to search results. Exa can return full text, but its more distinctive path is query-dependent highlights. Replacing Tavily raw content with Exa highlights changes the context contract: the model receives less text and loses some surrounding material.
+
+That is often beneficial, but it is not lossless. We retained a full-text fallback for:
+
+*   contract language where adjacent clauses matter;
+*   technical pages where examples depend on preceding definitions;
+*   tables whose headers are separated from matching rows;
+*   pages requiring provenance beyond a selected passage.
+
+We also found that “extraction quality” needs a precise definition. Our 300-question score measures whether search results let the answering model recover a correct fact. It does not isolate HTML cleaning, JavaScript rendering, table reconstruction, or PDF extraction. We refuse to convert factual-answer accuracy into a pure extractor score.
+
+The same caution applies to result overlap. Raw URL overlap is unstable because tracking parameters, mirrors, syndication, language variants, and canonical redirects can make identical sources look different. Our harness strips query strings and normalizes hosts, but we still treat Jaccard overlap as a debugging signal rather than a relevance metric. A low overlap can mean healthy source diversity.
+
+Configuration validation exposed another trap. We reproduced the common pre-restart check with Python 3.12.14 and `json.load`. An OpenClaw-style file containing a trailing comma failed with `JSONDecodeError` at line 6, column 7, exactly as expected.
+
+A duplicate provider key was more dangerous:
+
+```
+{
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "tavily",
+        "provider": "brave"
+      }
+    }
+  }
+}
+```
+
+The default parser accepted this file and silently selected `brave`, the last value. Syntax validation alone therefore prevents malformed JSON but does not prove configuration intent. Our local test covered only standard-library `json.load` on three synthetic fixtures; it did not test the duplicate-key rejection hook below, the agent’s configuration schema, or restart behavior. For deployment, we would use the hook below to reject duplicate keys and separately validate the configuration against the agent’s schema before restarting:
+
+```
+import json
+
+def reject_duplicates(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+with open("agent.json") as handle:
+    config = json.load(handle, object_pairs_hook=reject_duplicates)
+```
+
+Rate-limit design also needs explicit treatment. Tavily publishes a higher standard ceiling of 1,000 requests per minute. Exa publishes 10-plus queries per second with custom enterprise scaling. We did not run a production-scale saturation test, so we cannot tell buyers how either service degrades during a burst. We implement bounded concurrency, exponential backoff with jitter, and provider-specific circuit breakers rather than assuming the published ceiling is a latency guarantee.
+
+Domain filters differ too. Exa supports up to 1,200 included and 1,200 excluded domains. Tavily’s referenced limits are 300 included and 150 excluded. That matters for regulated allowlists and large tenant-specific exclusion sets.
+
+Finally, all returned content is untrusted. We do not store raw extracted bodies in long-lived agent memory. We persist source URLs, hashes, constrained summaries, and citation metadata. Otherwise, prompt-injection text can survive beyond the search turn and contaminate later sessions.
+
+If this threat model is part of a larger agent deployment, our [AI infrastructure services](https://effloow.com/services) cover retrieval boundaries, observability, and tool authorization rather than treating search as an isolated API call.
+
+## Scale, Latency & Cost vs. Alternatives
+
+Here is the decision table we actually use:
+
+| Configuration | Accuracy | Answer recall at 5 | Median search latency | Search price per 1,000 | Result tokens | Best fit |
+| --- | --- | --- | --- | --- | --- | --- |
+| Exa `fast` | 99.3% | 99.3% | 569 ms | $7 | 1,987 | High-accuracy factual and semantic retrieval |
+| Exa `instant` | 97.7% | 97.3% | 386 ms | $7 | 2,128 | Latency-sensitive agent loops |
+| Tavily `advanced` | 93.0% | 92.7% | 4.2 s | $16 | 2,210 | General research with bundled content |
+| Tavily `basic` | 87.7% | 87.7% | 1.7 s | $8 | 1,639 | Lower-cost general lookups |
+| Firecrawl search | 95.3% | 96.7% | 471 ms | $5 | 678 | Search attached to a crawl-heavy stack |
+
+These figures come from the same 300-question company-news workload summarized in the [independent benchmark record](https://openbenchmarks.com/web-search/exa-vs-tavily-vs-firecrawl). We kept latency and cost separate from accuracy rather than collapsing them into a subjective weighted score.
+
+At pay-as-you-go list pricing, 100,000 searches cost approximately:
+
+*   Exa: $700.
+*   Tavily basic: $800.
+*   Tavily advanced: $1,600.
+
+Tavily’s monthly plans can reduce credit prices to roughly $0.0075–$0.005, so procurement volume can reverse part of that difference. Enterprise discounts can also make public prices irrelevant. We recommend comparing signed quotes, not landing pages.
+
+Search cost is only half of the calculation. At a hypothetical input price of $5 per million tokens, the recorded result payloads produce these 100,000-query totals:
+
+| Configuration | Search cost | Approximate input-token cost | Combined cost |
+| --- | --- | --- | --- |
+| Exa `fast` | $700.00 | $993.50 | $1,693.50 |
+| Tavily `advanced` | $1,600.00 | $1,105.00 | $2,705.00 |
+| Tavily `basic` | $800.00 | $819.50 | $1,619.50 |
+
+Tavily basic is slightly cheaper in this model, but it gives up 11.6 percentage points of accuracy versus Exa fast. For search spending alone, the more useful metric is search-API cost per correct result. Our benchmark record puts Exa fast at about $7.05 per 1,000 correct answers and Tavily advanced at $17.20, excluding downstream model-token charges.
+
+Token totals remain workload-specific. Exa highlights can materially reduce context on long pages, while Tavily basic happened to return fewer tokens in this suite. We would not sign a contract based on a universal “Exa uses fewer tokens” assumption. Measure the payload generated by your parameters and your query mix.
+
+Latency compounds in agent loops. As a planning scenario, if each of five sequential calls took its provider’s measured single-call p99 time, search alone would total roughly 2.19 seconds with Exa `instant` versus 2.88 seconds with Tavily ultra-fast, before model inference or retries. These sums are not measured five-step runtimes or workflow p99 estimates. Parallel fan-out changes the arithmetic, but the slowest branch still controls completion.
+
+The acquisition of Tavily by Nebius in February 2026 is also a roadmap consideration. We do not treat ownership change as an automatic negative. It can bring distribution, infrastructure, and enterprise contracting advantages. We do, however, put API compatibility, pricing protection, data residency, and deprecation notice periods into the contract because integration priorities can change after an acquisition.
+
+Related reading: [Web-Search Agents Waste Tokens: We Measured How Much](https://effloow.com/articles/agentic-web-search-context-control-token-proof-2026) and [Token Optimization for Production LLMs: Cut Costs Effectively](https://effloow.com/articles/token-optimization-production-llm-cost-guide-2026).
+
+## Our Final Verdict: When to Deploy, When to Skip
+
+We would deploy Exa first when the agent must find a specific company, person, paper, code reference, or original factual source. It won our fixed factual suite on accuracy, cost per correct answer, and practical latency. Its `instant` mode also gave us the tighter recorded tail in the separate speed test.
+
+We would deploy Tavily when the team wants a simpler general-research interface with raw content, generated-answer options, news and finance modes, and a high published request ceiling. Tavily is also reasonable when consolidated Nebius procurement matters more than absolute retrieval performance.
+
+**Deploy Exa if:**
+
+*   rank-one semantic retrieval is central to the product;
+*   agents search for entities or publications;
+*   tail latency controls a multi-step workflow;
+*   query-dependent highlights can replace most full-page text;
+*   large domain allowlists or blocklists are required.
+
+**Deploy Tavily if:**
+
+*   general web research dominates the workload;
+*   bundled raw content reduces engineering work;
+*   news or finance topic routing is valuable;
+*   the published 1,000 RPM standard ceiling fits a high-volume design;
+*   Nebius consolidation simplifies procurement or infrastructure.
+
+**Hold off or run a longer proof of concept if:**
+
+*   JavaScript-heavy extraction, PDFs, or tables are the primary workload;
+*   you need contractual latency objectives rather than benchmark medians;
+*   your agent sends sensitive customer data in queries;
+*   you cannot isolate untrusted retrieved text from instructions and memory;
+*   your economics depend on unverified enterprise discounts.
+
+Our production recommendation is not “pick one forever.” Put both behind a typed adapter, retain raw timing and billing metadata, and route by workload. Start with Exa for semantic or high-value factual retrieval. Use Tavily where full-page general research is the actual requirement. Add a fallback only after measuring whether the extra recall justifies duplicate search spend.
+
+Most importantly, benchmark correctness before speed. A 250 ms search call that grounds the agent in the wrong source is not fast infrastructure. It is a fast path to an expensive mistake.

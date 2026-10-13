@@ -6,10 +6,17 @@ httpx==0.28.1
 
 # Extraktion
 trafilatura==1.12.2
+resiliparse==1.0.9
 
 # Reranker (lokaler Cross-Encoder, CUDA/MPS wenn vorhanden)
 torch==2.14.1
 transformers==4.44.2
+
+# Optional: Seiten mit Chrome-TLS-Profil laden (FETCH_CLIENT=curl_cffi)
+curl_cffi==0.16.3
+
+# Optional: Reader rendert JS-Seiten (READER_RENDER, app/compat/render.py)
+playwright==1.63.0
 
 # Optionales Such-Backend ohne Key (SEARCH_BACKEND=ddgs)
 ddgs==9.16.0

@@ -1,0 +1,150 @@
+Title: Exa vs Tavily (2026): Which AI Search API Wins? (47 chara...
+
+URL Source: https://coldiq.com/blog/tavily-vs-exa
+
+Published Time: 2026-07-12T21:00:00.000Z
+
+Markdown Content:
+**Key takeaways:**
+
+*   On the Exa vs Tavily question: Tavily is agent-optimized web search plus extraction in one call, while Exa is neural, embeddings-based search that ranks pages by meaning rather than keywords.
+*   On raw search cost they're close: Exa is $7 per 1,000 requests, Tavily runs about $7.50 to $8 per 1,000 basic searches. Exa's free tier is far bigger at 20,000 requests a month versus Tavily's 1,000 credits.
+*   Tavily fits real-time web grounding and single-call RAG. Exa fits semantic discovery, research agents, and people, company, and code search.
+*   Tavily was acquired by Nebius in February 2026 but still ships under its own brand. Exa is independent.
+
+If you're wiring live web access into an AI agent, you'll hit the same fork most developers do: [Tavily](https://coldiq.com/tools/tavily) or Exa. Both are [search APIs](https://coldiq.com/blog/11-gtm-apis-worth-plugging-into-your-ai-agents) built for large language models, not humans, and both return clean, structured results instead of raw HTML. That's where the similarity ends.
+
+This Exa vs Tavily comparison breaks down how each one actually searches, what it costs per 1,000 queries, where each wins on result quality, and which stack each one belongs in. The short version: they solve overlapping problems with different engines, and the right pick depends on whether your agent needs to read the live web or understand meaning across it. Here's the full Tavily vs Exa AI breakdown.
+
+## Exa vs Tavily At a Glance
+
+Before the detail, here's the Tavily vs Exa AI matchup on the dimensions developers ask about most.
+
+|  | **Tavily** | **Exa** |
+| --- | --- | --- |
+| Core approach | Agent-optimized web search plus extraction | Neural, embeddings-based semantic search |
+| Best at | Real-time web grounding, single-call RAG | Semantic discovery, research, people and company search |
+| Basic search cost | ~$7.50–$8 per 1,000 (1 credit each) | $7 per 1,000 requests (up to 10 results) |
+| Free tier | 1,000 credits per month | 20,000 requests per month |
+| Key endpoints | Search, Extract, Crawl, Map, Research | Search, Contents, Agent, Websets, Monitors |
+| Specialized indexes | None | People, company, code, news |
+| Frameworks | LangChain, LlamaIndex (native) | LangChain, LlamaIndex, Vercel AI SDK |
+| Ownership | Acquired by Nebius (Feb 2026) | Independent |
+
+Both are genuine LLM-first APIs, so either will get real-time web data into your agent. The gap shows up once you look at how each finds and ranks that data, which is where the rest of this guide goes.
+
+## How Tavily Searches: Agentic Web Search and Extraction
+
+Tavily is built to do the whole search-and-scrape job in one API call. You send a query, and it searches the live web, pulls content from the top sources, filters and ranks it, then hands back clean snippets or summaries with citations. Your model gets context it can use straight away, not a pile of HTML to parse.
+
+![Image 1: Tavily homepage](https://coldiq.com/_next/image?url=https%3A%2F%2Fib8nrja70n2lsqtp.public.blob.vercel-storage.com%2Fproduction%2FTavily%2520homepage-1.png&w=3840&q=75)
+
+*Tavily's homepage, tavily.com.*
+
+The engine leans on keyword and web retrieval, with two depth settings. Basic search is fast and cheap for straightforward lookups. Advanced search reviews more sources, scores them, and ranks the most trustworthy content to the top, which helps when the answer needs to be right rather than just fast. You can also set an `include_answer` flag to get a short, LLM-generated answer packaged with the results.
+
+Beyond search, Tavily ships four more endpoints: Extract pulls full content from URLs with JavaScript rendering, Crawl navigates whole sites using natural-language instructions, Map discovers a site's structure before you extract, and Research runs multi-step agentic lookups that synthesize across sources. It's popular in the LangChain community, with more than 3 million monthly SDK downloads and a developer base past 1 million.
+
+One thing to note for 2026: Nebius acquired Tavily in February for $275 million. Founder Rotem Weiss and the team stayed on, and Tavily keeps operating under its own brand with the same API, so nothing broke for existing users. It now sits inside Nebius's wider AI cloud stack.
+
+## How Exa Searches: Neural, Embeddings-Based Retrieval
+
+Exa takes a different route. Its core is a neural search index that embeds both your query and the web pages it has crawled, then matches on meaning rather than exact keywords. Ask it something conceptual, and it can surface pages that never use your search terms but are genuinely about the thing you meant.
+
+![Image 2: Exa homepage](https://coldiq.com/_next/image?url=https%3A%2F%2Fib8nrja70n2lsqtp.public.blob.vercel-storage.com%2Fproduction%2FExa%2520homepage-2.png&w=3840&q=75)
+
+*Exa's homepage, exa.ai.*
+
+That semantic approach makes Exa strong at discovery. You can run "find similar" from a single result, or ask for "research papers that argue the opposite of this one," and get relevant hits a keyword engine would miss. It also runs a keyword and an auto mode, so you're not locked into neural search when a plain lookup is all you need.
+
+Exa splits search from content retrieval. The Contents endpoint returns full page text, token-efficient highlights, or AI summaries, so you pull only the passages your model needs. On top of that sit specialized indexes most search APIs don't have: people search over more than 1 billion LinkedIn profiles, a company search index, plus code and news indexes. Those power queries like "Series B fintech companies in Singapore with 50 to 200 employees" that general web search can't filter.
+
+Rounding out the lineup are async Agent runs for deep research, list building, and enrichment, Websets for turning a query into a structured dataset, and Monitors that ping your agent when something new appears on the web. Exa is independent, with no parent company steering the roadmap.
+
+## Result Quality for LLM Grounding and Real-Time Search
+
+Grounding is the reason these APIs exist. Feed a model current, factual context and it's far less likely to invent an answer. The risk is real and measurable: in a [2024 Nature paper](https://www.nature.com/articles/s41586-024-07421-0), Farquhar and colleagues showed that LLMs "hallucinate" confident, wrong answers often enough that they built a statistical method (semantic entropy) just to flag when a model is likely making things up. Live search is the standard fix, and how well each API grounds a response depends on the quality of what it returns.
+
+For an Exa vs Tavily comparison for LLM grounding, the split is about what "good context" means for your query. Tavily's single call returns deduped, ranked, ready-to-read passages, which is ideal when you want the model anchored to what the web says right now, like a news event or a product's current pricing. Exa's neural retrieval and highlights are strongest when relevance is about concepts rather than string matches, so a research agent pulling the five most on-topic passages from a long report tends to do better with Exa's pre-chunked contents.
+
+How much this matters is itself now a benchmarked question. Google DeepMind's [FACTS Grounding benchmark](https://deepmind.google/blog/facts-grounding-a-new-benchmark-for-evaluating-the-factuality-of-large-language-models/) scores how faithfully a model sticks to provided source documents (up to 32,000 tokens across 1,719 examples), and even strong models don't hit 100%. Better retrieval narrows that gap, because a model can only ground on the passages you actually give it.
+
+On the Exa vs Tavily comparison for LLM real-time search, both hit the live web, so the practical question is latency. An [independent December 2025 benchmark](https://dev.to/ritza/best-serp-api-comparison-2025-serpapi-vs-exa-vs-tavily-vs-scrapingdog-vs-scrapingbee-2jci) by dev.to's Ritza team ran 50 real queries through five APIs: Exa averaged 1.18 seconds (the fastest of the group), Tavily 1.885 seconds, both at a 100% success rate. Exa also markets an Instant mode under 200 milliseconds, which matters if your agent chains dozens of searches or powers a voice interface where anything over half a second feels laggy.
+
+Exa publishes its own accuracy benchmarks claiming a lead (81% versus 71% on one internal test), but those are vendor-run, so treat them as a prompt to test yourself rather than a final verdict. Run both against your real queries before you commit.
+
+## Pricing and Cost Per 1,000: Exa vs Tavily
+
+Neither tool hides its pricing behind a sales call, which is a relief after the enterprise data vendors. Exa is pure pay-as-you-go with no minimum; Tavily uses a monthly credit model with a pay-as-you-go overage.
+
+![Image 3: Tavily pricing](https://coldiq.com/_next/image?url=https%3A%2F%2Fib8nrja70n2lsqtp.public.blob.vercel-storage.com%2Fproduction%2FTavily%2520pricing.png&w=3840&q=75)
+
+*Tavily's pricing page, tavily.com/pricing (July 2026).*
+
+![Image 4: Exa pricing](https://coldiq.com/_next/image?url=https%3A%2F%2Fib8nrja70n2lsqtp.public.blob.vercel-storage.com%2Fproduction%2FExa%2520pricing.png&w=3840&q=75)
+
+*Exa's pricing page, exa.ai/pricing (July 2026).*
+
+Tavily bills in credits: basic search is 1 credit, advanced search is 2. Its free Researcher plan gives 1,000 credits a month, the Project plan is $30 a month for 4,000 credits ($0.0075 each), and paid overage runs $0.008 per credit. Exa charges $7 per 1,000 search requests (up to 10 results, then $1 per 1,000 for each extra result), $1 per 1,000 pages for contents, and gives you 20,000 free requests every month.
+
+Here's the Exa vs Tavily pricing comparison on the tasks you'll actually run, normalized to cost per 1,000 where it helps.
+
+| **Task** | **Exa** | **Tavily** |
+| --- | --- | --- |
+| Free tier | 20,000 requests/month | 1,000 credits/month |
+| Basic web search (per 1,000) | $7 (up to 10 results) | ~$7.50–$8 (1 credit each) |
+| Deeper search (per 1,000) | Deep Search $12–$15 | Advanced search ~$15–$16 (2 credits) |
+| Page contents / extract | $1 per 1,000 pages | Extract ~$1.60 per 1,000 URLs (1 credit / 5 URLs) |
+| Agentic research | Agent $0.012–$1.00 per run | Research ~$0.03–$2.00 per call |
+| Entry paid plan | Pay-as-you-go, no minimum | Project $30/month (4,000 credits) |
+| Enterprise | Custom | Custom |
+
+In practice, the free tiers stretch differently. Exa's 20,000 monthly requests cover a real prototype, maybe a small internal tool running all month, while Tavily's 1,000 credits are closer to a weekend of testing before you upgrade.
+
+Read across the rows and the pattern is clear: basic search costs about the same on both, Exa's contents endpoint is cheaper for pulling page text, and Exa's free tier is 20 times larger, which makes it the easier one to prototype on before you spend a cent.
+
+## Features Head to Head
+
+Both APIs go well past plain search, but they optimize for different jobs. Tavily is built to fetch and process web content: Extract handles full-page pulls with JavaScript rendering, Crawl walks a whole site from a natural-language instruction, Map returns a site's structure, and Research chains multiple lookups into a synthesized result. If your agent's job is "read these sources and the wider web, then answer," Tavily's toolkit maps neatly onto it.
+
+Exa optimizes for finding and structuring the right entities. Its Contents endpoint returns text, highlights, or summaries per page; Agent runs asynchronous research, list building, and enrichment; Websets turns a query into a structured dataset; and Monitors keep watching the web and notify your agent when something changes. The people, company, and code indexes are the real differentiator here, because sales enrichment, recruiting, and competitive-intelligence agents need to search for entities, not documents, and Tavily has no equivalent. A sales team can spin up a Webset of "AI infrastructure startups that raised in the last 90 days" and let Monitors flag new matches as they appear, which behaves more like a data pipeline than a search box.
+
+Both can hand back a ready-made answer: Tavily's `include_answer` bundles a short synthesized reply with search results, and Exa exposes an answer capability grounded in its index. For most agent builds you'll wire the raw results into your own model instead, but the option saves a hop for simple Q&A. Pick the feature set that matches your agent's real task rather than the longer list.
+
+## Developer Experience and SDKs
+
+Getting started is quick on both. Each ships official Python and JavaScript/TypeScript SDKs, and both drop into the frameworks most teams already use. Tavily has native LangChain and LlamaIndex integrations and a large LangChain following, so if that's your stack, it's often a two-line change to add search. Exa covers LangChain and LlamaIndex too, plus the Vercel AI SDK, an MCP server, and native tool-calling for the Anthropic and OpenAI APIs.
+
+Day to day, the ergonomics differ in small ways. Tavily's single-call search-plus-extract means less orchestration code: one request in, clean context out. Exa's split between search and contents gives you finer control (search first, then decide which results to pull full text for), at the cost of one extra step. Neither is hard, but they reward different habits.
+
+Developer sentiment backs the ease-of-use point. On an r/Rag thread comparing the two, one builder wrote that they "like Tavily, easy to implement and super accurate retrieval," calling it stronger than the alternatives they tried ([Reddit](https://www.reddit.com/r/Rag/comments/1gr8jnr/which_search_api_should_i_use_between_tavilycom/)). That's one team's take rather than a benchmark, but it lines up with Tavily's reputation for a gentle on-ramp.
+
+Reliability tooling is comparable too. Both publish rate limits and return structured error codes, so you can wire up retries without guessing at failures. Tavily doesn't charge for calls that fail, and Exa's dashboard meters usage in real time, which keeps surprise bills down while you load-test.
+
+## Best for: Matching Each API to Your Stack
+
+Choose Tavily when your agent needs general real-time web retrieval and extraction in a single call. It's the natural fit for RAG grounded on current events, news monitoring, and any LangChain build where you want search and scraping handled together. If your queries are mostly "what does the live web say about X," Tavily's ranked, deduped context is built for exactly that.
+
+Choose Exa when relevance is semantic. Research agents, "find similar" workflows, coding agents pulling documentation, and sales or recruiting tools that search for people and companies all play to Exa's neural index and specialized search. Its generous free tier and cheap contents endpoint also make it the easier one to experiment on at low cost.
+
+Watch cost at scale, though, especially on the heavier endpoints. On that same r/Rag thread, one team reported they "were using Exa but it got too expensive too quickly," so they switched to Brave and layered their own filtering on top ([Reddit](https://www.reddit.com/r/Rag/comments/1gr8jnr/which_search_api_should_i_use_between_tavilycom/)). Deep Search, Agent runs, and per-content-type charges add up faster than the $7 base rate suggests, so model your real query mix before you scale.
+
+Neither is the only option, either. If you outgrow both or need a different shape, [Serper](https://coldiq.com/tools/serper) and SerpAPI return raw Google SERP data, Brave Search API runs an independent index, Perplexity's API returns cited answers, and Firecrawl focuses on [scraping and crawling](https://coldiq.com/blog/the-best-web-scraping-apis-for-b2b-data-in-2026). Any of them can slot in beside or instead of your primary search API.
+
+## Which Should You Choose?
+
+There's no universal winner, because Tavily and Exa are tuned for different questions. If your agent reads the live web and needs clean, current context in one call, Tavily is the simpler, more direct tool, and the Nebius acquisition hasn't changed how it works. If your agent hunts by meaning (research, discovery, or people and company lookups) Exa's neural engine and specialized indexes do things Tavily can't, at a comparable base price and a much larger free tier.
+
+The honest move is to test both on your own traffic. The free tiers are generous enough to run that bake-off for nothing, and your query mix will settle the argument faster than any benchmark.
+
+### How to Run a Quick Bake-Off
+
+You can get a real answer in an afternoon. Here's the sequence that works:
+
+1.   Pull 30 to 50 real queries from your logs or backlog, weighted the way production traffic actually looks (mostly lookups, a few deep-research asks).
+2.   Sign up for both free tiers, install the Python or JavaScript SDK, and wire each API behind the same function so you can swap them with one flag.
+3.   Run the full query set through both, and log three things per call: latency, the passages returned, and the credits or requests spent.
+4.   Feed the returned context into your own model and grade the answers, since grounding quality is what you're really buying rather than raw search results.
+5.   Multiply the per-query cost by your expected monthly volume across the endpoints you'll use, so the winner is the one that's both accurate and affordable at your scale.
+
+Step four is the one teams skip and regret. A search API that returns tidy-looking results but grounds the model on the wrong passages will quietly cost you in wrong answers, so judge the end output, not the middle.

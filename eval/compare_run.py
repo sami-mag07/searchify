@@ -236,7 +236,7 @@ def main() -> None:
         try:
             print("Lade bge-reranker-base (einmaliger Warmup)...", flush=True)
             rerank_mod.rerank("warmup", [{"url": "u", "title": "t", "content": "warmup text", "full_text": "warmup"}])
-            reranker_note = f"bge-reranker-base (FlagEmbedding), Modell={os.environ['RERANKER_MODEL']}"
+            reranker_note = f"Cross-Encoder (transformers), Modell={os.environ['RERANKER_MODEL']}"
         except Exception as exc:  # noqa: BLE001
             use_reranker = False
             reranker_note = "FALLBACK ohne neuronalen Reranker: " + strip_key(f"{type(exc).__name__}: {exc}")

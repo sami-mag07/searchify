@@ -1,0 +1,18 @@
+Title: Perplexity API sucks – found a way to emulate it
+
+URL Source: https://news.ycombinator.com/item?id=41415775
+
+Markdown Content:
+I have been trying out Perplexity's API for weeks now. There is a big problem with it.
+
+The results returned from the API are not the same as the actual Perplexity API returns. Most results seem not to be returning any kind of actual web data. At best, the returned results hallucinate.
+
+I had to come up with a different way to solve for this.
+
+1. I created an LLM agent using Langgraph 2. Added Google search (also DuckDuckGo search) as tools 3. For scraping purposes, you can optionally add a scraper as a tool
+
+The difference to Perplexity in this case is that the results will load slower as the LLM is running the search in real time through a custom Google search engine. If anyone has found better alternatives, that would be welcome.
+
+P.S.: Tried out Exa and Tavily APIs however the results get still pretty bad or outdated once the search query gets a bit more complex.
+
+Curious if anyone has different methods that have been working better

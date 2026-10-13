@@ -13,7 +13,6 @@ Start: `python -m pytest tests/ -q`.
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -21,6 +20,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app import answer as answer_mod  # noqa: E402
+
+_REAL_GENERATE = answer_mod.generate_answer
 from app import extract as extract_mod  # noqa: E402
 from app import main as main_mod  # noqa: E402
 from app import rerank as rerank_mod  # noqa: E402
@@ -33,8 +34,9 @@ from app.schema import SearchRequest, SearchResponse  # noqa: E402
 def test_schema_roundtrip():
     req = SearchRequest(query="Testfrage", max_results=3)
     assert req.query == "Testfrage"
-    assert req.include_answer is True
+    assert req.include_answer is False  # Tavily-Standard
     assert req.max_results == 3
+    assert SearchRequest(query="x", include_answer="basic").include_answer == "basic"
 
 
 def test_chunking():
@@ -87,19 +89,6 @@ def _install_stubs(monkeypatch):
             },
         ]
 
-    def fake_fetch_and_extract(candidates, **kwargs):
-        out = []
-        for c in candidates:
-            out.append(
-                {
-                    "url": c["url"],
-                    "title": c["title"],
-                    "content": c["content"],
-                    "full_text": c["content"] + " Mehr Kontext im Volltext.",
-                }
-            )
-        return out
-
     def fake_rerank(query, chunks, top_pool=None):
         scored = []
         for i, ch in enumerate(chunks):
@@ -116,7 +105,6 @@ def _install_stubs(monkeypatch):
         return iter([[(i, c["content"] + " Mehr Kontext im Volltext.") for i, c in enumerate(candidates)]])
 
     monkeypatch.setattr(search_mod, "web_search", fake_searxng)
-    monkeypatch.setattr(extract_mod, "fetch_and_extract", fake_fetch_and_extract)
     monkeypatch.setattr(extract_mod, "iter_pages", fake_iter_pages)
     monkeypatch.setattr(rerank_mod, "rerank", fake_rerank)
     monkeypatch.setattr(answer_mod, "generate_answer", fake_generate_answer)
@@ -133,8 +121,9 @@ def test_dry_run_full_pipeline(monkeypatch):
     assert len(resp.results) == 2
     # Nach score sortiert.
     assert resp.results[0].score >= resp.results[1].score
-    # raw_content durchgereicht, Pflichtfelder vorhanden.
-    assert resp.results[0].raw_content
+    # raw_content ist der geladene Volltext, Seiten-Chunks landen im content.
+    assert all(r.raw_content.endswith("Mehr Kontext im Volltext.") for r in resp.results)
+    assert any("Mehr Kontext im Volltext." in r.content for r in resp.results)
     for r in resp.results:
         assert r.title and r.url and r.content and isinstance(r.score, float)
     assert resp.request_id
@@ -150,3 +139,52 @@ def test_dry_run_no_answer(monkeypatch):
     resp = main_mod.run_search(req)
     assert resp.answer is None
     assert len(resp.results) == 2
+
+
+def _client_with_stubs(monkeypatch):
+    from fastapi.testclient import TestClient  # noqa: PLC0415
+
+    from app import stream as stream_mod  # noqa: PLC0415
+
+    _install_stubs(monkeypatch)
+    monkeypatch.setattr(stream_mod, "gather", lambda *a, **k: None)
+    monkeypatch.setattr(search_mod, "peek_cache", lambda *a, **k: None)
+    monkeypatch.setattr(main_mod, "require_key", lambda *a, **k: None)
+    return TestClient(main_mod.app)
+
+
+def test_search_defaults_without_llm_is_200(monkeypatch):
+    """Standardwerte duerfen ohne LLM in .env nie 500 geben (frueher include_answer=true)."""
+    c = _client_with_stubs(monkeypatch)
+    monkeypatch.setattr(answer_mod, "generate_answer", lambda q, r: (_ for _ in ()).throw(
+        AssertionError("Standard darf kein LLM rufen")))
+    r = c.post("/search", json={"query": "Wofuer steht RAG?"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["answer"] is None and len(body["results"]) == 2
+    assert body["usage"]["answer_error"] is None and "x-answer-status" not in r.headers
+
+
+def test_search_answer_without_llm_still_returns_results(monkeypatch):
+    c = _client_with_stubs(monkeypatch)
+    monkeypatch.setattr(answer_mod, "generate_answer", _REAL_GENERATE)
+    monkeypatch.setattr(answer_mod, "get_settings", lambda: type("S", (), {"openai_api_key": ""})())
+    for flag in (True, "basic", "advanced"):
+        r = c.post("/search", json={"query": "Wofuer steht RAG?", "include_answer": flag})
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert body["answer"] is None and len(body["results"]) == 2
+        assert body["usage"]["answer_error"] == "no_llm_configured"
+        assert r.headers["x-answer-status"] == "no_llm_configured"
+
+
+def test_search_answer_llm_unreachable_still_returns_results(monkeypatch):
+    c = _client_with_stubs(monkeypatch)
+
+    def down(query, results):
+        raise ConnectionError("LLM weg")
+
+    monkeypatch.setattr(answer_mod, "generate_answer", down)
+    r = c.post("/search", json={"query": "Wofuer steht RAG?", "include_answer": True})
+    assert r.status_code == 200, r.text
+    assert r.json()["answer"] is None and r.json()["usage"]["answer_error"] == "llm_unavailable"

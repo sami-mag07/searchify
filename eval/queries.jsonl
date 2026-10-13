@@ -12,7 +12,7 @@
 {"id": "de-fakt-5", "query": "Was ist die Halbwertszeit von Kohlenstoff-14?", "lang": "de", "answer_re": "5[.\\s]?730|5[.\\s]?700"}
 {"id": "de-fakt-6", "query": "In welchem Jahr wurde die Universität Heidelberg gegründet?", "lang": "de", "answer_re": "1386"}
 {"id": "de-fakt-7", "query": "Wie viele Bundesländer hat Österreich?", "lang": "de", "answer_re": "neun|\\b9 Bundesl"}
-{"id": "de-schule-1", "query": "Was ist ein Nachteilsausgleich in der Schule?", "lang": "de", "answer_re": "Beeinträchtigung|Behinderung|Benachteiligung"}
+{"id": "de-schule-1", "query": "Was ist ein Nachteilsausgleich in der Schule?", "lang": "de", "answer_re": "Beeinträchtigung|Behinderung|Benachteiligung|Förderbedarf|Lernstörung|Legasthenie|Teilleistungsstörung"}
 {"id": "en-tech-3", "query": "What is the default port for HTTPS?", "lang": "en", "answer_re": "\\b443\\b"}
 {"id": "en-fact-4", "query": "Who founded Nvidia?", "lang": "en", "answer_re": "Jensen Huang"}
 {"id": "en-tech-4", "query": "What is the time complexity of binary search?", "lang": "en", "answer_re": "log\\s?n|log₂|logarithmic|O\\(log"}

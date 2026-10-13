@@ -49,9 +49,14 @@ from compare_tavily import jaccard_urls  # noqa: E402
 
 
 def hit_rank(results: list, pattern: str) -> int | None:
+    """Rang des ersten Treffers, dessen content die Antwort enthaelt. Zweiter
+    Versuch ohne Leerzeichen, damit Satzformatierung wie "H yper T ext" keinen
+    falschen Fehltreffer erzeugt (gilt fuer beide Seiten gleich)."""
     rx = re.compile(pattern, re.IGNORECASE)
+    rx_tight = re.compile(re.sub(r"(\\s|\s)[?*+]?", "", pattern), re.IGNORECASE)
     for i, r in enumerate(results, start=1):
-        if rx.search((r.get("content") or "")[:CONTENT_CAP]):
+        text = (r.get("content") or "")[:CONTENT_CAP]
+        if rx.search(text) or rx_tight.search(re.sub(r"\s+", "", text)):
             return i
     return None
 
@@ -98,6 +103,9 @@ def run_own(queries: list, repeat: int = 1, depth: str = "basic") -> dict:
         return SearchRequest(query=q["query"], max_results=10, include_answer=False,
                              language=q.get("lang"), search_depth=depth)
 
+    from app.extract import warm_up
+
+    warm_up()  # Extraktions-Prozesse starten, wie beim Dienststart
     run_search(req({"query": "warmup", "lang": "en"}))  # Modell laden, Verbindungen oeffnen
     out = {}
     for rnd in range(repeat):
@@ -131,14 +139,18 @@ def main() -> None:
     ap.add_argument("--depth", default="basic", help="search_depth der eigenen Seite")
     ap.add_argument("--cache", action="store_true",
                     help="Seiten-Cache an (Standard aus: jede Query kalt, ehrlicher Vergleich)")
+    ap.add_argument("--no-tavily", action="store_true",
+                    help="Nur die eigene Seite messen (kein Tavily-Call, kein Cache noetig)")
     ap.add_argument("--tavily-answer", action="store_true",
                     help="Tavily mit answer messen (Standard: ohne, wie die eigene Seite)")
     args = ap.parse_args()
 
     if not args.cache:
         os.environ["PAGE_CACHE_TTL_S"] = "0"
+        os.environ["SEARCH_CACHE_TTL_S"] = "0"
     queries = [json.loads(l) for l in open(args.queries, encoding="utf-8") if l.strip()]
-    tav = tavily_results(queries, args.tavily_answer)
+    empty = {"latency_s": 0.0, "results": []}
+    tav = {q["query"]: empty for q in queries} if args.no_tavily else tavily_results(queries, args.tavily_answer)
     own = run_own(queries, args.repeat, args.depth)
 
     print(f"{'id':12} {'T s':>5} {'E s':>5}  T@  E@  jac  E-usage")

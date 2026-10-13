@@ -1,0 +1,274 @@
+https://github.com/jianjungki/tavily-open	jianjungki/tavily-open	2026-10-11 13:34
+https://apiserpent.com/blog/serp-api-vs-tavily-exa-ai-agents	SERP API vs Tavily vs Exa: Which Search API for AI Agents?	2026-10-11 13:34
+https://blog.elest.io/give-your-ai-agent-private-web-search-self-host-searxng	Give Your AI Agent Private Web Search: Self-Host SearXNG	2026-10-11 13:34
+https://zenvanriel.com/ai-engineer-blog/perplexica-vs-searxng-self-hosted-search	Perplexica vs SearXNG Building the Right Self-Hosted AI Search Stack	2026-10-11 13:34
+https://towardsdatascience.com/advanced-rag-retrieval-cross-encoders-reranking	Advanced RAG Retrieval: Cross-Encoders & Reranking | Towards Data Science	2026-10-11 13:34
+https://reddit.com/r/selfhosted/comments/1tzrdd7/searxng_vs_degoog	SearXNG vs degoog : r/selfhosted	2026-10-11 13:34
+https://note.com/nobby_shimada/n/n3f8b5e18be94?hl=en	Replacing Tavily with self-hosted SearXNG for OpenClaw web search	2026-10-11 13:34
+https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private	The $1,200 Mistake: Why I Switched an AI Agent from Tavily to Self-Hosted SearXN	2026-10-11 13:34
+https://github.com/khsarvar/siftdog	OrioSearch — Open-Source Web Search API	2026-10-11 13:34
+https://siftdog.com	GitHub - khsarvar/siftdog: Open-source, self-hosted Tavily alternative: web sear	2026-10-11 13:34
+https://coldiq.com/blog/tavily-vs-exa	Exa vs Tavily (2026): Which AI Search API Wins? (47 chara...	2026-10-11 13:34
+https://d5n.xyz/en/posts/openclaw-search-solutions-comparison	Search Solutions for AI Agents: SearXNG vs. Tavily vs. Custom | D5N	2026-10-11 13:34
+https://promtable.com/compare/exa-vs-tavily	Exa vs Tavily: which AI search API for agents wins in 2026?	2026-10-11 13:34
+https://data4ai.com/blog/tool-comparisons/exa-ai-vs-tavily	Exa.ai vs. Tavily - AI Semantic Search API for LLM - Data4AI	2026-10-11 13:34
+https://effloow.com/articles/exa-vs-tavily-agent-web-search-benchmark-2026	Exa vs Tavily in 2026: Our Agent Web Search Benchmark	2026-10-11 13:34
+https://link.sc/blog/exa-vs-tavily-which-ai-search-api	Exa vs Tavily: Which Search API Is Better for AI Agents? | link.sc blog	2026-10-11 13:34
+https://apipick.com/blog/exa-vs-tavily-search-api-for-ai-agents	Exa vs Tavily: Which Search API for Your AI Agent? (2026)	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/4435	Google suspended: too many requests · Issue #4435 · searxng/searxng · GitHub	2026-10-11 13:34
+https://news.ycombinator.com/item?id=49435555	Show HN: Keenable – A different web search API for AI agents | Hacker News	2026-10-11 13:34
+https://news.ycombinator.com/item?id=46646798	Show HN: Crawl4AI – Open-Source Web Crawler for LLMs and Structured Data | Hacke	2026-10-11 13:34
+https://news.ycombinator.com/item?id=49963171	Web Search API | Hacker News	2026-10-11 13:34
+https://grounder.dev/guides/open-source-search-api-llm	Open-Source & Self-Hosted Search APIs for LLMs (2026) | Grounder MCP	2026-10-11 13:34
+https://github.com/unclecode/crawl4ai	GitHub - unclecode/crawl4ai: Open-source web crawler and scraper for LLMs and AI	2026-10-11 13:34
+https://github.com/kinorai/omnifeed	GitHub - kinorai/omnifeed: LLM-friendly web crawler & scraper with a ...	2026-10-11 13:34
+https://docs.crawl4ai.com	Home - Crawl4AI Documentation (v0.9.x)	2026-10-11 13:34
+https://scrapingbee.com/blog/crawl4ai	The complete Crawl4AI guide for LLM-ready data and AI web crawling	2026-10-11 13:34
+https://crawl4ai.org	Crawl4AI - Open Source AI Web Crawler & Scraper	2026-10-11 13:34
+https://reddit.com/r/selfhosted/comments/1jhtczl/perplexica_an_ai_powered_search_engine	Perplexica: An AI powered search engine : r/selfhosted	2026-10-11 13:34
+https://sumguy.com/local-perplexity-searxng-llm	DIY Perplexity: SearXNG + Local LLM = Private Web Search | SumGuy's Ramblings	2026-10-11 13:34
+https://github.com/reidlai/perplexica	GitHub - reidlai/perplexica: Perplexica is an AI-powered search engine. It is an	2026-10-11 13:34
+https://redditmedia.com/r/selfhosted/comments/1jhtczl/perplexica_an_ai_powered_search_engine	Perplexica: An AI powered search engine : selfhosted	2026-10-11 13:34
+https://reddit.com/r/perplexity_ai/comments/1cn5lw8/perplexity_ai_being_very_slow_for_you_guys	Perplexity AI being very slow for you guys? - Reddit	2026-10-11 13:34
+https://reddit.com/r/TheDecoder/comments/1dchuzr/perplexica_is_an_opensource_ai_search_engine	Perplexica is an open-source AI search engine alternative to ... - Reddit	2026-10-11 13:34
+https://reddit.com/r/Rag/comments/1ruebyd/i_built_an_opensource_rag_system_that_actually	I built an open-source RAG system that actually ...	2026-10-11 13:34
+https://reddit.com/r/Rag/comments/1kzkoaf/this_paper_eliminates_reranking_in_rag	This paper Eliminates Re-Ranking in RAG	2026-10-11 13:34
+https://fareedkhan-dev.github.io/rag-cookbook-2026/recipes/05-reranking-and-fusion/cross-encoder-rerank	Cross encoder rerank - The RAG Cookbook 2026	2026-10-11 13:34
+https://teachmeidea.com/reranking-in-rag-cohere-cross-encoders	Reranking in RAG: Cohere Rerank and Cross-Encoders Guide	2026-10-11 13:34
+https://thegeocommunity.com/blogs/generative-engine-optimization/reranking-cross-encoder-llm-reranker	Reranking for RAG: Cross-Encoders vs LLM Rerankers (How to Choose)	2026-10-11 13:34
+https://neelmishra.github.io/blog/mlops/rag/reranking.html	Reranking: Cross-Encoders, ColBERT, Cohere | Neel Mishra	2026-10-11 13:34
+https://dataaspirant.com/blog/reranking	Reranking for RAG Explained: Cross-Encoders & More (2026)	2026-10-11 13:34
+https://github.com/topics/tavily-alternative	tavily-alternative · GitHub Topics · GitHub	2026-10-11 13:34
+https://fastcrw.com/blog/best-tavily-alternatives	7 Tavily Alternatives Tested in 2026 — Cheaper, Faster Search APIs for AI Agents	2026-10-11 13:34
+https://codenote.net/en/posts/tavily-alternatives-cost-comparison-search-extract-api	Tavily Alternatives Compared — Cost-Optimizing Search and Extraction APIs for AI	2026-10-11 13:34
+https://agents.stackoverflow.com/tils/32cc000e-e8b0-4513-8689-b276e3304929	Self-hosted SearXNG: an LLM veto pass beats reranking	2026-10-11 13:34
+https://reddit.com/r/Searx	r/Searx	2026-10-11 13:34
+https://olostep.com/blog/tavily-alternatives	8 Best Tavily Alternatives for AI Agents and RAG in 2026	2026-10-11 13:34
+https://github.com/searxng/searxng/discussions/4637	Open source Tavily-like usage using searXNG and crawl4AI · searxng/searxng · Dis	2026-10-11 13:34
+https://reddit.com/r/LangChain/comments/1rdg2f9/is_adding_a_reranker_to_my_rag_stack_actually	Is Adding a Reranker to My RAG Stack Actually Worth the Extra Latency? (Explaine	2026-10-11 13:34
+https://docs.bswen.com/blog/2026-03-26-tavily-vs-searxng-opencode	Tavily vs Searxng MCP: Which Web Search Server is Better for OpenCode? | BSWEN	2026-10-11 13:34
+https://reddit.com/r/AI_Agents/comments/1tijxk8/selfhosted_search_for_llm_agents_searxng_keeps	Self-hosted search for LLM agents: SearXNG keeps getting blocked : r/AI_Agents	2026-10-11 13:34
+https://agentic-pulse.dev/blog/2026-09-28-searxng-vs-tavily-vs-brave-search-agent-benchmark	SearXNG vs Tavily vs Brave Search: Web Search API Benchmark for AI Agents (2026)	2026-10-11 13:34
+https://github.com/vkfolio/orio-search	vkfolio/orio-search	2026-10-11 13:34
+https://reddit.com/r/vectordatabase/comments/1v7gdrk/benchmark_exa_vs_tavily_vs_firecrawl_for_llm	Exa vs. Tavily vs. Firecrawl for LLM Retrieval & Data Scraping	2026-10-11 13:34
+https://reddit.com/r/selfhosted/comments/1rg1v2x/selfhosted_private_search_egine	Self-hosted private search egine : r/selfhosted	2026-10-11 13:34
+https://reddit.com/r/selfhosted/comments/1r35wr9/selfhosted_ai_research_engine_using_searxng_ollama	Self-hosted AI research engine using SearXNG + Ollama : r/selfhosted	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1jkkqs3/free_search_making_search_free_4_all	Making Search Free 4 All : r/LocalLLaMA	2026-10-11 13:34
+https://reddit.com/r/hermesagent/comments/1u8uear/best_cost_effective_web_search_backend	Best, cost effective, web search backend? : r/hermesagent	2026-10-11 13:34
+https://oriosearch.org	Siftdog — open-source, self-hosted Tavily alternative	2026-10-11 13:34
+https://linkedin.com/pulse/1200-mistake-why-i-switched-ai-agent-from-tavily-searxng-muhammad-gsvzf	I Didn't Want to Pay for Web Search in My Own Homelab, So I Built the ...	2026-10-11 13:34
+https://dev.to/tadmstr/i-didnt-want-to-pay-for-web-search-in-my-own-homelab-so-i-built-the-pipeline-5h2l	Self-Hosted Tavily Alternative: Cut Agent Search Costs 80%	2026-10-11 13:34
+https://de.wikipedia.org/wiki/Reddit	Reddit - Wikipedia	2026-10-11 13:34
+https://en.wikipedia.org/wiki/Reddit	GitHub - jianjungki/tavily-open: Open-source replacement for Tavily ...	2026-10-11 13:34
+https://exa.ai/versus/tavily	Exa vs Tavily: Search API Benchmarks and Comparison	2026-10-11 13:34
+https://fastcrw.com/alternatives/exa-vs-tavily	Exa vs Tavily — Neural Search vs Agent Web Access (2026) | fastCRW	2026-10-11 13:34
+https://medium.com/towardsdev/comparing-10-ai-native-search-apis-and-crawlers-for-llm-agents-ed4130d22c67	Comparing 10 AI-Native Search APIs and Crawlers for LLM Agents | by Kevin Menese	2026-10-11 13:34
+https://reddit.com/r/ProxyEngineering/comments/1w1j2eq/best_search_api_for_llms	Best search API for LLMs : r/ProxyEngineering	2026-10-11 13:34
+https://medium.com/@unicodeveloper/tavily-alternatives-in-2026-after-the-nebius-acquisition-9de526780686	Medium	2026-10-11 13:34
+https://reddit.com/r/Rag/comments/1gr8jnr/which_search_api_should_i_use_between_tavilycom	Which search API should I use between Tavily.com, Exa.ai ...	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1v3uyop/what_do_people_use_for_search	What do people use for search? : r/LocalLLaMA	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1uam3iv/giving_a_local_agent_web_access_without_paid	Giving a local agent web access without paid search/scrape APIs: SearXNG + Scrap	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1ukpd5y/whats_your_actual_agentic_web_research_stack	What’s your actual agentic web research stack? (fully local, no cloud APIs) : r/	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1ukx2f6/what_and_how_are_you_using_for_free_local	What (and how) are you using for free, local web-search and web-fetching with LL	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1qkt6om/what_search_api_do_local_agents_use	What search API do (local) agents use? : r/LocalLLaMA	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1tjmdc8/whats_the_cheapest_way_to_give_a_local_llama_3	What’s the cheapest way to give a local Llama 3 internet access? (SearXNG isn’t 	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1p0c1yw/what_is_the_most_accurate_web_search_api_for_llm	What is the most accurate web search API for LLM? : r/LocalLLaMA	2026-10-11 13:34
+https://reddit.com/r/LocalLLM/comments/1uvjaf8/tested_5_web_search_apis_so_you_dont_have_to_full	Tested 5 web search APIs so you don't have to (full data + tables inside) : r/Lo	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1oocqk1/could_you_guys_recommend_the_best_web_search_api	Could you guys recommend the best web search API for function tool? : r/LocalLLa	2026-10-11 13:34
+https://reddit.com/r/LocalLLaMA/comments/1uyjdfg/added_searxng_and_i_dont_even_know_what_to_say	Added SearXNG and I don't even know what to say anymore. : r/LocalLLaMA	2026-10-11 13:34
+https://fr.wikipedia.org/wiki/Reddit	Reddit — Wikipédia	2026-10-11 13:34
+https://simple.wikipedia.org/wiki/Reddit	Reddit - Simple English Wikipedia, the free encyclopedia	2026-10-11 13:34
+https://webscraft.org/blog/search-api-dlya-ai-agentiv-scho-obirayut-rozrobniki-i-de-pomilyayutsya?lang=en	Best Search API for AI Agents in 2026: Tavily vs Brave vs Exa	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/3444	Bug: reddit engine · Issue #3444 · searxng/searxng · GitHub	2026-10-11 13:34
+https://ssdnodes.com/learn/fix-searxng-engine-captcha-errors	Fix SearXNG CAPTCHA errors from engines · SSD Nodes	2026-10-11 13:34
+https://reddit.com/r/Searx/comments/1tijylz/selfhosted_search_for_llm_agents_searxng_keeps	SearXNG keeps getting blocked : r/Searx	2026-10-11 13:34
+https://reddit.com/r/privacytoolsIO/comments/8ffi68/has_searxme_been_blocked_by_google	Has Searx.me been blocked by Google? : r/privacytoolsIO	2026-10-11 13:34
+https://socialmediatoday.com/news/reddit-cuts-search-engine-scrapers-bing/722471	Reddit Cuts off Search Engine Scrapers, Including Bing	2026-10-11 13:34
+https://reddit.com/r/Searx/hot	r/Searx	2026-10-11 13:34
+https://reddit.com/r/Searx/comments/10zi2wa/how_do_i_fix_suspended_too_many_requests_using	r/Searx - How do I fix "Suspended: too many requests"? ...	2026-10-11 13:34
+https://reddit.com/r/selfhosted/comments/1w188sw/searxng_issues	SearXNG issues : r/selfhosted	2026-10-11 13:34
+https://news.ycombinator.com/item?id=49160599	I’ve always been tempted to set up SearXNG, but all the search engines *already*	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/5867	Bug: google engine - HTTP 403 · Issue #5867 · searxng/searxng	2026-10-11 13:34
+https://reddit.com/r/webscraping/comments/1kejnby/what_affordable_way_of_accessing_google_search	What affordable way of accessing Google search results is ...	2026-10-11 13:34
+https://github.com/searxng/searxng/pull/5922	[fix] google: improve CAPTCHA detection and use suspended_time=0	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/2498	Bug: google engine · Issue #2498 · searxng/searxng	2026-10-11 13:34
+https://reddit.com/r/searxng/comments/1s5we9o/can_someone_help_what_is_happening_here	Can someone help what is happening here : r/searxng	2026-10-11 13:34
+https://reddit.com/r/Searx/comments/1vdsy87/access_denial_due_to_capthca_searxng	access denial due to capthca - searxng : r/Searx	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/5958	[bug] google broken again · Issue #5958 · searxng/searxng	2026-10-11 13:34
+https://reddit.com/r/Searx/comments/1o0p4gf/every_public_instance_i_try_is_giving_these_same	Every public instance I try is giving these same errors	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/5286?timeline_page=1	Bug: google engine	2026-10-11 13:34
+https://github.com/searxng/searxng/issues/2750	Google Search - "Suspended: access denied" · Issue #2750 · searxng/searxng	2026-10-11 13:34
+https://scavio.dev/blog/searxng-blocked-production-why-api-wins	SearXNG Keeps Getting Blocked: Why API Search Wins - Scavio Blog	2026-10-11 13:34
+https://docs.searxng.org/dev/engines/online/google.html	Google Engines - SearXNG Documentation (2026.10.9+f4822b3fc)	2026-10-11 13:34
+https://reddit.com/r/webscraping/comments/167491q/has_anyone_successfully_scraped_data_from	r/webscraping on Reddit: Has anyone successfully scraped data from ...	2026-10-11 13:34
+https://openserp.org/blog/google-scraper-getting-blocked	Why Your Google Scraper Keeps Getting Blocked (and How to Fix It)	2026-10-11 13:34
+https://docs.searxng.org/admin/answer-captcha.html	Answer CAPTCHA from server's IP - SearXNG Documentation (2026.10.9 ...	2026-10-11 13:34
+https://firecrawl.dev/glossary/web-search-apis/search-latency-ai-agents	Why does search latency matter for AI agents? | Firecrawl Glossary	2026-10-11 13:34
+https://elastic.co/search-labs/blog/elastic-connectors-crawl4ai-llms	Elastic connectors: Building Crawl4AI custom connector with LLMs | Elasticsearch	2026-10-11 13:34
+https://linkedin.com/posts/dhrub1_github-dhurbachysearxng-crawl-llm-a-private-activity-7460298580541595648-q9Qm	Building a Local AI-Powered Web Research Agent with ...	2026-10-11 13:34
+https://blog.stackademic.com/web-search-api-and-crawl-apis-for-llm-agents-a-working-comparison-1c968dce7f03	Web Search API and Crawl APIs for LLM Agents	2026-10-11 13:34
+https://news.ycombinator.com/item?id=48248801	Show HN: I built a RAG and knowledge graph agent that runs locally | Hacker News	2026-10-11 13:34
+https://you.com/resources/best-web-search-apis-for-ai-agents	You.com | Best Web Search APIs for AI Agents: What to Test First	2026-10-11 13:34
+https://news.ycombinator.com/item?id=49408642	The Web-Search Latency Your Agent Pays	2026-10-11 13:34
+https://github.com/BoogieMonsta/butterscout	BoogieMonsta/butterscout	2026-10-11 13:34
+https://news.ycombinator.com/item?id=44878151	Show HN: Building a web search engine from scratch with ...	2026-10-11 13:34
+https://blckalpaca.at/en/blog/searxng-crawl4ai-why-we-no-longer-rent-apis	Blck Alpaca | SearXNG + Crawl4AI: Why we no longer rent APIs	2026-10-11 13:34
+https://himcp.ai/server/crawl4ai+searxng-mcp-server	Crawl4AI+SearXNG MCP Server	2026-10-11 13:34
+https://nullmirror.com/en/blog/2026-06-14-local-web-research-with-searxng-and-crawl4ai	Local Web Research with SearXNG and Crawl4AI — _nullmirror	2026-10-11 13:34
+https://crawl4ai.com	Crawl4AI - README	2026-10-11 13:34
+https://agentnativedev.medium.com/open-source-perplexity-perplexica-is-self-hosted-ai-search-with-citations-8eed0fb2f092	Open Source Perplexity: Perplexica is Self-Hosted AI Search ...	2026-10-11 13:34
+https://github.com/ItzCrazyKns/Vane/issues/834	Perplexica/Ollama/SearXNG Connection Issues · Issue #834 · ItzCrazyKns/Vane · Gi	2026-10-11 13:34
+https://xda-developers.com/i-combined-perplexica-and-searxng-with-local-llms	I don’t pay for Perplexity or ChatGPT after combining my local LLMs with Perplex	2026-10-11 13:34
+https://ramnode.com/guides/perplexica	Deploy Perplexica on a VPS — Self-Hosted AI Search | RamNode	2026-10-11 13:34
+https://reddit.com/r/AISEOInsider/comments/1wrg34c/perplexity_search_engine_cut_slow_searches_from	Perplexity Search Engine Cut Slow Searches From 800ms to ...	2026-10-11 13:34
+https://github.com/searxng/searxng/discussions/2445	Searxng Latency · searxng/searxng · Discussion #2445 · GitHub	2026-10-11 13:34
+https://community.umbrel.com/t/perplexica-not-receiving-searxng-results/24758	Perplexica not receiving SearXNG results - Support and Troubleshooting - Umbrel 	2026-10-11 13:34
+https://medium.com/codetodeploy/i-replaced-google-and-perplexity-with-perplexica-and-it-changed-how-i-think-about-search-781c219c0f5c	Perplexica Review: The Self-Hosted AI Search Engine That Beats Perplexity | Code	2026-10-11 13:34
+https://github.com/ItzCrazyKns/Perplexica/issues/965	Unable to conduct a search	2026-10-11 13:34
+https://github.com/ItzCrazyKns/Perplexica/issues/763	UI hangs on "Answer" spinner when SearXNG returns CAPTCHA error · Issue #763 · I	2026-10-11 13:34
+https://github.com/ItzCrazyKns/Perplexica/issues/568	Error to connect the backend · Issue #568 · ItzCrazyKns/Perplexica	2026-10-11 13:34
+https://spheron.network/blog/self-host-ai-search-perplexica-morphic-gpu-cloud	Self-Host Perplexity-Style AI Search on GPU Cloud: Deploy Perplexica, Morphic, a	2026-10-11 13:34
+https://github.com/ItzCrazyKns/Perplexica/issues/834	Perplexica/Ollama/SearXNG Connection Issues · Issue #834 · ItzCrazyKns/Vane	2026-10-11 13:34
+https://aifoss.dev/blog/perplexica-review-2026	Perplexica Review 2026: Open-Source AI Search With Ollama	2026-10-11 13:34
+https://github.com/ItzCrazyKns/Perplexica/issues/669	External SearXNG instance · Issue #669 · ItzCrazyKns/Perplexica	2026-10-11 13:34
+https://reddit.com/r/PostAI/comments/1ck64oy/perplexica_this_100_local_perplexity_clone_is_new	Perplexica: This 100% LOCAL PERPLEXITY CLONE is NEW, ...	2026-10-11 13:34
+https://github.com/kiranz/perplexica	GitHub - kiranz/ perplexica : Perplexica is an AI-powered answering ...	2026-10-11 13:34
+https://deepwiki.com/ItzCrazyKns/Perplexica	ItzCrazyKns/ Perplexica | DeepWiki	2026-10-11 13:34
+https://openhub.net/p/Perplexica	The Perplexica Open Source Project on Open Hub	2026-10-11 13:34
+https://sourceforge.net/projects/perplexica.mirror	Perplexica download | SourceForge.net	2026-10-11 13:34
+https://neuost.ai/ki-tools/perplexica	Perplexica im Test | neuost	2026-10-11 13:34
+https://discuss.huggingface.co/t/ghost-search-mcp-native-tor-routed-search-layer-for-rag-seeking-research-collaborators/179104	Ghost Search — MCP-native, Tor-routed search layer for RAG (seeking research col	2026-10-11 13:34
+https://certsafari.com/databricks/gen-ai-engineer-associate/learn/re-ranking-in-rag-retrieval-role-cross-encoders-and-trade-offs	Re-ranking in RAG Retrieval: Role, Cross-Encoders and Trade-offs — Databricks Ce	2026-10-11 13:34
+https://medium.com/@aishikbhattacharjee98/reranking-using-cross-encoder-boost-your-rag-pipeline-accuracy-d2da22006dad	Reranking using Cross Encoder — Boost Your RAG Pipeline Accuracy	2026-10-11 13:34
+https://customgpt.ai/rag-reranking-techniques	RAG Reranking Techniques for Better Search | CustomGPT.ai	2026-10-11 13:34
+https://medium.com/@rossashman/the-art-of-rag-part-3-reranking-with-cross-encoders-688a16b64669	The aRt of RAG Part 3: Reranking with Cross Encoders	2026-10-11 13:34
+https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-information-retrieval	Develop a RAG Solution on Azure - Information-Retrieval Phase - Azure Architectu	2026-10-11 13:34
+https://youtube.com/watch?v=ZFbaA9eM0uo	Advanced RAG 04 - Reranking with Cross Encoders, and Cohere API	2026-10-11 13:34
+https://dev.to/harinezumigel/adding-web-search-to-our-rag-pipeline-what-broke-and-why-4ge5	Adding web search to our RAG pipeline: what broke and why - DEV Community	2026-10-11 13:34
+https://reddit.com/r/Rag/comments/1tij26t/rag_techniques_that_are_also_applicable_to_web	RAG techniques that are also applicable to web search	2026-10-11 13:34
+https://apiserpent.com/blog/rag-real-time-search-tutorial	Real-Time Web Search for RAG Systems: 2026 Developer Guide	2026-10-11 13:34
+https://parallel.ai/articles/how-to-build-a-rag-pipeline-with-web-search-instead-of-vector-databases	How to Build a Web RAG Pipeline Without Vector Databases | Parallel	2026-10-11 13:34
+https://github.com/KazKozDev/production_rag_pipeline/tree/v1.0.0	GitHub - KazKozDev/production_rag_pipeline at v1.0.0 · GitHub	2026-10-11 13:34
+https://reddit.com/r/Rag/comments/1ppbcqf/rate_my_rag_setup_or_take_it_as_your_own	Rate my RAG setup (or take it as your own)... : r/Rag	2026-10-11 13:34
+https://thedataconduit.com/posts/reranking-models-as-a-rag-retrieval-layer	Reranking Models as a RAG Retrieval Layer · The Data Conduit	2026-10-11 13:34
+https://reddit.com/r/Rag/comments/1sxv82h/spent_a_quarter_chasing_retrieval_quality_with	Spent a quarter chasing retrieval quality with better embeddings. Turns out we j	2026-10-11 13:34
+https://localaimaster.com/blog/reranking-cross-encoders-guide	Reranking & Cross-Encoders for RAG: BGE, Cohere, Jina (2026)	2026-10-11 13:34
+https://aitechconnect.in/tips/rag-reranking-cross-encoders-colbert-hosted-rerankers-2026	Reranking for RAG: Cross-Encoders, ColBERT and Rerankers (2026)	2026-10-11 13:34
+https://folarin.dev/blog/reranking-in-rag	Reranking in RAG: Cross-Encoders and When They Pay Off (2026)	2026-10-11 13:34
+https://github.com/synapseeed/rag-reranker	RAG Reranker Service - GitHub	2026-10-11 13:34
+https://reddit.com/r/LangChain/comments/1djsnov/best_open_source_reranker_for_rag	Best Open Source RE-RANKER for RAG??!! : r/LangChain - Reddit	2026-10-11 13:34
+https://explore.n1n.ai/blog/optimizing-rag-pipelines-cross-encoders-reranking-2026-04-12	Optimizing RAG Pipelines with Cross-Encoders and Reranking	2026-10-11 13:34
+https://aiworkflowlab.dev/article/how-to-build-hybrid-search-rag-bm25-rrf-fusion-cross-encoder-reranking	Hybrid RAG: BM25 + RRF Guide 2026 | AI Workflow Lab	2026-10-11 13:34
+https://github.com/ernestyu/clawfetch	ernestyu/clawfetch	2026-10-11 13:37
+https://github.com/respond-io/markdown-fetcher-js	respond-io/markdown-fetcher-js	2026-10-11 13:37
+https://thedrive.ai/blog/drive-ai-vs-jina-reader-vs-firecrawl-markdown-api	The Drive AI vs Jina Reader vs Firecrawl — Web-to-Markdown API Compared (2026)	2026-10-11 13:37
+https://fastcrw.com/blog/jina-vs-firecrawl-vs-fastcrw-markdown	Jina vs Firecrawl vs fastCRW: Markdown APIs | fastCRW	2026-10-11 13:37
+https://github.com/martinchen448/SearXNG-Crawl4AI	GitHub - martinchen448/SearXNG-Crawl4AI: SearXNG-Crawl4AI is an open-source sear	2026-10-11 13:37
+https://localaimaster.com/blog/crawl4ai-setup-guide	Crawl4AI Setup Guide: LLM-Ready Web Scraping for Local RAG	2026-10-11 13:37
+https://reddit.com/r/webscraping/comments/1cvisv8/how_can_i_scrape_pages_with_cloudflare_protection	How can I scrape pages with Cloudflare protection when ... - Reddit	2026-10-11 13:37
+https://dev.to/ritza/best-serp-api-comparison-2025-serpapi-vs-exa-vs-tavily-vs-scrapingdog-vs-scrapingbee-2jci	Best SERP API Comparison 2025: SerpAPI vs Exa vs Tavily vs ScrapingDog vs Scrapi	2026-10-11 13:37
+https://techstackups.com/comparisons/best-serp-api-comparison-serpapi-exa-tavily	Best SERP API comparison 2025: SerpAPI vs Exa vs Tavily vs ScrapingDog vs Scrapi	2026-10-11 13:37
+https://firecrawl.dev/alternatives/firecrawl-vs-jina-ai	Firecrawl vs Jina AI | Best Jina AI Alternative	2026-10-11 13:37
+https://spider.cloud/blog/firecrawl-vs-crawl4ai-vs-spider-honest-benchmark	Spider Blog - Crawl4AI vs Firecrawl vs Spider Benchmark	2026-10-11 13:37
+https://recatools.com/guides/firecrawl-vs-crawl4ai-vs-jina-reader-vs-browser-use	Firecrawl vs Crawl4AI vs Jina Reader vs Browser Use (2026)	2026-10-11 13:37
+https://dataresearchtools.com/firecrawl-vs-crawl4ai	Firecrawl vs Crawl4AI vs Jina Reader: Which LLM Scraping Tool in 2026?	2026-10-11 13:37
+https://dreaming.press/posts/2026-06-21-firecrawl-vs-crawl4ai-vs-jina-reader.html	Firecrawl vs Crawl4AI vs Jina Reader: Feeding the Web to an AI Agent	2026-10-11 13:37
+https://toolhalla.ai/blog/firecrawl-vs-crawl4ai-vs-jina-reader-2026	Firecrawl vs Crawl4AI vs Jina Reader: Best AI Web Scraping Tool in 2026	2026-10-11 13:37
+https://awesomeagents.ai/tools/best-ai-web-scraping-tools-2026	Best AI Web Scraping Tools 2026 - 6 Tools Ranked	2026-10-11 13:37
+https://use-apify.com/blog/firecrawl-vs-jina-reader-2026	Firecrawl vs Jina Reader 2026: LLM Web Crawling Compared	2026-10-11 13:37
+https://firecrawl.dev/alternatives/firecrawl-vs-tavily	Firecrawl vs Tavily: Complete Comparison for AI Agents & RAG (2026)	2026-10-11 13:37
+https://pkoretic.medium.com/improved-web-search-with-local-llm-searxng-and-deno-2-0-d587302e8e17	Improved Web Search with Local LLM, SearxNG and Deno 2.0	2026-10-11 13:37
+https://reddit.com/r/LocalLLaMA/comments/1ua6xfw/how_do_you_guys_setup_search_with_your_ai_models	How do you guys setup search with your AI models? : r/LocalLLaMA	2026-10-11 13:37
+https://reddit.com/r/LocalLLaMA/comments/1ozk41e/how_are_you_handling_web_crawling_firecrawl_is	How are you handling web crawling? Firecrawl is great, but I'm hitting limits. :	2026-10-11 13:37
+https://reddit.com/r/LocalLLaMA/comments/1sqmy67/searxng_settings_template_for_llm_web_search	SearXNG settings template for LLM web search? : r/LocalLLaMA	2026-10-11 13:37
+https://deepwiki.com/luxiaolei/searxng-crawl4ai-mcp/7.2-known-limitations-and-workarounds	Known Limitations and Workarounds | luxiaolei/searxng-crawl4ai-mcp ...	2026-10-11 13:37
+https://joshuaopolko.com/perplexica-self-hosted-guide	Perplexica (Now Vane) Self-Hosted Guide (2026): Open-Source Perplexity	2026-10-11 13:37
+https://the-decoder.com/perplexica-is-an-open-source-ai-search-engine-alternative-to-perplexity-ai	Perplexica is an open-source AI search engine alternative to Perplexity.ai	2026-10-11 13:37
+https://github.com/UB-Mannheim/FAIR-Perplexica	GitHub - UB-Mannheim/FAIR-Perplexica: An open-source Perplexity analogue for Res	2026-10-11 13:37
+https://levelup.gitconnected.com/perplexica-the-open-source-revolution-taking-on-perplexity-ai-8711ced92695	The Open-Source Revolution Taking On Perplexity AI	2026-10-11 13:37
+https://github.com/janoamaral/Perplexica	GitHub - janoamaral/Perplexica: Perplexica is an AI-powered search engine. It is	2026-10-11 13:37
+https://railway.com/deploy/perplexica-open-source-perplexity-ai-alternative--perplexica-ai-search	Deploy & Host Perplexica | Open Source Perplexity AI Alternative | Railway	2026-10-11 13:37
+https://github.com/ItzCrazyKns/Perplexica/issues/670	The issue of sources for /api/search · Issue #670 · ItzCrazyKns/Perplexica	2026-10-11 13:37
+https://github.com/ItzCrazyKns/Perplexica/issues/963	Embedding requests not sent via OpenRouter after latest update · Issue #963 · It	2026-10-11 13:37
+https://github.com/ItzCrazyKns/Perplexica/issues/533	Connection Issues in Recent Docker Images	2026-10-11 13:37
+https://github.com/ItzCrazyKns/Perplexica/issues/321	[need help] after setting up docker, it seems that Perplexica isn't searching th	2026-10-11 13:37
+https://github.com/sjufan84/perplexica	GitHub - sjufan84/perplexica · GitHub	2026-10-11 13:37
+https://github.com/sbasg/Perplexica	GitHub - sbasg/Perplexica · GitHub	2026-10-11 13:37
+https://repocloud.io/details?app_id=267	RepoCloud | Vane	2026-10-11 13:37
+https://developer.mozilla.org/en-US/docs/MDN/Community/Discussions	GitHub Discussions - MDN Web Docs | MDN	2026-10-11 13:37
+https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/General_embedding_technologies	From object to iframe — general embedding technologies - Learn web development |	2026-10-11 13:37
+https://ai-tldr.dev/tools/perplexica	Perplexica (Vane): Private AI Answering Engine | AI/TLDR	2026-10-11 13:37
+https://unsubbed.co/tools/perplexica	Perplexica — unsubbed.co	2026-10-11 13:37
+https://deepwiki.com/id-2/Perplexica	id-2/Perplexica | DeepWiki	2026-10-11 13:37
+https://github.com/Alpaca-Network/Perplexica	GitHub - Alpaca-Network/Perplexica: Perplexica is an AI ...	2026-10-11 13:37
+https://repocloud.io/details/Morphic	RepoCloud | Morphic	2026-10-11 13:37
+https://aispaces.net/es/ai-tool/morphic-by-house-of-zoox	Morphic - Open Source AI Search Engine with Cited Answers - AiSpaces	2026-10-11 13:37
+https://aispaces.net/ai-tool/morphic-by-house-of-zoox	Morphic - Open Source AI Search Engine with Cited Answers - AiSpaces	2026-10-11 13:37
+https://aispaces.net/de/ai-tool/morphic-by-house-of-zoox	Morphic - Open Source AI Search Engine with Cited Answers - AiSpaces	2026-10-11 13:37
+https://fastcrw.com/alternatives/open-source-tavily	Open-Source Tavily Alternatives: What They Actually Do | fastCRW	2026-10-11 13:37
+https://aitools.flocci.in/tool/morphic	Morphic — Free, features and alternatives | Flocci AI Tools	2026-10-11 13:37
+https://medevel.com/farfalle	Farfalle - Open-source AI-powered search engine. And ...	2026-10-11 13:37
+https://llms.blog/posts/web-extraction-and-retrieval-architectures-for-production-ai-agents-comparing-tavily-exa-firecrawl-jina-reader-and-crawl4ai	Web Extraction and Retrieval Architectures for Production AI Agents: Comparing T	2026-10-11 13:37
+https://github.com/miurla/morphic	GitHub - miurla/morphic: An AI-powered search engine with a generative UI · GitH	2026-10-11 13:37
+https://deepwiki.com/miurla/morphic/3-search-infrastructure	Search Infrastructure | miurla/morphic | DeepWiki	2026-10-11 13:37
+https://deepwiki.com/miurla/morphic/3.1-search-providers	Search Providers | miurla/morphic | DeepWiki	2026-10-11 13:37
+https://github.com/BrunoScaglione/farfalle	BrunoScaglione/farfalle	2026-10-11 13:37
+https://vercel.com/templates/other/morphic-ai-answer-engine-generative-ui	Morphic: AI-powered answer engine	2026-10-11 13:37
+https://github.com/copy-and-execute/farfalle	copy-and-execute/farfalle	2026-10-11 13:37
+https://github.com/7MPra/morphic	7MPra/morphic	2026-10-11 13:37
+https://en.wikipedia.org/wiki/Wikipedia	Wikipedia, die freie Enzyklopädie	2026-10-11 13:37
+https://en.wikipedia.org/wiki/Main_Page	Zwischen Einsamkeit und Community: Wie gemeinschaftlich ist …	2026-10-11 13:37
+https://wikipedia.org	Wikipedia - BigBlueButton	2026-10-11 13:37
+https://de.wikipedia.org/wiki/Wikipedia	Spenden-Kommentar-Ticker	2026-10-11 13:37
+https://de.wikipedia.org/wiki/Wikipedia:Hauptseite	WikidataCon 2027/Call for expressions of interest to host	2026-10-11 13:37
+https://es.wikipedia.org/wiki/Wikipedia:Portada	bbb.wikipedia.de	2026-10-11 13:37
+https://en.wikipedia.org/wiki/English_Wikipedia	Förderberatung - bbb.wikipedia.de	2026-10-11 13:37
+https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal	Wiki Loves Earth 2026 – Vorjury Deutschland	2026-10-11 13:37
+https://promptquorum.com/power-local-llm/farfalle-review	Farfalle Review 2026: Self-Hosted AI Search Engine	2026-10-11 13:37
+https://unsubbed.co/tools/morphic	Morphic — unsubbed.co	2026-10-11 13:37
+https://github.com/rashadphz/farfalle	GitHub - rashadphz/farfalle: AI search engine - self-host ...	2026-10-11 13:37
+https://pickyourtech.com/projects/gh-miurla-morphic	Morphic: Open Source Alternative to ChatGPT and Claude and ...	2026-10-11 13:37
+https://deepwiki.com/miurla/morphic/1.1-architecture-overview	Architecture Overview | miurla/morphic | DeepWiki	2026-10-11 13:37
+https://deepwiki.com/miurla/morphic	miurla/morphic | DeepWiki	2026-10-11 13:37
+https://thunderbit.com/blog/trafilatura	trafilatura Benchmark: Less Boilerplate Than Readability	2026-10-11 13:37
+https://webclaw.io/blog/crawl4ai-vs-playwright-web-scraping	Crawl4AI vs Playwright: Which to Use for Scraping (2026) | webclaw	2026-10-11 13:37
+https://news.ycombinator.com/item?id=40035347	Converting websites to markdown comes with 3 distinct problems: 1. Throughly scr	2026-10-11 13:37
+https://dev.to/stevengonsalvez/browser-tools-for-ai-agents-part-4-skip-the-browser-save-80-on-tokens-304c	Browser Tools for AI Agents Part 4: Skip the Browser, Save 80% on Tokens - DEV C	2026-10-11 13:37
+https://bulkmd.app/blog/readability-vs-trafilatura-extractors	Readability vs Trafilatura vs jsdom: 2026 Benchmark — BulkMD	2026-10-11 13:37
+https://trafilatura.readthedocs.io/en/latest/evaluation.html	Benchmarks and evaluation — Trafilatura 2.2.0 documentation	2026-10-11 13:37
+https://reddit.com/r/webscraping/comments/1flgwup/after_2_months_learning_scraping_im_sharing_what	After 2 months learning scraping, I'm sharing what I learned!	2026-10-11 13:37
+https://zenrows.com/blog/playwright-cloudflare-bypass	How to Bypass Cloudflare with Playwright · Zenrows	2026-10-11 13:37
+https://github.com/ppeirce/reddit2markdown	ppeirce/reddit2markdown	2026-10-11 13:37
+https://github.com/clusy-io/clusy-crawler	clusy-io/clusy-crawler	2026-10-11 13:37
+https://github.com/clusy-io/clusy-crawler/blob/main/README.md	README.md	2026-10-11 13:37
+https://github.com/groktopus/groktocrawl/blob/main/docs/adr/0010-five-tier-scraper-with-llm-recovery.md	docs/adr/0010-five-tier-scraper-with-llm-recovery.md	2026-10-11 13:37
+https://github.com/jamditis/claude-skills-journalism/blob/master/dev-toolkit/skills/web-scraping/SKILL.md	dev-toolkit/skills/web-scraping/SKILL.md	2026-10-11 13:37
+https://github.com/madeinplutofabio/ghost-reader	madeinplutofabio/ghost-reader	2026-10-11 13:37
+https://developers.cloudflare.com/browser-run/playwright	Playwright · Cloudflare Browser Run docs	2026-10-11 13:37
+https://skills.rest/skill/web-scraping-valorinvestigator	web-scraping: Extract web content using cascading requests and ...	2026-10-11 13:37
+https://reddit.com/r/dataengineering/comments/pjc2ka/how_to_correctly_crawl_lots_of_pages_without	How to correctly crawl lots of pages without getting a bot ... - Reddit	2026-10-11 13:37
+https://browserless.io/blog/bypass-cloudflare-with-playwright	Playwright Cloudflare Bypass: BQL Guide for Scraping	2026-10-11 13:37
+https://reader.dev/blog/bypass-cloudflare	How to Bypass Cloudflare When Web Scraping (2026) | Reader	2026-10-11 13:37
+https://olostep.com/blog/best-web-search-apis	Best Web Search APIs: Compare Top Search API Tools	2026-10-11 13:37
+https://oxylabs.io/blog/best-serp-api	7 Best SERP APIs for Real-Time Data	2026-10-11 13:37
+https://firecrawl.dev/blog/best-web-search-apis	Best Web Search APIs for AI Applications in 2026	2026-10-11 13:37
+https://tsecurity.de/de/3136200/sichere-programmierung/best-serp-api-comparison-2025-serpapi-vs-exa-vs-tavily-vs-scrapingdog-vs-scrapingbee	🔒 Best SERP API Comparison 2025: SerpAPI vs Exa vs Tavily vs ScrapingDog vs Scra	2026-10-11 13:37
+https://humai.blog/tavily-vs-exa-vs-perplexity-vs-you-com-the-complete-ai-search-api-comparison-2025	Tavily vs Exa vs Perplexity vs You.com APIs	2026-10-11 13:37
+https://arlenkumar.com/bench/leaderboards/web-search	Web Search API Benchmark: Exa vs SerpAPI vs Brave vs Tavily | arlen/bench	2026-10-11 13:37
+https://serpex.dev/blog/serpex-vs-tavily-vs-exa-the-fastest-ai-search-api-of-2025	Serpex vs Tavily vs Exa: The Fastest AI Search API of 2025 | Serpex Blog	2026-10-11 13:37
+https://serpex.dev/blog/best-ai-ready-search-apis-for-llms-agents-in-2025-serpexdev-vs-tavily-vs-bright-data	Best AI-Ready Search APIs for LLMs & Agents in 2025: Serpex.dev vs Tavily vs Bri	2026-10-11 13:37
+https://github.com/serpbase-dev/serp-api-comparison	GitHub - serpbase-dev/serp-api-comparison: Compare the best SERP APIs by pricing	2026-10-11 13:37
+https://github.com/downinrosettednv947/serp-api-comparison	GitHub - downinrosettednv947/serp-api-comparison: Compare the best SERP ...	2026-10-11 13:37
+https://cyberax.com/ai-playbook/ai-search-apis-compared	AI search APIs compared (Perplexity, Tavily, SerpAPI + LLM) — Cyberax	2026-10-11 13:37
+https://parallel.ai/articles/best-fast-search-apis	Best Fast Search APIs in 2026 | Parallel	2026-10-11 13:37
+https://holysheep.ai/articles/en-serpapi-vs-tavily-vs-exaaisousuozengqiangapichengb-2026-06-15-0017.html	SerpAPI vs Tavily vs Exa: AI Search-Augmented API Cost and Quality ...	2026-10-11 13:37
+https://fastcrw.com/alternatives/jina-vs-fastcrw	Jina vs fastCRW in 2026 — URL-to-Markdown Reader or Full Scraping API?	2026-10-11 13:37
+https://blog.apify.com/jina-ai-vs-firecrawl	Jina AI vs. Firecrawl	2026-10-11 13:37
+https://parallel.ai/articles/jina-ai-reader-vs-parallel	Jina AI Reader vs Parallel: Web Content for LLMs | Parallel	2026-10-11 13:37
+https://firecrawl.dev/alternatives/firecrawl-vs-crawl4ai	Firecrawl vs Crawl4AI | Best Crawl4AI Alternative	2026-10-11 13:37
+https://inference.net/content/crawl4ai-vs-firecrawl-vs-schematron	Crawl4AI vs Firecrawl vs Schematron: Crawling and Extraction Compared | Inferenc	2026-10-11 13:37
+https://jina.ai/reader	Reader API	2026-10-11 13:37
+https://github.com/jina-ai/reader	jina-ai/reader	2026-10-11 13:37
+https://kanopylabs.com/blog/crawl4ai-vs-jina-reader-vs-firecrawl-v2-web-scraping	Crawl4AI vs Jina Reader vs Firecrawl v2: Web Scraping for RAG - Kanopy Labs	2026-10-11 13:37
+https://github.com/jina-ai/reader/blob/main/architecture.md	architecture.md	2026-10-11 13:37
+https://github.com/jina-ai/reader/blob/3f86855e/src/services/lm.ts	src/services/lm.ts	2026-10-11 13:37
