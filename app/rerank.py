@@ -341,6 +341,7 @@ def merge_by_source(
     chunks_per_source: int,
     max_results: int,
     candidates: Optional[List[Dict]] = None,
+    query: Optional[str] = None,
 ) -> List[Dict]:
     """Fasst rerankte Chunks pro Quelle zusammen -> eine result-Zeile je URL.
 
@@ -348,6 +349,8 @@ def merge_by_source(
     - content = die besten chunks_per_source Chunks, zusammengefuehrt.
     - mit `candidates` (Treffer mit Engine-Raengen): Reihenfolge per RRF aus
       Cross-Encoder-Rang und Engine-Rang (fuse_engine_rank).
+    - mit `query` und QUALITY_PRIOR: hoechstens Platz 1 fuer SEO-/Antwortfarm-Seiten
+      (_demote_farms).
     Rueckgabe: bis zu max_results Quellen, absteigend nach score bzw. Fusion.
     """
     by_url: Dict[str, Dict] = {}
@@ -388,12 +391,33 @@ def merge_by_source(
     results.sort(key=lambda r: (r["_rank"], canonical_url(r["url"])), reverse=True)
     ce = [r.pop("_rank") for r in results]
     settings = get_settings()
+    ce_by_url = {canonical_url(r["url"]): c for r, c in zip(results, ce)}
     if candidates:
         results = fuse_engine_rank(
             results, candidates, settings.fusion_weight, settings.fusion_k,
             ce_scores=ce, trust_min=settings.fusion_trust_min,
         )
-    return diversify(results, settings.results_per_domain)[:max_results]
+    results = diversify(results, settings.results_per_domain)
+    if query and quality_active():
+        results = _demote_farms(query, results, ce_by_url)
+    return results[:max_results]
+
+
+def _demote_farms(query: str, results: List[Dict], ce_by_url: Dict[str, float]) -> List[Dict]:
+    """quality.demote_farms mit denselben Regeln wie der Logit-Abzug in rerank():
+    Quellen mit festem Prior (Wikipedia, Behoerden, ...) gelten nie als Farm."""
+    settings = get_settings()
+    language = lang_mod.detect(query) if settings.source_prior else None
+
+    def flagged(r: Dict) -> bool:
+        url = r.get("url", "")
+        if settings.source_prior and source_prior(url, language) != 0.0:
+            return False
+        return quality_mod.seo_score(url, r.get("title", ""), query) >= quality_mod.FARM_MIN_SCORE
+
+    return quality_mod.demote_farms(
+        results, query, flagged, lambda r: ce_by_url.get(canonical_url(r.get("url", "")), 0.0)
+    )
 
 
 CONTENT_MIN_CHARS = 1000

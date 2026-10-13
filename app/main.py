@@ -244,7 +244,7 @@ def _run_search(req: SearchRequest, _relaxed: bool = False) -> "tuple[SearchResp
     # 4) Zusammenfuehren je Quelle -> Top-k results
     merged = rerank_mod.merge_by_source(
         ranked, chunks_per_source=req.chunks_per_source, max_results=req.max_results,
-        candidates=candidates,
+        candidates=candidates, query=req.query,
     )
     merged = rerank_mod.drop_weak(merged, settings.min_result_score, settings.min_results_kept)
 

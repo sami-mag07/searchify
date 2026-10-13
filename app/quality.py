@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from typing import Dict, Optional
+from typing import Callable, Dict, List, Optional
 from urllib.parse import unquote, urlparse
 
 _Q_WORDS = (
@@ -34,8 +34,17 @@ _CLICKBAIT = re.compile(
     r"\binfos? und tipps\b|\bdefinition,|\bwhat happened\b|\bstructure explained\b)",
     re.IGNORECASE,
 )
+# Blickfang-Zeichen im Titel (≡ Liste, ᐅ Angebot, ★ ...): bekannter SEO-Kniff fuer mehr
+# Klicks in der Trefferliste. Anfuehrungszeichen (» «) und Pfeile als Trenner zaehlen nicht.
+_TITLE_SYMBOL = re.compile(r"[≡★⭐ᐅ✅✓✔►▶➤⇒【】]")
 _NEW_TLD = (".io", ".ai", ".dev", ".co", ".info", ".xyz", ".site", ".online", ".blog", ".app",
-            ".me", ".biz", ".top", ".net")
+            ".me", ".biz", ".top", ".net", ".guide", ".wiki", ".club", ".tech", ".space", ".website",
+            ".store", ".shop", ".page", ".one", ".today", ".world", ".zone", ".fyi", ".tips", ".how")
+# Sprach-Subdomain (de.example.com): typisch fuer maschinell uebersetzte Antwort-Farmen.
+# Nachschlagewerke mit Sprach-Subdomain (Wikipedia) haben einen festen Quellen-Prior
+# und werden hier gar nicht bewertet.
+_LANG_SUB = {"de", "en", "es", "fr", "it", "nl", "pt", "pl", "ru", "tr", "sv", "da", "fi", "no",
+             "cs", "ja", "ko", "zh", "ar"}
 _SLD2 = ("co.uk", "org.uk", "ac.uk", "com.au", "co.at", "or.at", "gv.at", "com.br", "co.jp")
 
 
@@ -72,8 +81,10 @@ def features(url: str, title: str = "", query: str = "") -> Dict[str, int]:
         "seo_path": int(bool(_SEO_PATH.search(p.path)) and not re.search(r"/(?:docs|wiki)/", p.path)),
         "digit_domain": int(bool(re.search(r"\d", label))),
         "new_tld": int(host.endswith(_NEW_TLD)),
+        "lang_subdomain": int(len(host.split(".")) >= 3 and host.split(".")[0] in _LANG_SUB),
         "title_question": int(t.endswith("?") or "?" in t.split(" - ")[0].split(" | ")[0]),
         "title_clickbait": int(bool(_CLICKBAIT.search(t))),
+        "title_symbol": int(bool(_TITLE_SYMBOL.search(t))),
         # Titel wiederholt fast die ganze Frage (Antwort-Farmen)
         "title_echo": int(len(q_tokens) >= 2 and len(q_tokens & title_tokens) >= 0.8 * len(q_tokens)),
         # Domainname enthaelt ein Fragewort (exact-match domain)
@@ -90,6 +101,10 @@ WEIGHTS: Dict[str, float] = {
     "digit_domain": 0.5,
     "new_tld": 0.6,
     "title_clickbait": 0.8,
+    # 14.10.2026 von Hand gesetzt (nicht aus der Regression), Begruendung je Merkmal oben;
+    # gegen den unabhaengigen Werbe-/Affiliate-Marker (eval/seo_share.py) geprueft
+    "lang_subdomain": 0.6,
+    "title_symbol": 0.8,
     # gemessen, aber ohne Gewicht (Kreuzvalidierung: kein Gewinn bzw. schadet)
     "title_question": 0.0,
     "title_echo": 0.0,
@@ -113,6 +128,8 @@ def is_question(query: str) -> bool:
 
 
 PENALTY_CAP = 2.0
+# Ab diesem seo_score gilt eine Seite fuer demote_farms als Antwort-Farm (ein Merkmal reicht).
+FARM_MIN_SCORE = 0.5
 
 
 def seo_penalty(url: str, title: str, query: str, weight: float, cap: Optional[float] = PENALTY_CAP) -> float:
@@ -126,3 +143,31 @@ def seo_penalty(url: str, title: str, query: str, weight: float, cap: Optional[f
     if cap is not None:
         s = min(s, cap)
     return -weight * s
+
+
+def demote_farms(
+    results: List[Dict], query: str, is_flagged: Callable[[Dict], bool], ce: Callable[[Dict], float],
+    floor: float = 0.0,
+) -> List[Dict]:
+    """Hoechstens eine auffaellige Seite oben: nur auf Platz 1 darf eine SEO-/Antwortfarm-
+    Seite stehen (dort sind sich Cross-Encoder und Engines am sichersten, und sie traegt oft
+    die Antwort). Weitere markierte Seiten rutschen hinter die unauffaelligen Treffer, aber
+    nie hinter themenfremde (Cross-Encoder-Logit < floor). Nichts wird entfernt.
+
+    Grund: Der Logit-Abzug allein reicht nicht, weil Antwort-Farmen die Frage woertlich
+    wiederholen (Logit 2-7 ueber Wikipedia) und die Engine-Fusion sie wieder hochzieht.
+    Nur bei Fragen in Satzform, wie seo_penalty."""
+    if not is_question(query) or len(results) < 2:
+        return results
+    out: List[Dict] = []
+    held: List[Dict] = []
+    for i, r in enumerate(results):
+        flagged = is_flagged(r)
+        if flagged and i > 0:
+            held.append(r)
+            continue
+        if not flagged and held and ce(r) < floor:
+            out.extend(held)
+            held = []
+        out.append(r)
+    return out + held
