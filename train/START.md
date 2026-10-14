@@ -9,12 +9,12 @@ Du machst nur die 4 Schritte unter „Was du machst“. Den Rest macht Claude Co
 3. Im Ordner `C:\tavily` Claude Code starten: `mkdir C:\tavily; cd C:\tavily; claude`
 4. Den ganzen Block unter „Auftrag“ reinkopieren und Enter drücken. Wenn ein Browserfenster für GitHub aufgeht, einmal bestätigen. Danach kannst du schlafen gehen.
 
-Morgen früh: In derselben Claude-Sitzung „Wie ist der Stand?“ fragen. Der fertige Ordner liegt unter `C:\tavily\tavily-clone\models\`, ihn per USB auf den Mac kopieren.
+Morgen früh: Nichts kopieren. Claude lädt Logs und Modell selbst hoch (Branch `laptop/lauf-<datum>` und ein privates Release). Auf dem Mac sagst du nur „Werte den Laptop-Lauf aus“.
 
 ## Auftrag
 
 ```
-Du richtest auf diesem Windows-Laptop (RTX 3070 Ti Laptop, 8 GB) das Reranker-Training aus dem privaten Repo github.com/sami-mag07/tavily-clone ein und startest es über Nacht. Der Besitzer schläft, frag ihn nichts, entscheide selbst und arbeite bis das Training sicher läuft. Erlaubt ist alles in diesem Auftrag; nichts löschen ausser train/data bei einem fehlgeschlagenen Rauchtest, nichts pushen, keine Anfragen an Tavily, Serper oder Exa.
+Du richtest auf diesem Windows-Laptop (RTX 3070 Ti Laptop, 8 GB) das Reranker-Training aus dem privaten Repo github.com/sami-mag07/tavily-clone ein und startest es über Nacht. Der Besitzer schläft, frag ihn nichts, entscheide selbst und arbeite bis das Training sicher läuft. Erlaubt ist alles in diesem Auftrag; nichts löschen ausser train/data bei einem fehlgeschlagenen Rauchtest, nichts pushen ausser in Schritt 11 (eigener Branch und Release, nie main), keine Anfragen an Tavily, Serper oder Exa.
 
 1. Werkzeuge: Prüfe git, gh (GitHub CLI) und Python 3.12. Fehlt etwas, installiere es mit winget (Git.Git, GitHub.cli, Python.Python.3.12), ohne Rückfrage (--accept-package-agreements --accept-source-agreements). Danach PATH in der Sitzung neu laden.
 2. GitHub: Prüfe `gh auth status`. Ist niemand angemeldet, starte `gh auth login --web --git-protocol https` und warte, bis der Besitzer im Browser bestätigt hat. Danach `gh auth setup-git`.
@@ -25,7 +25,11 @@ Du richtest auf diesem Windows-Laptop (RTX 3070 Ti Laptop, 8 GB) das Reranker-Tr
 7. Energie: Damit der Laptop nicht einschläft, im Netzbetrieb Standby und Ruhezustand aus und Deckel zuklappen auf „Nichts unternehmen“ (powercfg /change standby-timeout-ac 0, powercfg /change hibernate-timeout-ac 0, powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0, powercfg /setactive SCHEME_CURRENT). Die alten Werte vorher in C:\tavily\power-vorher.txt notieren.
 8. Nachtlauf: Nach erfolgreichem Rauchtest train\data löschen (Rauchtest-Daten) und den vollen Lauf als eigenen Prozess starten, der weiterläuft, auch wenn diese Sitzung endet: Start-Process powershell mit -ExecutionPolicy Bypass -File train\run_night.ps1, Arbeitsordner C:\tavily\tavily-clone.
 9. Kontrolle: Nach 15 Minuten prüfen, dass der Datendownload läuft (train/logs). Sobald das Training beginnt, mit `train_reranker.py --status` und nvidia-smi prüfen, dass Schritte zählen und die GPU arbeitet. Danach jede Stunde einmal prüfen. Bei Abbruch: Log lesen, beheben, run_night.ps1 erneut starten (setzt fort).
-10. Schreibe nach jeder Prüfung einen kurzen Stand in C:\tavily\STATUS.txt (Uhrzeit, Phase, Schritte, dev-Wert, Fehler). Wenn das Modell fertig unter models\ liegt: Energieeinstellungen aus power-vorher.txt wiederherstellen, Endstand in STATUS.txt schreiben (Ordnername, Dauer, dev-Werte aus der Modellkarte) und aufhören.
+10. Schreibe nach jeder Prüfung einen kurzen Stand in C:\tavily\STATUS.txt (Uhrzeit, Phase, Schritte, dev-Wert, Fehler).
+11. Wenn das Modell fertig unter models\ liegt, gib alles an den Mac zurück, ohne USB:
+    a) Neuer Branch laptop/lauf-<JJJJ-MM-TT> vom aktuellen Stand. Darauf committen: train/logs/ (ohne Dateien über 50 MB), STATUS.txt nach train/logs/, die Modellkarte (JSON) aus dem Modellordner. Nichts aus train/data, keine .env, vorher den Diff auf Schlüssel prüfen. Branch pushen, nie main.
+    b) Modellordner zippen und als Release-Datei hochladen: gh release create modell-<JJJJ-MM-TT> <zip> --prerelease --target laptop/lauf-<JJJJ-MM-TT> --title "Reranker <JJJJ-MM-TT>" --notes "dev-Werte aus der Modellkarte". Das Repo ist privat, die Datei bleibt privat.
+    c) Energieeinstellungen aus power-vorher.txt wiederherstellen, Endstand in STATUS.txt schreiben (Branch, Release, Dauer, dev-Werte) und aufhören.
 ```
 
 ## Gut zu wissen
