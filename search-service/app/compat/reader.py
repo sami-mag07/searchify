@@ -59,6 +59,10 @@ _WIKI_CHROME = (
     "|//*[contains(concat(' ',normalize-space(@class),' '),' vector-menu ')]"
     "|//*[contains(concat(' ',normalize-space(@class),' '),' vector-column-end ')]"
     "|//*[@id='mw-hidden-catlinks' or @id='siteSub' or @id='contentSub']"
+    # Seitenrahmen unter dem Artikel: "Abgerufen von ...", Kategorien, Normdaten (GND/VIAF)
+    "|//*[@id='catlinks' or @id='normdaten']"
+    "|//*[contains(concat(' ',normalize-space(@class),' '),' printfooter ')]"
+    "|//*[contains(concat(' ',normalize-space(@class),' '),' catlinks ')]"
     "|//*[@id='mw-navigation' or @id='mw-panel' or @id='p-lang' or @id='footer'"
     " or @id='mw-head' or @id='vector-toc' or @id='toc']"
 )
