@@ -1,0 +1,50 @@
+# 10 - Query-fokussierte Snippets und schnelleres Laden (Stand 11.10.2026)
+
+Methode: search.py (Tavily/Exa), r.jina.ai, eigene curl-Messungen vom Mac (Heimnetz, nicht Server; Werte nur als Größenordnung).
+
+## A. Was Tavily und Exa dokumentieren (belegt)
+- Tavily: `content` besteht aus Chunks, "about 500 characters each for basic and fast, 800 for advanced", getrennt durch ` [...] `, bis `chunks_per_source` (max 3). Benachbarte Chunks werden zu einer längeren Passage verschmolzen, Länge ist "a target, not a hard limit". 3x~350-500 + Trenner = die ~1150 Zeichen, die wir als Referenz haben. https://docs.tavily.com/documentation/api-reference/endpoint/search
+- Tavily-Stufen: ultra-fast liefert nur "Content" (NLP-Zusammenfassung der Seite), fast/basic/advanced liefern "Chunks reranked nach Query". https://docs.tavily.com/documentation/best-practices/best-practices-search
+- Tavily Extract: Chunks max 500 Zeichen, pro Quelle 1-5, Rerank per `query`. https://docs.tavily.com/documentation/best-practices/best-practices-extract
+- Tavily empfiehlt Dedupe der `content`-Chunks über `[...]`-Trenner (gleiche Seite).
+- Exa Highlights: "relevant passages copied from the page", Start für Agents/RAG. `numSentences`/`highlightsPerUrl` sind deprecated, jetzt `maxCharacters` (Beispiel AWS-Blog: 4000 Zeichen). https://exa.ai/docs/contents/quickstart , https://exa.ai/docs/changelog , https://aws.amazon.com/blogs/machine-learning/building-web-search-enabled-agents-with-strands-and-exa
+- Exa Dynamic Highlights (Beta, 28.08.2026): Budget wird über ALLE Ergebnisse verteilt, redundante Quellen bekommen weniger. Exa-Angabe: ca. 49 % bessere Token-Effizienz, +2,4 % Qualität (Single-turn RAG), ca. 30 % weniger Tokens bei Agents. Herstellerzahl, nicht unabhängig geprüft. https://exa.ai/docs/changelog
+- Exa Preis Orientierung: 7 USD / 1k Suchen mit Text+Highlights (10 Ergebnisse).
+
+## B. Snippet-Forschung (Google/Bing-Linie)
+- Query-biased summaries: Tombros & Sanderson 1998; Google war erste Websuche damit (Hugh Williams). Methode: Sätze nach Query-Treffern ranken, 1-3 Fragmente. https://hughewilliams.com/2012/04/02/snippets-the-unsung-heroes-of-web-search
+- Turpin/Tsegay/Hawking/Williams, SIGIR 2007, "Fast generation of result snippets": Satz = minimale Einheit; Score pro Satz aus (a) Position (erste Sätze Bonus), (b) Anzahl Query-Terme inkl. Wiederholung, (c) Anzahl DISTINKTER Terme, (d) längster zusammenhängender Lauf von Query-Termen; Top 2-3 Sätze. Kosten dominiert vom Dokument-Laden, nicht vom Ranken; Dokumente nur mit führenden Sätzen vorhalten "marginal impact on quality". https://boyter.org/static/abusing-aws-lambda/snippet/Fast_generation_of_result_snippets_in_web_search.pdf
+  -> direkt übertragbar: Satzscoring ist billig (Mikrosekunden), der Engpass ist Fetch.
+- Google: BERT wird für Ranking UND Featured Snippets eingesetzt (Offizielles Blog, 2019). Passage Ranking: Passagen innerhalb einer Seite werden separat bewertet (Martin Splitt, SEJ). Details der Snippet-Extraktion sind nicht öffentlich; Papers zur Featured-Snippet-Extraktion selbst: keine Primärquelle von Google gefunden. https://blog.google/products-and-platforms/products/search/search-language-understanding-bert , https://www.searchenginejournal.com/google-passage-ranking-martin-splitt/388206
+- Passage-Retrieval klassisch (Callan 1994, Passage-Level Evidence): überlappende Fenster fester Länge schlagen Absatzgrenzen; Primärpaper nicht abgerufen (nur Sekundärlisting: https://www.scitepress.org/Papers/2017/65028/65028.pdf). Als "bekannt, nicht selbst geprüft" behandeln.
+
+## C. Chunk-Größe und Struktur
+- Wire-Überblick (sekundär, verweist auf Papers): rekursive Token-Chunks 100 Token ohne Overlap gewannen in 25-Konfig-Studie (Chemie, arXiv 2506.17277); Absatzgruppen nDCG@5 0,459 vs. < 0,244 für Zeichen-Fixchunks (arXiv 2603.06976); Semantic Chunking lohnt sich laut NAACL 2025 nicht. Default 256-512 Token, unter 128 für Fakten-Lookups. https://usewire.io/blog/best-chunk-size-for-rag-what-research-shows
+- Chauzov (Blog, Eigenmessung, mit Vorsicht): FAQ/Kurztext 128-256 Token, Doku 256-512, Langtext 512-1024; > 1024 Token 20-30 % Präzisionsverlust. https://avchauzov.github.io/blog/2025/chunk-size-optimization-rag-systems
+- Für uns: Tavily-Ziel 500 Zeichen ~ 100-125 Token. Das liegt genau im "kleine Chunks für Fakten"-Bereich. Unsere 100-Wörter-Chunks (~130 Token, ~600 Zeichen) sind also nicht das Problem; Problem ist Anzahl/Abdeckung (Median 290 Zeichen heißt: oft 0-1 Chunk).
+- Satzgrenzen statt Wortfenster: Wire: "character-blind splitting is not [a strong baseline]", rekursives Trennen Absatz -> Satz -> Wort ist die starke Variante.
+- Small-to-big / Sentence-Window: best Satz finden (präzise), dann n Nachbarsätze zurückgeben (Kontext). LlamaIndex-Konzept, Tutorial: https://dev.to/rushanksavant/sentence-window-retrieval-212d , https://www.youtube.com/watch?v=ihSiRrOUwmg . Keine harte Zahl gefunden.
+- Kontext vor Grenze: Anthropic Contextual Retrieval: Top-20-Fehlerrate 5,7 % -> 3,7 % (Kontext pro Chunk) -> 1,9 % (+BM25+Rerank). https://www.anthropic.com/engineering/contextual-retrieval . Für uns billige Variante: Seitentitel + Überschrift (H1/H2 über dem Chunk) vor den Chunk setzen, keine LLM-Kosten.
+- Late Chunking (Jina, arXiv 2409.04701): ganzes Dokument durch Long-Context-Embedder, dann Pooling pro Chunk. Braucht Embedding-Lauf über die ganze Seite (bis 8k Token) = zu teuer für 300 ms auf CPU. Nicht empfohlen für den Hot Path. https://arxiv.org/abs/2409.04701 , https://jina.ai/news/late-chunking-in-long-context-embedding-models
+- MMR (Carbonell/Goldstein 1998): iterativ wählen, Score = lambda*Rel - (1-lambda)*max Sim zu bereits gewählten. Sinnvoll als Satz-Ebene innerhalb einer Seite (Jaccard auf Wörtern reicht, kein Embedding nötig) und quellenübergreifend (Exa Dynamic Highlights macht das Äquivalent). Erklärung: https://qdrant.tech/blog/mmr-diversity-aware-reranking , https://mixpeek.com/docs/retrieval/stages/mmr . lambda-Wert: keine belastbare Studie gefunden, 0,7 ist Konvention.
+
+## D. Längen für LLM-Kontext
+- Lost in the Middle (Liu et al. 2023, arXiv 2307.03172): Leistung am besten bei Info am Anfang/Ende, schlechter in der Mitte; Sekundärquelle nennt > 30 % Abfall bei 20-30 Dokumenten. -> Beste Passage zuerst, Ergebnisse nach Score sortiert, nicht chronologisch. https://arxiv.org/abs/2307.03172 , https://www.getmaxim.ai/articles/solving-the-lost-in-the-middle-problem-advanced-rag-techniques-for-long-context-llms
+- Praxiswerte der Anbieter: 500-800 Zeichen je Chunk, 1-3 Chunks -> 500-2400 Zeichen je Quelle (Tavily); Exa 4000 Zeichen Obergrenze je Highlight-Set.
+
+## E. Mehr Seiten in 300 ms (eigene Messungen 11.10.2026, curl vom Mac)
+- Wikipedia REST `/api/rest_v1/page/summary/<Titel>`: 62-165 ms, 3,4 KB JSON, 200 (3 Läufe; erster Lauf kalt 165 ms). Enthält `extract` (Einleitung als Klartext). User-Agent mit Kontakt Pflicht. Für längeren Text: `w/api.php?action=query&prop=extracts&explaintext=1&exchars=1200` ~240 ms. Schnellpfad lohnt für wikipedia.org-Treffer: 1 kleiner Request statt 1 MB HTML (Python-Artikel = 1,02 MB bei Range-Versuch).
+- Range-Header-Test (Range: bytes=0-32767, Accept-Encoding identity): bbc.com/news -> 206, 32 KB in 225 ms (von 381 KB); docs.python.org -> 206 in 172 ms; github.com -> 206 in 468 ms; en.wikipedia.org/wiki -> Range IGNORIERT (200, 1 MB); stackoverflow, realpython, nytimes -> 403 für Browser-UA ohne Cookies (Bot-Schutz, Range hilft nicht). Fazit: Range funktioniert bei ca. der Hälfte der kooperativen Seiten, ist kein Allheilmittel. Zuverlässiger: normal GET streamen und nach N KB oder `</article>`/`</main>` abbrechen (httpx stream + aclose), Range zusätzlich mitschicken schadet nicht. Cloudflare-Hinweis: Range wird teils ignoriert, dann Länge prüfen und abbrechen. https://community.cloudflare.com/t/cloudflare-worker-fetch-ignores-byte-request-range-on-initial-request/395047/4
+- Googlebot selbst liest nur die ersten 2 MB je Datei (seit Feb 2026, vorher 15 MB) -> Hauptinhalt steht fast immer in den ersten 100-200 KB. https://ppc.land/google-slashes-web-crawl-limit-by-86-7-as-cost-pressures-mount (Quelle: Sekundär, Google-Doku nicht selbst geprüft)
+- Google Cache: Cached-Link Feb 2024 entfernt, `cache:`-Operator Doku 24.09.2024 gelöscht. Keine Alternative. https://www.semrush.com/blog/google-cached-pages , https://www.searchenginejournal.com/google-removes-cache-search-operator-documentation/528022 . Ersatz: Wayback `archive.org/wait` zu langsam; eigener Cache ist die einzige echte Antwort.
+- AMP/Mobile: nicht belegt, hier keine Messung. Mobile-Seiten sind oft kleiner, aber Extra-Redirects kosten RTT; nicht empfohlen ohne Test.
+- Parsen: selectolax (Lexbor) 0,02 s auf Benchmark-Dokument gegen BeautifulSoup 0,9-2,5 s (context.dev); lxml selbst ~4x schneller als BS4 (aows.jpt.sh); Thunderbit misst lxml beim reinen Parsen sogar ~33 % schneller als selectolax. -> BS4 meiden, lxml oder selectolax. https://www.context.dev/blog/selectolax-vs-lxml-vs-parsel-vs-beautifulsoup , https://aows.jpt.sh/parsing , https://thunderbit.com/blog/selectolax-review
+- Extraktion: rs-trafilatura 44 ms/Seite (F1 0,859), Readability schneller als Trafilatura (BulkMD). Für 300 ms zu langsam, wenn Python-Trafilatura; Heuristik (p/li-Tags im <main>/<article>) reicht. https://arxiv.org/html/2605.21097v1 , https://www.bulkmd.app/blog/readability-vs-trafilatura-extractors
+- Turpin 2007: Ladezeit dominiert, Cache in RAM entscheidend -> LRU-Cache der bereits geholten Seiten (nur Satzliste der ersten ~50 KB).
+
+## F. Empfehlungen (Kurzfassung, Details in Antwort)
+1. Satzbasiert statt Wortfenster; Turpin-Score + BM25, Top-Sätze + 1 Nachbar vor/nach (small-to-big), Ziel 350-500 Zeichen je Passage, 3 Passagen.
+2. Budget-Ziel 1000-1200 Zeichen: nach Auswahl auffüllen bis Ziel, MMR/Jaccard gegen Dubletten.
+3. Ladeweg: Stream mit Abbruch bei 64-128 KB + Range, Wikipedia-Schnellpfad, lxml/selectolax.
+4. Fallback bei Timeout: SERP-Snippet + Titel + Meta-Description/og:description aus dem Head (erste 16 KB reichen oft), nie leer.
+5. Cross-Encoder nur auf 8-10 Kandidaten-Sätze/Passagen, Rest BM25.

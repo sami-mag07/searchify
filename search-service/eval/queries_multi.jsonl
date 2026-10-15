@@ -1,0 +1,20 @@
+{"id": "es-01", "query": "¿En qué año se inauguró la Sagrada Familia como basílica?", "lang": "es", "answer_re": "2010"}
+{"id": "es-02", "query": "¿Quién escribió Cien años de soledad?", "lang": "es", "answer_re": "Garc(i|í)a M(a|á)rquez"}
+{"id": "es-03", "query": "¿Cuál es la altura del Teide en metros?", "lang": "es", "answer_re": "3[.\\s]?71[58]"}
+{"id": "es-04", "query": "¿Cuántas comunidades autónomas tiene España?", "lang": "es", "answer_re": "\\b17\\b|diecisiete"}
+{"id": "es-05", "query": "¿En qué año se firmó la Constitución española vigente?", "lang": "es", "answer_re": "1978"}
+{"id": "es-06", "query": "¿Qué río pasa por Sevilla?", "lang": "es", "answer_re": "Guadalquivir"}
+{"id": "es-07", "query": "¿Cuál es el puerto por defecto de MySQL?", "lang": "es", "answer_re": "\\b3306\\b"}
+{"id": "es-08", "query": "¿Quién pintó Las Meninas?", "lang": "es", "answer_re": "Vel(a|á)zquez"}
+{"id": "es-09", "query": "¿Cuál es la capital de Uruguay?", "lang": "es", "answer_re": "Montevideo"}
+{"id": "es-10", "query": "¿En qué año ganó España su primer Mundial de fútbol masculino?", "lang": "es", "answer_re": "2010"}
+{"id": "fr-01", "query": "En quelle année la tour Eiffel a-t-elle été inaugurée ?", "lang": "fr", "answer_re": "1889"}
+{"id": "fr-02", "query": "Qui a écrit Les Misérables ?", "lang": "fr", "answer_re": "Victor Hugo"}
+{"id": "fr-03", "query": "Quelle est la hauteur du mont Blanc ?", "lang": "fr", "answer_re": "4[\\s.]?80[5-9]"}
+{"id": "fr-04", "query": "Combien de régions compte la France métropolitaine ?", "lang": "fr", "answer_re": "\\b13\\b|treize"}
+{"id": "fr-05", "query": "En quelle année a été fondée la Ve République ?", "lang": "fr", "answer_re": "1958"}
+{"id": "fr-06", "query": "Quel fleuve traverse Lyon avec le Rhône ?", "lang": "fr", "answer_re": "Sa(o|ô)ne"}
+{"id": "fr-07", "query": "Quel est le port par défaut de SSH ?", "lang": "fr", "answer_re": "\\b22\\b"}
+{"id": "fr-08", "query": "Qui a peint La Liberté guidant le peuple ?", "lang": "fr", "answer_re": "Delacroix"}
+{"id": "fr-09", "query": "Quelle est la capitale du Québec ?", "lang": "fr", "answer_re": "Qu(e|é)bec"}
+{"id": "fr-10", "query": "Quel élément chimique a pour symbole Fe ?", "lang": "fr", "answer_re": "\\bfer\\b"}

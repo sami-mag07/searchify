@@ -1,0 +1,435 @@
+Title: Google suspended: too many requests
+
+URL Source: https://github.com/searxng/searxng/issues/4435
+
+Published Time: 2025-03-06T07:54:15Z
+
+Markdown Content:
+[Skip to content](https://github.com/searxng/searxng/issues/4435#start-of-content)
+
+## Navigation Menu
+
+[](https://github.com/)
+
+[Sign in](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsearxng%2Fsearxng%2Fissues%2F4435)
+
+Appearance settings
+
+*   
+Platform
+
+    *   
+AI CODE CREATION
+        *   [GitHub Copilot Write better code with AI](https://github.com/features/copilot)
+        *   [GitHub Copilot app Direct agents from issue to merge](https://github.com/features/ai/github-app)
+        *   [MCP Registry Integrate external tools](https://github.com/mcp)
+
+    *   
+DEVELOPER WORKFLOWS
+        *   [Actions Automate any workflow](https://github.com/features/actions)
+        *   [Codespaces Instant dev environments](https://github.com/features/codespaces)
+        *   [Issues Plan and track work](https://github.com/features/issues)
+        *   [Code Review Manage code changes](https://github.com/features/code-review)
+        *   [Code Quality Enforce quality at merge](https://github.com/features/code-quality)
+
+    *   
+APPLICATION SECURITY
+        *   [GitHub Advanced Security Find and fix vulnerabilities](https://github.com/security/advanced-security)
+        *   [Code security Secure your code as you build](https://github.com/security/advanced-security/code-security)
+        *   [Secret protection Stop leaks before they start](https://github.com/security/advanced-security/secret-protection)
+
+    *   
+EXPLORE
+        *   [Why GitHub](https://github.com/why-github)
+        *   [Documentation](https://docs.github.com/)
+        *   [Blog](https://github.blog/)
+        *   [Changelog](https://github.blog/changelog)
+        *   [Marketplace](https://github.com/marketplace)
+
+[View all features](https://github.com/features)
+
+*   
+Solutions
+
+    *   
+BY COMPANY SIZE
+        *   [Enterprises](https://github.com/enterprise)
+        *   [Small and medium teams](https://github.com/team)
+        *   [Startups](https://github.com/enterprise/startups)
+        *   [Nonprofits](https://github.com/solutions/industry/nonprofits)
+
+    *   
+BY USE CASE
+        *   [App Modernization](https://github.com/solutions/use-case/app-modernization)
+        *   [DevSecOps](https://github.com/solutions/use-case/devsecops)
+        *   [DevOps](https://github.com/solutions/use-case/devops)
+        *   [CI/CD](https://github.com/solutions/use-case/ci-cd)
+        *   [View all use cases](https://github.com/solutions/use-case)
+
+    *   
+BY INDUSTRY
+        *   [Healthcare](https://github.com/solutions/industry/healthcare)
+        *   [Financial services](https://github.com/solutions/industry/financial-services)
+        *   [Manufacturing](https://github.com/solutions/industry/manufacturing)
+        *   [Government](https://github.com/solutions/industry/government)
+        *   [View all industries](https://github.com/solutions/industry)
+
+[View all solutions](https://github.com/solutions)
+
+*   
+Resources
+
+    *   
+EXPLORE BY TOPIC
+        *   [AI](https://github.com/resources/articles?topic=ai)
+        *   [Software Development](https://github.com/resources/articles?topic=software-development)
+        *   [DevOps](https://github.com/resources/articles?topic=devops)
+        *   [Security](https://github.com/resources/articles?topic=security)
+        *   [View all topics](https://github.com/resources/articles)
+
+    *   
+EXPLORE BY TYPE
+        *   [Customer stories](https://github.com/customer-stories)
+        *   [Events & webinars](https://github.com/resources/events)
+        *   [Ebooks & reports](https://github.com/resources/whitepapers)
+        *   [Business insights](https://github.com/solutions/executive-insights)
+        *   [GitHub Skills](https://skills.github.com/)
+
+    *   
+SUPPORT & SERVICES
+        *   [Documentation](https://docs.github.com/)
+        *   [Customer support](https://support.github.com/)
+        *   [Community forum](https://github.com/orgs/community/discussions)
+        *   [Trust center](https://github.com/trust-center)
+        *   [Partners](https://github.com/partners)
+
+[View all resources](https://github.com/resources)
+
+*   
+Open Source
+
+    *   
+COMMUNITY
+        *   [GitHub Sponsors Fund open source developers](https://github.com/open-source/sponsors)
+
+    *   
+PROGRAMS
+        *   [Security Lab](https://securitylab.github.com/)
+        *   [Maintainer Community](https://maintainers.github.com/)
+        *   [GitHub Stars](https://stars.github.com/)
+        *   [Archive Program](https://archiveprogram.github.com/)
+
+    *   
+REPOSITORIES
+        *   [Topics](https://github.com/topics)
+        *   [Trending](https://github.com/trending)
+        *   [Collections](https://github.com/collections)
+
+*   
+Enterprise
+
+    *   
+ENTERPRISE SOLUTIONS
+        *   [Enterprise platform AI-powered developer platform](https://github.com/enterprise)
+
+    *   
+AVAILABLE ADD-ONS
+        *   [GitHub Advanced Security Enterprise-grade security features](https://github.com/security/advanced-security)
+        *   [Copilot for Business Enterprise-grade AI features](https://github.com/features/copilot/copilot-business)
+        *   [Premium Support Enterprise-grade 24/7 support](https://github.com/enterprise/premium-support)
+
+*   [Pricing](https://github.com/pricing)
+
+Search/
+
+[Sign in](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsearxng%2Fsearxng%2Fissues%2F4435)
+
+[Sign up](https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fissues_fragments%2Fissue_layout&source=header-repo&source_repo=searxng%2Fsearxng)
+
+Appearance settings
+
+You signed in with another tab or window. [Reload](https://github.com/searxng/searxng/issues/4435) to refresh your session.You signed out in another tab or window. [Reload](https://github.com/searxng/searxng/issues/4435) to refresh your session.You switched accounts on another tab or window. [Reload](https://github.com/searxng/searxng/issues/4435) to refresh your session.Dismiss alert
+
+{{ message }}
+
+1.   [searxng](https://github.com/searxng)
+2.   [searxng](https://github.com/searxng/searxng)
+
+## Repository navigation
+
+*   [Code](https://github.com/searxng/searxng)
+*   [Issues 167(167)](https://github.com/searxng/searxng/issues)
+*   [Pull requests 24(24)](https://github.com/searxng/searxng/pulls)
+*   [Discussions](https://github.com/searxng/searxng/discussions)
+*   [Actions](https://github.com/searxng/searxng/actions)
+*   [Security and quality](https://github.com/searxng/searxng/security)
+*   [Insights](https://github.com/searxng/searxng/pulse)
+
+More items
+
+[](https://github.com/searxng/searxng)
+
+# Google suspended: too many requests#4435
+
+New issue
+
+Copy link
+
+New issue
+
+Copy link
+
+Closed
+
+Closed
+
+[Google suspended: too many requests](https://github.com/searxng/searxng/issues/4435#top)#4435
+
+Copy link
+
+Labels
+
+[CAPTCHA](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22CAPTCHA%22)[bug](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22bug%22)[google-engine](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22google-engine%22)
+
+## Description
+
+[![Image 2: @AdminGodZ](https://avatars.githubusercontent.com/u/159120313?u=609a1d5eeaa054c0de1de7a9780d051586d1be2a&v=4&size=48)](https://github.com/AdminGodZ)
+
+[AdminGodZ](https://github.com/AdminGodZ)
+
+opened [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issue-2899639764)
+
+Issue body actions
+
+**Version of SearXNG, commit number if you are using on master branch and stipulate if you forked SearXNG**
+
+**How did you install SearXNG?**  
+ I use my own selfhosted [SearXNG](https://searxng.admingod.ch/) instance, which is forked from [priv.au](https://priv.au/) (I also opened an issue there).  
+ Source code: [priv.au github](https://github.com/privau/searxng)
+
+**What happened?**  
+ Currently when having the google search engine activated under preferences and you are searching something, then google gives back the "Suspended: too many requests" error. Seems like google did something there, idk
+
+**How To Reproduce**  
+ Just have google in preferences activated and then search something, you should then get the same error
+
+**Expected behavior**  
+ Google results are showing
+
+**Screenshots & Logs**  
+ Example:  
+[![Image 3: Image](https://private-user-images.githubusercontent.com/159120313/419805126-8b41ee51-db05-449c-8d06-04605d186932.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTE3MTg4ODUsIm5iZiI6MTc5MTcxODU4NSwicGF0aCI6Ii8xNTkxMjAzMTMvNDE5ODA1MTI2LThiNDFlZTUxLWRiMDUtNDQ5Yy04ZDA2LTA0NjA1ZDE4NjkzMi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTAxMVQxMTM2MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kN2FlMmE2OTFjMzE0NmYwYzg2MmRlZDU3MWEyZmQ0ZWQyM2U5Mjk1MmYwZGRkMmJmYjJmMDQ0MWM4Nzc3YzI4JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZwbmcifQ.6mlrV1qMN9j-jF8U5zi_rnB4511ENmlfXggAa_tiicc)](https://private-user-images.githubusercontent.com/159120313/419805126-8b41ee51-db05-449c-8d06-04605d186932.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTE3MTg4ODUsIm5iZiI6MTc5MTcxODU4NSwicGF0aCI6Ii8xNTkxMjAzMTMvNDE5ODA1MTI2LThiNDFlZTUxLWRiMDUtNDQ5Yy04ZDA2LTA0NjA1ZDE4NjkzMi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTAxMVQxMTM2MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kN2FlMmE2OTFjMzE0NmYwYzg2MmRlZDU3MWEyZmQ0ZWQyM2U5Mjk1MmYwZGRkMmJmYjJmMDQ0MWM4Nzc3YzI4JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZwbmcifQ.6mlrV1qMN9j-jF8U5zi_rnB4511ENmlfXggAa_tiicc)
+
+**Additional context**  
+ As far as I know this problem is with every SearXNG instance right now, at least for some I tried out at [searx.space](https://searx.space/)
+
+Reactions are currently unavailable
+
+## Activity
+
+1.     [![Image 4](https://avatars.githubusercontent.com/u/159120313?s=64&u=609a1d5eeaa054c0de1de7a9780d051586d1be2a&v=4)AdminGodZ](https://github.com/AdminGodZ) added [bug](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22bug%22) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16612692918)     
+2.      ### fr0st-xyz commented on Mar 6, 2025
+
+[![Image 5: @fr0st-xyz](https://avatars.githubusercontent.com/u/119555371?u=d343197788296bf51dafd3cf2f30cb9f74ab7611&v=4&size=48)](https://github.com/fr0st-xyz) [fr0st-xyz](https://github.com/fr0st-xyz) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703083861)    More actions     got the same issue it just happened to me         
+3.      ### arkhorizon commented on Mar 6, 2025
+
+[![Image 6: @arkhorizon](https://avatars.githubusercontent.com/u/37822176?u=c27880d643c9dd56d9d1102cecc9b82e01206f2a&v=4&size=48)](https://github.com/arkhorizon) [arkhorizon](https://github.com/arkhorizon) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703090740)·Hidden as duplicate    show comment More actions          
+4.     [![Image 7](https://avatars.githubusercontent.com/u/554536?s=64&u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4)return42](https://github.com/return42) added [google-engine](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22google-engine%22) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16612818490)     
+5.   
+   
+
+### return42 commented on Mar 6, 2025
+
+[![Image 8: @return42](https://avatars.githubusercontent.com/u/554536?u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4&size=48)](https://github.com/return42) [return42](https://github.com/return42) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703102313)  Last edited by return42  Member More actions     
+
+Please guys don't post every minute the same issue:
+
+    *   [Bug: google engine - rate limits#4429](https://github.com/searxng/searxng/discussions/4429)
+    *   [We seem to be (almost) shut down at the moment?#4434](https://github.com/searxng/searxng/discussions/4434)
+    *   [Search for "abc1" yields no results#4431](https://github.com/searxng/searxng/issues/4431)
+
+**I really won't to work on the issue** but every two minutes I have to give an answer here that you could have found yourself ..
+
+❤️React with ❤️1 Reacted by andersnordh
+
+6.      ### return42 commented on Mar 6, 2025
+
+[![Image 9: @return42](https://avatars.githubusercontent.com/u/554536?u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4&size=48)](https://github.com/return42) [return42](https://github.com/return42) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703136343)   Member More actions     Starting around ~12h ago Google does no longer accept requests without enabling JS:
+
+[![Image 10: Image](https://private-user-images.githubusercontent.com/554536/419818234-bacef24b-d668-4219-baef-3626deeec27d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTE3MTg4ODUsIm5iZiI6MTc5MTcxODU4NSwicGF0aCI6Ii81NTQ1MzYvNDE5ODE4MjM0LWJhY2VmMjRiLWQ2NjgtNDIxOS1iYWVmLTM2MjZkZWVlYzI3ZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTAxMVQxMTM2MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02ODExYzQ4YzQ4OGYyMWRhNTI2MWI2NmI5NjcxMTZmNjk1ZGVkMDJiZGNhNDUzOTQ1OTJiYzdiNDhlMjNkYmIyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZwbmcifQ.AYG0-01pcoEifp7u8_fS5hBmxfeioKLgnirJTgm3DLQ)](https://private-user-images.githubusercontent.com/554536/419818234-bacef24b-d668-4219-baef-3626deeec27d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTE3MTg4ODUsIm5iZiI6MTc5MTcxODU4NSwicGF0aCI6Ii81NTQ1MzYvNDE5ODE4MjM0LWJhY2VmMjRiLWQ2NjgtNDIxOS1iYWVmLTM2MjZkZWVlYzI3ZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTAxMVQxMTM2MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02ODExYzQ4YzQ4OGYyMWRhNTI2MWI2NmI5NjcxMTZmNjk1ZGVkMDJiZGNhNDUzOTQ1OTJiYzdiNDhlMjNkYmIyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZwbmcifQ.AYG0-01pcoEifp7u8_fS5hBmxfeioKLgnirJTgm3DLQ)         
+7.      ### unixfox commented on Mar 6, 2025
+
+[![Image 11: @unixfox](https://avatars.githubusercontent.com/u/4016501?u=d113bfcd7a1bb996a29af9ace2c158a3c6289b40&v=4&size=48)](https://github.com/unixfox) [unixfox](https://github.com/unixfox) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703171567)   Contributor More actions     [@return42](https://github.com/return42) it's not new: [https://github.com/benbusby/whoogle-search/issues/1211](https://github.com/benbusby/whoogle-search/issues/1211) but keep in mind we are using a special endpoint for sending to google: [#159](https://github.com/searxng/searxng/issues/159)         
+8.      ### unixfox commented on Mar 6, 2025
+
+[![Image 12: @unixfox](https://avatars.githubusercontent.com/u/4016501?u=d113bfcd7a1bb996a29af9ace2c158a3c6289b40&v=4&size=48)](https://github.com/unixfox) [unixfox](https://github.com/unixfox) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703224214)  Last edited by unixfox  Contributor More actions     Found the issue there is a new "arc_id" which probably comes from actually going a request from the real [www.google.com](http://www.google.com/). If you don't pass it then you get a CAPTCHA.
+
+`https://www.google.com/search?q=ok&hl=en-US&lr=lang_en&cr=countryUS&ie=utf8&oe=utf8&filter=0&start=0&asearch=arc&async=arc_id:srp_zF_JZ_ehGr-L7M8Po-jhgQE_120,use_ac:true,_fmt:prog`
+
+VS what's sending searxng:
+
+`https://www.google.com/search?q=ok&hl=en-US&lr=lang_en&cr=countryUS&ie=utf8&oe=utf8&filter=0&start=0&asearch=arc&async=use_ac:true,_fmt:prog`  👍React with 👍2 Reacted by Markus Heiser and Aadniz ❤️React with ❤️1 Reacted by Gina Häußge 👀React with 👀1 Reacted by Markus Heiser        
+9.     [![Image 13](https://avatars.githubusercontent.com/u/554536?s=64&u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4)return42](https://github.com/return42) added 2 commits that reference this issue [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16613808507)[[fix] Google suspended: too many requests (interim solution)](https://github.com/return42/searxng/commit/9439d1804e3571fa5b91b95805482c78374ab652) ...  [9439d18](https://github.com/return42/searxng/commit/9439d1804e3571fa5b91b95805482c78374ab652)   [[fix] Google suspended: too many requests (interim solution)](https://github.com/return42/searxng/commit/17ba3b7ee2a4da0b2d0c10876ff89e77da9b28b8) ...  [17ba3b7](https://github.com/return42/searxng/commit/17ba3b7ee2a4da0b2d0c10876ff89e77da9b28b8)         
+10.      ### unixfox commented on Mar 6, 2025
+
+[![Image 14: @unixfox](https://avatars.githubusercontent.com/u/4016501?u=d113bfcd7a1bb996a29af9ace2c158a3c6289b40&v=4&size=48)](https://github.com/unixfox) [unixfox](https://github.com/unixfox) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703279522)  Last edited by unixfox  Contributor More actions     Oddly enough, you can input any random things inside the arc_id as long as it starts with `srp_`, and you respect the same amount of characters for each `_` and `-`, and same for the last 3 digits.
+
+Something like this (yes it's generated by chatgpt ^^'):
+
+undefinedpython
+import random
+import string
+
+def generate_custom_string():
+    # Fixed prefix
+    prefix = "srp_"
+    
+    # Generate random letter segments with specified lengths
+    seg1 = ''.join(random.choices(string.ascii_letters, k=2))   # 2 letters
+    seg2 = ''.join(random.choices(string.ascii_letters, k=2))   # 2 letters
+    seg3 = ''.join(random.choices(string.ascii_letters, k=4))   # 4 letters
+    seg4 = ''.join(random.choices(string.ascii_letters, k=6))   # 6 letters
+    seg5 = ''.join(random.choices(string.ascii_letters, k=5))   # 5 letters
+    
+    # Generate the ending segment with 3 random digits
+    seg6 = ''.join(random.choices(string.digits, k=3))          # 3 digits
+
+    # Assemble the final string using underscores and dashes as in the example
+    return f"{prefix}{seg1}_{seg2}_{seg3}-{seg4}-{seg5}_{seg6}"
+
+# Example usage:
+if __name__ == "__main__":
+    random_string = generate_custom_string()
+    print(random_string)
+undefined
+
+Chatgpt query:
+
+> Give me a python code to generate a string like this: "srp_zF_JZ_ehGr-L7M8Po-jhgQE_120" but with random letters between each "_" and "-", and should starts with "srp_" and ends with 3 random digits like in the example.  👍React with 👍1 Reacted by Aadniz 😄React with 😄1 Reacted by Markus Heiser 🚀React with 🚀2 Reacted by Markus Heiser and Aadniz        
+11.      ### unixfox commented on Mar 6, 2025
+
+[![Image 15: @unixfox](https://avatars.githubusercontent.com/u/4016501?u=d113bfcd7a1bb996a29af9ace2c158a3c6289b40&v=4&size=48)](https://github.com/unixfox) [unixfox](https://github.com/unixfox) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703302713)  Last edited by unixfox  Contributor More actions     I generated a few more from a real search on [www.google.com](http://www.google.com/):
+
+```
+srp_Y2bJZ_3HB8vZ7M8PqPfysQE_120
+srp_2WvJZ-_hKs3U7M8PzN3PqAQ_110
+srp_C2zJZ--0OKfikdUPgNCx2Qg_130
+srp_WWzJZ86HK8PW7M8Px4eSkAU_130
+srp_f2zJZ-yfNqOskdUPvO60qQE_130
+``` 
+You most likely only need to have `srp_somerandomletters_3digits`  👍React with 👍2 Reacted by Markus Heiser and Aadniz        
+12.      ### unixfox commented on Mar 6, 2025
+
+[![Image 16: @unixfox](https://avatars.githubusercontent.com/u/4016501?u=d113bfcd7a1bb996a29af9ace2c158a3c6289b40&v=4&size=48)](https://github.com/unixfox) [unixfox](https://github.com/unixfox) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703341473)   Contributor More actions     OK the 3 digits it's the number page.
+
+`110` => second page  
+`120` => third page
+
+and so on...  👍React with 👍1 Reacted by Markus Heiser        
+13.   
+   
+
+### return42 commented on Mar 6, 2025
+
+[![Image 17: @return42](https://avatars.githubusercontent.com/u/554536?u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4&size=48)](https://github.com/return42) [return42](https://github.com/return42) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703364458)  Last edited by return42  Member More actions     
+
+> `120` => third page
+
+Do you know if the value is `200` on page 11?
+
+    *   [[mod] add option max_page#3002](https://github.com/searxng/searxng/pull/3002)
+    *   [Bug: google engine --> SearxEngineAccessDeniedException#2972](https://github.com/searxng/searxng/issues/2972)
+    *   [[Documentation - Enhancement] All the popular engines number of pages hard limit#2982](https://github.com/searxng/searxng/issues/2982)
+
+14.      ### unixfox commented on Mar 6, 2025
+
+[![Image 18: @unixfox](https://avatars.githubusercontent.com/u/4016501?u=d113bfcd7a1bb996a29af9ace2c158a3c6289b40&v=4&size=48)](https://github.com/unixfox) [unixfox](https://github.com/unixfox) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703398684)  Last edited by unixfox  Contributor More actions     > Do you know if the value is `200` on page 11?
+
+It's not:
+
+```
+start=10 -> arc_id 110
+...
+start=30 -> arc_id 130
+...
+start=90 -> arc_id 190
+start=100 -> arc_id 1100
+start=110 -> arc_id 1110
+...
+start=180 -> arc_id 1180
+```   🚀React with 🚀4 Reacted by Markus Heiser, Gina Häußge, wang2 and fr0st        
+15.      ### foosel commented on Mar 6, 2025
+
+[![Image 19: @foosel](https://avatars.githubusercontent.com/u/83657?u=f4f4bf757d4733719f0d4898428ef89a6dd13922&v=4&size=48)](https://github.com/foosel) [foosel](https://github.com/foosel) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703426250)    More actions     As an OSS maintainer myself I just want to say, love the collab here to get things going again, sending lots of love and thanks! 💚  ❤️React with ❤️7 Reacted by Markus Heiser, Andy Piper, george-photon, HAL703, Sam, Vin and Sunny        
+16.     [![Image 20](https://avatars.githubusercontent.com/u/554536?s=64&u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4)return42](https://github.com/return42) added 2 commits that reference this issue [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16617528054)[[fix] engines: Google-Web & Google-Video (random arc_id)](https://github.com/return42/searxng/commit/36867ff5c108d31ce912c0bd5f8f38c9874ab55d) ...  [36867ff](https://github.com/return42/searxng/commit/36867ff5c108d31ce912c0bd5f8f38c9874ab55d)   [[fix] engines: Google-Web & Google-Video (random arc_id)](https://github.com/return42/searxng/commit/375019241f54803fb999a16c64ac8710257f6174) ...  [3750192](https://github.com/return42/searxng/commit/375019241f54803fb999a16c64ac8710257f6174)         
+17.      ### merit-mediumdigest commented on Mar 6, 2025
+
+[![Image 21: @merit-mediumdigest](https://avatars.githubusercontent.com/u/151815753?v=4&size=48)](https://github.com/merit-mediumdigest) [merit-mediumdigest](https://github.com/merit-mediumdigest) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2703899775)    More actions     got the same issue it just happened to me         
+18.     [![Image 22](https://avatars.githubusercontent.com/u/554536?s=64&u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4)return42](https://github.com/return42) added 2 commits that reference this issue [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16617691964)[[fix] engines: Google-Web & Google-Video (random arc_id)](https://github.com/return42/searxng/commit/cf90f6ea9bdf131df4548aa08b518e5e4a98d8db) ...  [cf90f6e](https://github.com/return42/searxng/commit/cf90f6ea9bdf131df4548aa08b518e5e4a98d8db)   [[fix] engines: Google-Web & Google-Video (random arc_id)](https://github.com/searxng/searxng/commit/194f22220306b7949660492bdbc3e5418835f88f) ...  [194f222](https://github.com/searxng/searxng/commit/194f22220306b7949660492bdbc3e5418835f88f)         
+19.      ### cat3399 commented on Mar 6, 2025
+
+[![Image 23: @cat3399](https://avatars.githubusercontent.com/u/127954618?u=4d023b106397f514c78a667e6460b1001421ce2d&v=4&size=48)](https://github.com/cat3399) [cat3399](https://github.com/cat3399) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2704097715)    More actions     [![Image 24: Image](https://private-user-images.githubusercontent.com/127954618/419964361-0ee876ba-d1a9-4028-bd05-8613fecf299d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTE3MTg4ODUsIm5iZiI6MTc5MTcxODU4NSwicGF0aCI6Ii8xMjc5NTQ2MTgvNDE5OTY0MzYxLTBlZTg3NmJhLWQxYTktNDAyOC1iZDA1LTg2MTNmZWNmMjk5ZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTAxMVQxMTM2MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT05Y2YyOGJmODY1YTYxNzhhOWJlMmQ5OTljM2UzMzlmYzc3MmQwODg4OTI2YzAwNmQxODU4MWMzNWE2OWMzM2FhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZwbmcifQ.OFzvGtHoKr_gT8YuF5HVE14oAePakNoMpBS5vJ19_4Q)](https://private-user-images.githubusercontent.com/127954618/419964361-0ee876ba-d1a9-4028-bd05-8613fecf299d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTE3MTg4ODUsIm5iZiI6MTc5MTcxODU4NSwicGF0aCI6Ii8xMjc5NTQ2MTgvNDE5OTY0MzYxLTBlZTg3NmJhLWQxYTktNDAyOC1iZDA1LTg2MTNmZWNmMjk5ZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTAxMVQxMTM2MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT05Y2YyOGJmODY1YTYxNzhhOWJlMmQ5OTljM2UzMzlmYzc3MmQwODg4OTI2YzAwNmQxODU4MWMzNWE2OWMzM2FhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZwbmcifQ.OFzvGtHoKr_gT8YuF5HVE14oAePakNoMpBS5vJ19_4Q)  
+ Everything is working perfectly now! Thank you to the developers on GitHub for fixing the bug so quickly.  ❤️React with ❤️3 Reacted by Markus Heiser, george-photon and allixx        
+20.     [![Image 25](https://avatars.githubusercontent.com/u/554536?s=64&u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4)return42](https://github.com/return42) added [CAPTCHA](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22CAPTCHA%22) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16619083058)     
+21.      ### return42 commented on Mar 6, 2025
+
+[![Image 26: @return42](https://avatars.githubusercontent.com/u/554536?u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4&size=48)](https://github.com/return42) [return42](https://github.com/return42) [on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2704165368)   Member More actions     closed by: [#4442](https://github.com/searxng/searxng/pull/4442)  🎉React with 🎉1 Reacted by Sam        
+22.     [![Image 27](https://avatars.githubusercontent.com/u/554536?s=64&u=3646755b12ce8b3cbbbd5922e1af24c1fd8ed161&v=4)return42](https://github.com/return42) closed this as [completed](https://github.com/searxng/searxng/issues?q=is%3Aissue%20state%3Aclosed%20archived%3Afalse%20reason%3Acompleted)[on Mar 6, 2025](https://github.com/searxng/searxng/issues/4435#event-16619101998)     
+23.     [![Image 28](https://avatars.githubusercontent.com/u/80454229?s=64&v=4)searxng](https://github.com/searxng) deleted a comment from [fr0st-xyz](https://github.com/fr0st-xyz)[on Mar 7, 2025](https://github.com/searxng/searxng/issues/4435#event-16627238357)     
+24.      ### Rudder2 commented on Mar 8, 2025
+
+[![Image 29: @Rudder2](https://avatars.githubusercontent.com/u/43488150?u=4389b61c30bdc82a9780b00b0b3fa934dce25356&v=4&size=48)](https://github.com/Rudder2) [Rudder2](https://github.com/Rudder2) [on Mar 8, 2025](https://github.com/searxng/searxng/issues/4435#issuecomment-2708551734)  Last edited by Rudder2   More actions     Just wanted to comment on how much y'all rock! I did a SearXNG search for this problem and discovered it was fixed 2 days ago...Updated the docker the errors went away. Thank you for your AWESOME work!  ❤️React with ❤️3 Reacted by AdminGod, Markus Heiser and Riley Troyer        
+25.     [![Image 30](https://avatars.githubusercontent.com/u/34861290?s=64&u=f28657c0c49cd2b29ca3deeca82298cab12eeb75&v=4)inetol](https://github.com/inetol) added the[bug](https://github.com/searxng/searxng/issues?q=type:%22bug%22)  issue type [on Apr 6, 2026](https://github.com/searxng/searxng/issues/4435#event-24217781585)     
+26.     [![Image 31](https://avatars.githubusercontent.com/u/34861290?s=64&u=f28657c0c49cd2b29ca3deeca82298cab12eeb75&v=4)inetol](https://github.com/inetol) added [bug](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22bug%22) [on Aug 20, 2026](https://github.com/searxng/searxng/issues/4435#event-29736930057)     
+
+[Sign up for free](https://github.com/signup?return_to=https://github.com/searxng/searxng/issues/4435)**to join this conversation on GitHub.**Already have an account?[Sign in to comment](https://github.com/login?return_to=https://github.com/searxng/searxng/issues/4435)
+
+## Metadata
+
+## Metadata
+
+### Assignees
+
+No one assigned
+
+### Labels
+
+[CAPTCHA](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22CAPTCHA%22)[bug](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22bug%22)[google-engine](https://github.com/searxng/searxng/issues?q=state%3Aopen%20label%3A%22google-engine%22)
+
+### Projects
+
+No projects
+
+### Milestone
+
+No milestone
+
+### Relationships
+
+None yet
+
+### Development
+
+No branches or pull requests
+
+## Issue actions
+
+*   ![Image 32](https://github.githubassets.com/assets/github-copilot-app-light-15ad5534265eeacd.svg)Open in GitHub Copilot app
+
+## Footer
+
+[](https://github.com/) © 2026 GitHub,Inc. 
+
+### Footer navigation
+
+*   [Terms](https://docs.github.com/site-policy/github-terms/github-terms-of-service)
+*   [Privacy](https://docs.github.com/site-policy/privacy-policies/github-privacy-statement)
+*   [Security](https://github.com/security)
+*   [Status](https://www.githubstatus.com/)
+*   [Community](https://github.community/)
+*   [Docs](https://docs.github.com/)
+*   [Contact](https://support.github.com/?tags=dotcom-footer)
+*    Manage cookies 
+*    Do not share my personal information 
+
+ You can’t perform that action at this time.

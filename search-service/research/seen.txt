@@ -1,0 +1,989 @@
+https://ssdnodes.com/learn/searxng-route-engine-requests-through-a-proxy	Route SearXNG engine requests via a proxy	2026-10-11 13:32
+https://ssdnodes.com/learn/searxng-rate-limits-and-429-errors	Fix SearXNG Rate Limits and 429 Errors · SSD Nodes	2026-10-11 13:32
+https://travnewmatic.com/2026/09/11/routing-our-searxng-instance-through-tor	Routing our SearXNG instance through Tor – Travis Newman	2026-10-11 13:32
+https://ssdnodes.com/learn/lang/pcm/searxng-rate-limits-and-429-errors	How to Fix SearXNG 429 Errors and Rate Limits	2026-10-11 13:32
+https://ssdnodes.com/learn/fix-searxng-engine-captcha-errors	Fix SearXNG CAPTCHA errors from engines · SSD Nodes	2026-10-11 13:32
+https://github.com/open-webui/open-webui/discussions/9646	searxng Error searching · open-webui/open-webui · Discussion #9646 · GitHub	2026-10-11 13:32
+https://bitlaunch.io/blog/vps-hardware-performance	VPS performance, VPS Hardware, & 12 use case requirements	2026-10-11 13:32
+https://forums.developer.nvidia.com/t/building-local-hybrid-llms-on-dgx-spark-that-outperform-top-cloud-models/359569	Building Local + Hybrid LLMs on DGX Spark That Outperform Top Cloud Models - DGX	2026-10-11 13:32
+https://docs.searxng.org/src/searx.exceptions.html	SearXNG Exceptions - SearXNG Documentation (2026.9.30+a9d990033)	2026-10-11 13:32
+https://github.com/searxng/searxng/issues/5541	Bug: duckduckgo engine · Issue #5541 · searxng/searxng · GitHub	2026-10-11 13:32
+https://github.com/searxng/searxng/issues/4824	Bug: duckduckgo engine, Error: SearxEngineCaptchaException · Issue #4824 · searx	2026-10-11 13:32
+https://github.com/Fosowl/agenticSeek/issues/410	SearXNG Multiple Engine CAPTCHA and Error Issues · Issue #410 · Fosowl/agenticSe	2026-10-11 13:32
+https://melonslab.com/guides/searxng-podman	Run your own private search engine with SearXNG and rootless Podman · Melonslab	2026-10-11 13:32
+https://ssdnodes.com/learn/searxng-vs-startpage-vs-duckduckgo	SearXNG vs Startpage vs DuckDuckGo vs Qwant	2026-10-11 13:32
+https://reddit.com/r/Searx/comments/1tijylz/selfhosted_search_for_llm_agents_searxng_keeps	SearXNG keeps getting blocked : r/Searx	2026-10-11 13:32
+https://swetrix.com/blog/search-engine-no-tracking	The 12 Best Search Engines Without Tracking for 2026	2026-10-11 13:32
+https://fastcrw.com/blog/best-tavily-alternatives	7 Tavily Alternatives Tested in 2026 — Cheaper, Faster Search APIs for AI Agents	2026-10-11 13:32
+https://reddit.com/r/AI_Agents/comments/1tijxk8/selfhosted_search_for_llm_agents_searxng_keeps	SearXNG keeps getting blocked : r/AI_Agents	2026-10-11 13:32
+https://howtogeek.com/self-hosted-tool-lets-local-llm-search-web	Stop paying for search APIs—this self-hosted tool lets my local LLM search the w	2026-10-11 13:32
+https://linkedin.com/posts/nickgogerty_a-trillion-search-ad-empire-isnt-dead-activity-7375276726781759488-xnnX	Top 10 Open Source Search Tools for LLMs | Nick Gogerty posted on the topic | Li	2026-10-11 13:32
+https://reddit.com/r/Rag/comments/1v4q7wp/benchmark_exa_vs_tavily_vs_firecrawl_for_llm	Exa vs. Tavily vs. Firecrawl for LLM Retrieval & Data Scraping	2026-10-11 13:32
+https://exa.ai/versus/tavily	Exa vs Tavily: Search API Benchmarks and Comparison	2026-10-11 13:32
+https://aimultiple.com/agentic-search	Agentic Search: Benchmark 8 Search APIs for Agents	2026-10-11 13:32
+https://medium.com/@unicodeveloper/tavily-alternatives-in-2026-after-the-nebius-acquisition-9de526780686	Medium	2026-10-11 13:32
+https://firecrawl.dev/blog/brave-search-api-alternatives	Top 5 Brave Search API Alternatives in 2026	2026-10-11 13:33
+https://brave.com/learn/best-search-api-2026	The best web search APIs for AI in 2026 | Brave	2026-10-11 13:33
+https://implicator.ai/brave-drops-free-search-api-tier-puts-all-developers-on-metered-billing	Brave Search API Free Tier Killed, Saved Card Now Bills	2026-10-11 13:33
+https://brave.com/blog/search-api-growth	The Brave Search API shows exponential growth, emerging as the best search tool 	2026-10-11 13:33
+https://brave.com/blog/most-powerful-search-api-for-ai	Brave launches most powerful search API for AI to date | Brave	2026-10-11 13:33
+https://brave.com/blog/place-search-improved	Brave Place Search API: The Google Maps Alternative That Costs 6–7x Less | Brave	2026-10-11 13:33
+https://blog.laozhang.ai/en/posts/brave-search-api	Brave Search API in 2026: Search vs Answers, Pricing, and First Working Requests	2026-10-11 13:33
+https://linkup.so/blog/best-web-search-api-in-2026-top-providers-compared	Linkup - Best web search API 2026: top providers compared	2026-10-11 13:33
+https://brightdata.com/blog/web-data/best-serp-apis	The 16 Best SERP and Web Search APIs of 2026	2026-10-11 13:33
+https://tracxn.com/d/companies/mojeek/__ptb7mNLR0SugtFb8MGTQeh7enNgA9kUs942DpDXExp8	Mojeek - 2026 Company Profile, Team, Funding, Competitors & Financials - Tracxn	2026-10-11 13:33
+https://searchengines.net/mojeek	Mojeek | SearchEngines.Net	2026-10-11 13:33
+https://serp.fast/tools/mojeek	Mojeek Review: Pricing & Alternatives | serp.fast	2026-10-11 13:33
+https://outrank.so/blog/alternative-search-engines-to-google	12 Best Google Alternatives Worth Trying in 2026	2026-10-11 13:33
+https://makeuseof.com/mojeek-truly-independent-search-engine-shouldnt-exist-but-it-does-and-its-great	A truly independent search engine shouldn’t exist in 2026 — but it does, and it’	2026-10-11 13:33
+https://llmrefs.com/blog/which-search-engines-are-most-highly-recommended	Which Search Engines Are Most Highly Recommended? 12 Top Picks for 2026 - LLMref	2026-10-11 13:33
+https://searchenginewatch.com/best-google-alternative-search-engines	11 best alternative search engines to Google in 2026	2026-10-11 13:33
+https://github.com/benbusby/whoogle-search	GitHub - benbusby/whoogle-search: A self-hosted, ad-free, privacy-respecting met	2026-10-11 13:33
+https://reddit.com/r/selfhosted/comments/1smtshe/whoogle_just_released_v123_which_will_be_their	Whoogle just released v1.2.3 which will be their final ...	2026-10-11 13:33
+https://opencollective.com/libredirect	Libredirect	2026-10-11 13:33
+https://fastcrw.com/alternatives/open-source-tavily	Open-Source Tavily Alternatives: What They Actually Do | fastCRW	2026-10-11 13:33
+https://surnex.io/blog/ad-free-search-engines	10 Best Ad Free Search Engines for 2026	2026-10-11 13:33
+https://trisquel.info/en/forum/are-there-any-privacy-search-engines-better-startpage	Are there any privacy search engines better than Startpage? | Trisquel GNU/Linux	2026-10-11 13:33
+https://4pda.to/forum/index.php?showtopic=1021622&st=1160	Децентрализованная Сеть	2026-10-11 13:33
+https://cisa.gov/news-events/bulletins/sb26-173	Vulnerability Summary for the Week of June 15, 2026 | CISA	2026-10-11 13:33
+https://firecrawl.dev/blog/best-openclaw-search-providers	Best OpenClaw Search Providers in 2026	2026-10-11 13:33
+https://bitdoze.com/searxng-self-host-privacy-search	Self-Host SearXNG: Private Search Engine Setup Guide	2026-10-11 13:33
+https://reddit.com/r/selfhosted/comments/1wxfl0u/degoog_v100_stable_release_search_engine	degoog V1.0.0 - Stable Release (search engine aggregator)	2026-10-11 13:33
+https://github.com/vxcontrol/pentagi/blob/main/backend/docs/config.md	pentagi/backend/docs/config.md at main · vxcontrol/pentagi · GitHub	2026-10-11 13:33
+https://reddit.com/r/LocalLLaMA/comments/1ua2w5t/best_harness_for_web_searching	Best Harness for Web Searching : r/LocalLLaMA	2026-10-11 13:33
+https://dev.to/webhuis/the-only-honest-guide-to-web-search-in-ollama-43h4	The Only Honest Guide to Web Search in Ollama - DEV Community	2026-10-11 13:33
+https://news.ycombinator.com/item?id=48779454	SearXNG: A free internet metasearch engine | Hacker News	2026-10-11 13:33
+https://pi.dev/packages/pi-search-multi	pi-search-multi · Packages · Pi	2026-10-11 13:33
+https://about.marginalia-search.com/article/api	API - Marginalia Search	2026-10-11 13:33
+https://pi.dev/packages/pi-search-hub	pi-search-hub · Packages · Pi	2026-10-11 13:33
+https://marginalia.nu/log/a_134_nsfw	An NSFW filter for Marginalia Search | marginalia.nu	2026-10-11 13:33
+https://apis.io/rate-limits	API Rate Limits | APIs.io	2026-10-11 13:33
+https://news.ycombinator.com/item?id=47408321	Hey!!!!! That is my website! To be fair, the hard part is hard to keep a persona	2026-10-11 13:33
+https://marginalia.nu/log/a_127_index_filtering	New Search Filtering in Web and API | marginalia.nu	2026-10-11 13:33
+https://readmarginalia.com/terms	Terms of Service — Marginalia | Marginalia	2026-10-11 13:33
+https://digitalagencynetwork.com/proxies-for-duckduckgo	Proxies for DuckDuckGo: A Practical Guide to Search-Data Collection	2026-10-11 13:33
+https://apiserpent.com/blog	Serpent API Blog - SERP API Tutorials & Developer Guides	2026-10-11 13:33
+https://iproyal.com/blog/duckduckgo-api	DuckDuckGo API: A Developer's Guide for 2026	2026-10-11 13:33
+https://github.com/open-webui/open-webui/discussions/6624	duckduckgo_search.exceptions.RatelimitException: 202 Ratelimit · open-webui/open	2026-10-11 13:33
+https://github.com/open-webui/open-webui/discussions/5191	Can't Get Web Search DuckDuckGo Working · open-webui/open-webui · Discussion #51	2026-10-11 13:33
+https://pypi.org/project/duckduckgo-search	duckduckgo-search	2026-10-11 13:33
+https://gist.github.com/ruvnet/2a344ec385bbad6e21f1222c8ab80afa	iter 38: statusline 3.10.4 published · GitHub	2026-10-11 13:33
+https://github.com/HKUDS/nanobot/issues/2804	web_search via DuckDuckGo hangs indefinitely, blocking ...	2026-10-11 13:33
+https://lagindicator.com/dev-tools/search-gateways	Search Gateways Compared: Hound (master-fetch) vs SearXNG vs ddgs - lagindicator	2026-10-11 13:34
+https://apify.com/get-leads/linkedin-scraper	LinkedIn Scraper - No Cookies, Free Email Discovery, 8 Modes · Apify	2026-10-11 13:34
+https://news.ycombinator.com/item?id=48809877	GLM 5.2 and the coming AI margin collapse | Hacker News	2026-10-11 13:34
+https://palemoon.org/releasenotes-archived.shtml	Pale Moon - Release Notes for Archived Versions	2026-10-11 13:34
+https://mighil.com/degoogle	DeGoogle Directory: List of Alternatives to Google Products	2026-10-11 13:34
+https://github.com/xianyu110/awesome-deepseek-harness-0xsline	GitHub - xianyu110/awesome-deepseek-harness-0xsline: DeepSeek Harness (DSH) ecos	2026-10-11 13:34
+https://cnblogs.com/apachecn/p/19167855	生成式人工智能与-LangChain-第二版-全- - 绝不原创的飞龙 - 博客园	2026-10-11 13:34
+https://ssdnodes.com/learn/searxng-engines-to-enable-and-disable	SearXNG engines to enable and disable on a VPS	2026-10-11 13:34
+https://xda-developers.com/gave-local-llm-real-time-search-perplexica	My local LLM's real problem wasn't hallucination, it was a two-year blind spot	2026-10-11 13:34
+https://reddit.com/r/hermesagent/comments/1v1ok4c/i_built_a_completely_free_tool_that_gives_your_ai	I Built a completely free tool that gives your AI agent web ...	2026-10-11 13:34
+https://pcmag.com/picks/dont-just-google-it-smarter-search-engines-to-try	Sick of Google's AI Overload? Try These Search Engines Instead	2026-10-11 13:34
+https://reddit.com/r/degoogle/comments/1ne1zsu/recommendations_for_a_solid_search_engine_without	Recommendations for a solid search engine without an AI ...	2026-10-11 13:34
+https://geekflare.com/guides/brave-search-api-alternatives	9 Best Brave Search API Alternatives in 2026	2026-10-11 13:34
+https://reddit.com/r/openclaw/comments/1r340jz/psa_brave_search_api_no_longer_free_other_changes	Brave Search API no longer free, other changes and features added : r/openclaw	2026-10-11 13:34
+https://cloro.dev/blog/bing-search-api-key	Bing Search API Key in 2026: It's Retired. Use These Instead	2026-10-11 13:34
+https://apiserpent.com/blog/free-google-search-api-tested	Free Google Search API 2026: 7 Free Tiers Tested Honestly	2026-10-11 13:34
+https://tavily.com/blog/how-we-built-the-fastest-web-search-in-the-world	How we built the fastest web search in the world | Tavily Blog	2026-10-11 13:34
+https://tavily.com/blog/tavily-101-ai-powered-search-for-developers	Tavily 101: AI-powered Search for Developers | Tavily Blog	2026-10-11 13:34
+https://perplexity.ai/hub/blog/architecting-and-evaluating-an-ai-first-search-api	Architecting and Evaluating an AI-First Search API	2026-10-11 13:34
+https://vespa.ai/case-studies/why-perplexity-chose-vespa-for-ai-search	Why Perplexity Chose Vespa for AI Search - Vespa.ai	2026-10-11 13:34
+https://linkup.so/blog/linkup-raises-10m-seed-to-build-web-search-for-ai	Linkup - Linkup raises $10M to build web search for AIs	2026-10-11 13:34
+https://you.com/docs/guides/search	Web Search API Overview | You.com | You.com | Documentation	2026-10-11 13:34
+https://github.com/jina-ai/reader	GitHub - jina-ai/reader: Convert any URL to an LLM-friendly input with a simple 	2026-10-11 13:34
+https://exa.ai/blog/building-web-scale-vector-db	How We Built a Web-Scale Vector Database for Our Neural Network Search Engine | 	2026-10-11 13:34
+https://exa.ai/blog/how-to-build-nextgen-search	How We're Building the Next Generation of Search with Semantic Search Technology	2026-10-11 13:34
+https://zilliz.com/customers/exa	Exa Builds Entity Search Engine for AI Agents With Zilliz Cloud	2026-10-11 13:34
+https://exa.ai/blog/fastest-search-api	The World's Fastest Search API | Exa Blog	2026-10-11 13:34
+https://aihackers.net/posts/exa-search-ai-native-engine-2026	Exa Search: The AI-Native Search Engine Built for Agents | aihackers.net	2026-10-11 13:34
+https://exa.ai/research	Exa Research | Technical Blog on Search & AI Infrastructure	2026-10-11 13:34
+https://aifuturefront.com/exa-ai-introduces-exa-instant-a-sub-200ms-neural-search-engine-designed-to-eliminate-bottlenecks-for-real-time-agentic-workflows	Exa AI Introduces Exa Instant: A Sub-200ms Neural Search Engine ...	2026-10-11 13:34
+https://a16z.news/p/exa-is-building-the-search-engine	Exa is Building the Search Engine for the AI Era - a16z.news	2026-10-11 13:34
+https://zenml.io/llmops-database/building-a-search-engine-for-ai-agents-infrastructure-product-development-and-production-deployment	Exa.ai: Building a Search Engine for AI Agents: Infrastructure, Product ...	2026-10-11 13:34
+https://docs.tavily.com/documentation/about	About - Tavily Docs	2026-10-11 13:34
+https://grokipedia.com/page/Tavily_Search_API	Tavily Search API — Grokipedia	2026-10-11 13:34
+https://agentsapis.com/tavily-api	Tavily API - Complete Developer Guide - agentsapis.com	2026-10-11 13:34
+https://blog.vespa.ai/perplexity-show-what-great-rag-takes	How Perplexity beat Google on AI Search with Vespa.ai | Vespa Blog	2026-10-11 13:34
+https://geol.ai/briefing/perplexitys-sonar-api-democratizing-ai-search-capabilities	Perplexity Sonar API: Build Cited AI Search Fast - geol.ai	2026-10-11 13:34
+https://blog.vespa.ai/perplexity-builds-ai-search-at-scale-on-vespa-ai	Perplexity builds AI Search at scale on Vespa.ai | Vespa Blog	2026-10-11 13:34
+https://baeseokjae.github.io/posts/perplexity-sonar-api-guide-2026	Perplexity Sonar API Guide 2026: Add Real-Time Search to Your App	2026-10-11 13:34
+https://blog.vespa.ai	Home | Vespa Blog	2026-10-11 13:34
+https://multi-ai.ai/en/blog/perplexity-sonar-en	Perplexity Sonar: Complete API Guide & Review 2026 | Multi AI	2026-10-11 13:34
+https://phacetlabs.com/podcast/linkup-eu10m-to-build-the-search-engine-ai-agents-actually-need	Linkup: building the search infrastructure for AI agents	2026-10-11 13:34
+https://linkup.so	Linkup | The Web Search API for AI	2026-10-11 13:34
+https://docs.linkup.so/pages/documentation/get-started/introduction	Introduction - Linkup API Documentation	2026-10-11 13:34
+https://github.com/api-evangelist/linkup-so	GitHub - api-evangelist/linkup-so · GitHub	2026-10-11 13:34
+https://neuronfeed.com/startups/linkup	Linkup: Web Search API Built for AI Agents - neuronfeed.com	2026-10-11 13:34
+https://ai-market-watch.com/company/linkup	Linkup - AI Startup Profile | AI Market Watch	2026-10-11 13:34
+https://api-dashboard.search.brave.com/documentation/services/llm-context	Brave Search - API	2026-10-11 13:34
+https://you.com/docs/welcome	You.com API Docs | Real-Time Web Intelligence for AI Apps | You.com | Documentat	2026-10-11 13:34
+https://jina.ai/reader	Reader API - Jina AI	2026-10-11 13:34
+https://elastic.co/search-labs/tutorials/jina-tutorial/jina-reader	Jina Reader | Elasticsearch Labs	2026-10-11 13:34
+https://elastic.co/docs/explore-analyze/machine-learning/nlp/ml-nlp-jina	Jina models - Elastic Docs	2026-10-11 13:34
+https://agentscamp.com/guides/advanced/jina-reader-api	Jina Reader API Guide: r.jina.ai Headers, Examples, Limits — AgentsCamp	2026-10-11 13:34
+https://deepwiki.com/jina-ai/reader	jina-ai/reader | DeepWiki	2026-10-11 13:34
+https://ai.miraheze.org/wiki/Jina_Reader	Jina Reader - Learn AI	2026-10-11 13:34
+https://deepwiki.com/jina-ai/reader/5-ai-and-llm-integration	AI and LLM Integration | jina-ai/reader | DeepWiki	2026-10-11 13:34
+https://linkedin.com/posts/william-bryk_today-were-releasing-the-fastest-search-activity-7356058463145242626-5bAy	Introducing Exa Fast: The Fastest Search API for AIs | Will Bryk posted on the t	2026-10-11 13:34
+https://kshivendu.dev/blog/exa-napkin-math	I Reverse-Engineered Exa.ai Infrastructure Cost with Napkin Math	2026-10-11 13:34
+https://queryburst.com/blog/exa-highlights	Replicating Exa Highlights (With a Potato And Some String) — QueryBurst	2026-10-11 13:34
+https://blog.wilsonl.in/search-engine	Building a web search engine from scratch in two months with 3 billion neural em	2026-10-11 13:34
+https://ai.engineer/orgs/exa	exa: Search APIs for AI Agents | AI Engineer	2026-10-11 13:34
+https://exa.ai/blog/exa-api-2-0	Introducing Exa 2.0 | Exa Blog	2026-10-11 13:34
+https://exa.ai/blog/scaling-our-highlights-server	Scaling Our Server for Semantic Search Technology Highlights | Exa Blog	2026-10-11 13:34
+https://exa.ai/blog/exa-instant	Introducing Exa Instant: the fastest search engine in the world | Exa Blog	2026-10-11 13:34
+https://exa.ai/blog/meet-the-exacluster	The Exacluster: Powering Our Neural Network Search Engine | Exa Blog	2026-10-11 13:34
+https://exa.ai/blog/bm25-optimization	Optimizing BM25 for the Next Generation of Semantic Search Technology | Exa Blog	2026-10-11 13:34
+https://exa.ai/blog	Exa AI Research Blog	2026-10-11 13:34
+https://youtube.com/watch?v=y72AhP4oLZE	From Terabytes to Milliseconds: Inside Exa's Revolutionary Vector ...	2026-10-11 13:34
+https://apis.io/apis/tavily/web-api	Web Api | APIs.io APIs	2026-10-11 13:34
+https://alphacorp.ai/blog/perplexity-search-api-vs-tavily-the-better-choice-for-rag-and-agents-in-2025	Perplexity Search API vs. Tavily: The Better Choice for RAG and Agents in 2025	2026-10-11 13:34
+https://cbinsights.com/company/tavily	Tavily - Products, Competitors, Financials, Employees, Headquarters Locations	2026-10-11 13:34
+https://medium.com/@minhle_0210/boost-your-rag-performance-with-tavily-search-api-607a6437ab8e	Medium	2026-10-11 13:34
+https://parallel.ai/articles/tavily-vs-parallel-search	Tavily vs Parallel: Choosing a Search API for AI Agents | Parallel	2026-10-11 13:34
+https://docs.tavily.com/agents	Agents - Tavily Docs	2026-10-11 13:34
+https://zairalabs.ai/guide/tools/tavily	Tavily: Web retrieval API for AI agents with live search, extraction, and synthe	2026-10-11 13:34
+https://agentsindex.ai/tavily	Tavily : Live web data API for search, extraction, research	2026-10-11 13:34
+https://github.com/tavily-ai	Tavily AI - GitHub	2026-10-11 13:34
+https://tavily.org	Tavily - Connect your AI agents	2026-10-11 13:34
+https://docs.tavily.com/documentation/best-practices/best-practices-search	Best Practices for Search - Tavily Docs	2026-10-11 13:34
+https://deepwiki.com/tavily-ai/skills/3.2-performance-optimization	Performance Optimization | tavily-ai/skills | DeepWiki	2026-10-11 13:34
+https://businesswire.com/news/home/20250415258066/en/Perplexity-Partners-With-Vespa.ai-to-Bring-its-Search-Function-In-House	Perplexity Partners With Vespa.ai to Bring its Search Function In-House	2026-10-11 13:34
+https://linkedin.com/posts/perplexity-ai_introducing-perplexity-search-api-weve-activity-7377041245023625216-TA2o	Introducing Perplexity Search API: Fast, Accurate, and AI-Powered | Perplexity p	2026-10-11 13:34
+https://pristren.com/blog/perplexity-sonar-online-api	Master Perplexity Sonar API for Real Time Search Grounding	2026-10-11 13:34
+https://xnews.xgrowing.ai/news/perplexity-search-api-achieves-sub-250ms-latency-with-photon-5119	Perplexity Search API Achieves Sub-250ms Latency with Photon	2026-10-11 13:34
+https://xnews.xgrowing.ai/news/perplexity-launches-search-api-with-sub-250ms-latency-using-photon-engine-5165	Perplexity launches Search API with sub-250ms latency using ...	2026-10-11 13:34
+https://theaiengineer.substack.com/p/how-perplexity-built-their-search	How Perplexity Built Their Search Engine - by Paolo Perrone	2026-10-11 13:34
+https://parallel.ai/articles/perplexity-search-api-vs-parallel-search-api	Perplexity Search API vs Parallel Search API Compared | Parallel	2026-10-11 13:34
+https://perplexity.ai/hub/blog/introducing-the-perplexity-search-api	Introducing the Perplexity Search API	2026-10-11 13:34
+https://docs.perplexity.ai/docs/sonar/models/sonar.md	N/A	2026-10-11 13:34
+https://vespa.ai/case-studies/perplexity	Why Perplexity Chose Vespa for AI Search - Vespa.ai	2026-10-11 13:34
+https://perplexity.ai/en-GB/hub/blog/introducing-the-sonar-pro-api	Introducing the Sonar Pro API by Perplexity	2026-10-11 13:34
+https://perplexity.ai/en-GB/hub/blog/agent-api-one-place-to-build-with-llms-the-web-and-agents	Agent API: Build with LLMs, the Web, and Agents	2026-10-11 13:34
+https://toolkitbyai.com/perplexity-sonar-complete-guide-2025	Perplexity Sonar — Complete 2025 Guide & Benchmarks	2026-10-11 13:34
+https://vespa.ai/case-studies/perplexity?_bhlid=247642a4a4d84eb6bd9a94d2cad1fcf74af776be	Why Perplexity Chose Vespa for AI Search - Vespa.ai	2026-10-11 13:34
+https://finance.yahoo.com/news/linkup-raises-10m-seed-round-155000128.html?fr=sycsrp_catchall	Linkup Raises $10M Seed Round Led by Gradient to Build Web Search for AI	2026-10-11 13:34
+https://finance.yahoo.com/news/linkup-raises-10m-seed-round-155000128.html	Linkup Raises $10M Seed Round Led by Gradient to Build Web Search for AI	2026-10-11 13:34
+https://linkedin.com/posts/linkup-platform_today-were-excited-to-announce-our-10m-activity-7424354197380431872-J4vd	Today, we're excited to announce our $10M seed round and the release of Linkup /	2026-10-11 13:34
+https://hyperengage.io/podcast/ep-146-redefining-web-access-for-ai-agents-ft-philippe-mizrahi-ceo-linkup	Ep #146: Redefining Web Access for AI Agents ft. Philippe Mizrahi (CEO, Linkup)	2026-10-11 13:34
+https://linkedin.com/company/linkup-platform	Linkup	2026-10-11 13:34
+https://youtube.com/watch?v=vOgI_3CyRWU	Boost your agents with easy to integrate web search (by Linkup)	2026-10-11 13:34
+https://youtube.com/watch?v=R2F7m5p44tc	Off the Radar - Philippe Mizrahi (Linkup) on Building Web Search for AI Agents	2026-10-11 13:34
+https://linkup.so/blog/introducing-linkup-flash	Linkup - Linkup Flash: Accurate Web Search for Agents in Under 250ms	2026-10-11 13:34
+https://devsummit2026.sched.com/event/2KjRf/linkup-designing-a-retrieval-layer-for-ai-agents-lessons-from-production	Dev Summit 2026: LINKUP - Designing a retrieval layer for...	2026-10-11 13:34
+https://gradient.com/blog/posts/investing-in-linkup	Linkup - Building the Live Context Layer for LLMs | Gradient Ventures	2026-10-11 13:34
+https://rss.com/podcasts/zerotoone/2902041	Philippe Mizrahi (Linkup) : Building the Web Search Layer for AI Agents 🔍 | Zero	2026-10-11 13:34
+https://linkup.so/blog/building-web-search-for-ai-1-mercator	Linkup - Building Web Search for AI - #1 Mercator	2026-10-11 13:34
+https://buzzsprout.com/1861907/episodes/16897550-how-he-developed-the-world-s-best-search-agent-with-philippe-mizrahi-59	How He Developed the World's Best Search Agent with Philippe Mizrahi #59	2026-10-11 13:34
+https://github.com/LinkupPlatform	Linkup - GitHub	2026-10-11 13:34
+https://docs.linkup.so/pages/documentation/endpoints/search/overview	Search overview - Linkup API Documentation	2026-10-11 13:34
+https://youtube.com/watch?v=f3OPc-QMAlA	Philippe Mizrahi (Linkup) : Building the Web Search Layer for ...GitHub - api-ev	2026-10-11 13:34
+https://aiwiki.ai/wiki/linkup	Linkup - AI Wiki	2026-10-11 13:34
+https://searchcans.com/blog/brave-search-api-llm-training-data	Brave Search API for LLM Grounding and Web Data	2026-10-11 13:34
+https://dev.to/kenimo49/brave-search-is-the-default-search-engine-for-ai-agents-not-google-29cg	Brave Search is the default search engine for AI agents -- not Google - DEV Comm	2026-10-11 13:34
+https://scrapegraphai.com/blog/brave-search-api	Brave Search API: Get a Key, Test Free, Go Beyond Links	2026-10-11 13:34
+https://therundown.ai/tools/brave-search-api	Brave Search API: Features, Pricing & Alternatives	2026-10-11 13:34
+https://github.com/open-webui/open-webui/issues/24120	feat: Support Brave Search LLM Context API as web_search provider option · Issue	2026-10-11 13:34
+https://github.com/brave/brave-search-skills/blob/main/skills/llm-context/SKILL.md	brave-search-skills/skills/llm-context/SKILL.md at main · brave/brave-search-ski	2026-10-11 13:34
+https://github.com/kuangjun2021/skills-brave-search/blob/main/skills/llm-context/SKILL.md	skills-brave-search/skills/llm-context/SKILL.md at main · kuangjun2021/skills-br	2026-10-11 13:34
+https://agentscamp.com/tools/brave-search-api	Brave Search API: Independent Index, LLM Context, and Answers — AgentsCamp	2026-10-11 13:34
+https://skilld.dev/gh/brave/brave-search-skills/llm-context	llm-context by brave · skilld	2026-10-11 13:34
+https://mcpservers.org/agent-skills/brave/llm-context	llm-context | Claude Skills & Agent Skills Library	2026-10-11 13:34
+https://deepwiki.com/brave/brave-search-skills/3.2-llm-context	LLM Context | brave/brave-search-skills | DeepWiki	2026-10-11 13:34
+https://api-dashboard.search.brave.com/api-reference/summarizer/llm_context/get	LLM Context — Web search API for AI agents - API Reference	2026-10-11 13:34
+https://finance.yahoo.com/news/com-launches-apis-connect-llms-150046940.html?fr=sycsrp_catchall	You.com launches new APIs to connect LLMs to the web	2026-10-11 13:34
+https://techcrunch.com/2023/11/14/you-com-launches-new-apis-to-connect-llms-to-the-web	You.com launches new APIs to connect LLMs to the web | TechCrunch	2026-10-11 13:34
+https://you.com/resources/best-web-search-apis-for-ai-agents	You.com | Best Web Search APIs for AI Agents: What to Test First	2026-10-11 13:34
+https://youtube.com/watch?v=twFSPgY72S0	Amazing Answers: Richard Socher on how You.com is Reimagining Search with AI	2026-10-11 13:34
+https://braintrust.dev/articles/best-web-search-apis-mcps-ai-agents-2026	Best web search APIs and MCPs for AI agents in 2026 - Articles - Braintrust	2026-10-11 13:34
+https://medium.com/@you.com/introducing-the-you-api-web-scale-search-for-llms-3617c5712e16	Introducing the YOU API: Web-scale search for LLMs	2026-10-11 13:34
+https://you.com/docs/api-reference/search/v1-search.md	N/A	2026-10-11 13:34
+https://you.com/docs/capabilities/web-search-api-for-ai-agents	The Best Web Search API for AI Agents | You.com | Documentation	2026-10-11 13:34
+https://you.com/docs/capabilities/grounding-llm-responses-with-citations.md	N/A	2026-10-11 13:34
+https://you.com/resources/web-search-api-json-response	You.com | Web Search API JSON Response	2026-10-11 13:34
+https://you.com/docs/examples/simple-search	Simple Search | You.com | Documentation	2026-10-11 13:34
+https://you.com/docs/capabilities/mcp-server-for-web-search	MCP Server for Web Search | You.com | Documentation	2026-10-11 13:34
+https://you.com/docs/research/overview.md	Research API Overview	2026-10-11 13:34
+https://old-docs.you.com/get-started/welcome	Welcome - You.com API	2026-10-11 13:34
+https://docs.agno.com/tools/toolkits/search/youcom	You.com - Agno	2026-10-11 13:34
+https://github.com/youdotcom-oss/youdotcom-python-sdk	GitHub - youdotcom-oss/youdotcom-python-sdk: The official You.com Python SDK · G	2026-10-11 13:34
+https://github.com/youdotcom-oss/ydc-simple-search-sample	GitHub - youdotcom-oss/ydc-simple-search-sample: A simple example web ...	2026-10-11 13:34
+https://theaiagentindex.com/agents/you-com	You.com Review (2026): Web Search APIs for AI Agents	2026-10-11 13:34
+https://agentsindex.ai/you-com	You.com: Web Search APIs for AI agents, LLMs, and agentic	2026-10-11 13:34
+https://firecrawl.dev/alternatives/firecrawl-vs-jina-ai	Firecrawl vs Jina AI | Best Jina AI Alternative	2026-10-11 13:34
+https://jina.ai/contact-sales	Contact sales - Jina AI	2026-10-11 13:34
+https://medium.com/@kawsarlog/jina-ais-reader-api-a-game-changer-for-developers-be66154b2692	Jina.ai’s Reader API: A Game Changer for Developers | by MD Kawsar | Medium	2026-10-11 13:34
+https://simonwillison.net/2024/Jun/16/jina-ai-reader	Jina AI Reader	2026-10-11 13:34
+https://youtube.com/watch?v=GllAqZE6uws	Jina Reader API: Build better AI Agents and RAG systems with Reader	2026-10-11 13:34
+https://github.com/jina-ai/reader/blob/main/architecture.md	architecture.md	2026-10-11 13:34
+https://github.com/jina-ai/reader/blob/3f86855e/cookbooks.md	cookbooks.md	2026-10-11 13:34
+https://github.com/jina-ai/reader/blob/main/README.md	README.md	2026-10-11 13:34
+https://github.com/jina-ai/reader?tab=readme-ov-file	jina-ai/reader	2026-10-11 13:34
+https://jina.ai/news/fact-checking-with-new-grounding-api-in-jina-reader	Fact-Checking with New Grounding API in Jina Reader	2026-10-11 13:34
+https://github.com/jina-ai/reader/issues/1227	What kind of proxy infrastructure are they using to achieve this kind of speed? 	2026-10-11 13:34
+https://doramagic.ai/en/projects/reader/manual	https://github.com/jina-ai/reader Project Manual	2026-10-11 13:34
+https://github.com/kabilaymen/reader-jina-ai	GitHub - kabilaymen/reader-jina-ai: Convert any URL to an LLM-friendly input wit	2026-10-11 13:34
+https://recatools.com/ai-directory/jina-reader	Jina Reader — URL-to-Markdown API for LLMs (Elastic)	2026-10-11 13:34
+https://github.com/aiminnovations/jina-reader	GitHub - aiminnovations/jina-reader: Convert any URL to an LLM-friendly ...	2026-10-11 13:34
+https://osti.gov/servlets/purl/2429881	An Evaluation of Main Content Extraction Libraries in Java ...	2026-10-11 13:34
+https://webcontentextraction.org	Web Content Extraction Benchmark | WCXB Leaderboard & Dataset	2026-10-11 13:34
+https://trafilatura.readthedocs.io/en/latest/evaluation.html	Benchmarks and evaluation — Trafilatura 2.2.0 documentation	2026-10-11 13:34
+https://github.com/scrapinghub/article-extraction-benchmark	GitHub - scrapinghub/article-extraction-benchmark: Article extraction benchmark:	2026-10-11 13:34
+https://arxiv.org/pdf/2605.21097	WCXB: A Multi-Type Web Content Extraction Benchmark	2026-10-11 13:34
+https://arxiv.org/html/2605.21097v1	WCXB: A Multi-Type Web Content Extraction Benchmark	2026-10-11 13:34
+https://downloads.webis.de/publications/papers/bevendorff_2023c.pdf	An Empirical Comparison of Web Content Extraction ...	2026-10-11 13:34
+https://github.com/chatnoir-eu/web-content-extraction-benchmark	GitHub - chatnoir-eu/web-content-extraction-benchmark: Web Content Extraction Be	2026-10-11 13:34
+https://researchgate.net/publication/372537950_An_Empirical_Comparison_of_Web_Content_Extraction_Algorithms	An Empirical Comparison of Web Content Extraction ...	2026-10-11 13:34
+https://dl.acm.org/doi/pdf/10.1145/3539618.3591920	An Empirical Comparison of Web Content Extraction ...	2026-10-11 13:34
+https://downloads-cf.webis.de/publications/slides/bevendorff_2023b.pdf	PDF An Empirical Comparison of Web Content Extraction Algorithms	2026-10-11 13:34
+https://thunderbit.com/blog/trafilatura	trafilatura Benchmark: Less Boilerplate Than Readability	2026-10-11 13:34
+https://github.com/adbar/trafilatura/blob/master/docs/evaluation.rst	trafilatura/docs/evaluation.rst at master · adbar/trafilatura · GitHub	2026-10-11 13:34
+https://bulkmd.app/blog/readability-vs-trafilatura-extractors	Readability vs Trafilatura vs jsdom: 2026 Benchmark — BulkMD	2026-10-11 13:34
+https://16yun.cn/en/blog/2026/04/trafilatura-precision-content-metadata-extraction	Precision Extraction: Content, Metadata, and Tables — Trafilatura Deep ...	2026-10-11 13:34
+https://github.com/adbar/trafilatura	GitHub - adbar/trafilatura: Python & Command-line tool to gather text ...	2026-10-11 13:34
+https://maurelf.users.greyc.fr/docs/conferences/SIGIR_2025_paper_1968.pdf	Multilingual Benchmarking of Main Content Extractors	2026-10-11 13:34
+https://murroughfoley.com/web-content-extraction-benchmark	I Built a 2,000-Page Web Content Extraction Benchmark. Here's What I Found.	2026-10-11 13:34
+https://huggingface.co/datasets/allenai/scrapinghub-article-extraction-benchmark	allenai/scrapinghub-article-extraction-benchmark · Datasets at Hugging Face	2026-10-11 13:34
+https://github.com/Hydrafetch/extraction-benchmark	GitHub - Hydrafetch/extraction-benchmark: How well content extractors recover a 	2026-10-11 13:34
+https://jina.ai/news/readerlm-v2-frontier-small-language-model-for-html-to-markdown-and-json	ReaderLM v2: Frontier Small Language Model for HTML to Markdown and JSON	2026-10-11 13:34
+https://arxiv.org/html/2503.01151v1	ReaderLM-v2: Small Language Model for HTML to Markdown and JSON	2026-10-11 13:34
+https://huggingface.co/papers/2503.01151	Paper page - ReaderLM-v2: Small Language Model for HTML to Markdown and JSON	2026-10-11 13:34
+https://arxiv.org/html/2503.01151	ReaderLM-v2: Small Language Model for HTML to Markdown and JSON	2026-10-11 13:34
+https://huggingface.co/jinaai/ReaderLM-v2	jinaai/ReaderLM-v2 · Hugging Face	2026-10-11 13:34
+https://dias.users.greyc.fr/publications/sigir2025.pdf	Multilingual Evaluation of Main Content Extractors for Web ...	2026-10-11 13:34
+https://scholar.google.com/citations?user=9goRF9MAAAAJ&hl=en	‪Janek Bevendorff‬ - ‪Google Scholar‬	2026-10-11 13:34
+https://semanticscholar.org/paper/An-Empirical-Comparison-of-Web-Content-Extraction-Bevendorff-Gupta/53f5825df0c79bec9fa417379926f883927183f0	[PDF] An Empirical Comparison of Web Content Extraction ...	2026-10-11 13:34
+https://dl.acm.org/doi/10.1145/3539618.3591920	An Empirical Comparison of Web Content Extraction Algorithms | Proceedings of th	2026-10-11 13:34
+https://dblp.dagstuhl.de/rec/conf/sigir/BevendorffGK023.html	dblp: An Empirical Comparison of Web Content Extraction Algorithms.	2026-10-11 13:34
+https://ir.webis.de/anthology/publications/rec+conf+sigir+BevendorffGK023	An Empirical Comparison of Web Content Extraction Algorithms.	2026-10-11 13:34
+https://researchr.org/publication/BevendorffGK023	An Empirical Comparison of Web Content Extraction Algorithms - researchr publica	2026-10-11 13:34
+https://downloads.webis.de/publications/slides/bevendorff_2023b.pdf	An Empirical Comparison of Web Content Extraction Algorithms	2026-10-11 13:34
+https://dl.acm.org/doi/epdf/10.1145/3539618.3591920	An Empirical Comparison of Web Content Extraction Algorithms	2026-10-11 13:34
+https://bibliographie.uni-weimar.de/servlets/DozBibEntryServlet?mode=show&id=ubw_mods_00000461	Bevendorff, Janek: An Empirical Comparison of Web Content Extraction ...	2026-10-11 13:34
+https://dblp.org/rec/conf/sigir/BevendorffGK023	"An Empirical Comparison of Web Content Extraction Algorithms." - dblp	2026-10-11 13:34
+https://sigir.org/sigir2023/program/accepted-papers/reproducibility-papers	Reproducibility papers – SIGIR | Taipei | Taiwan | 2023	2026-10-11 13:34
+https://bbb.wikipedia.de/rooms/wir-76h-a2w-0gm/join	Förderberatung - bbb.wikipedia.de	2026-10-11 13:34
+https://wikipedia.de	Wikipedia, die freie Enzyklopädie	2026-10-11 13:34
+https://benchmarklist.com/benchmarks/webmainbench	WebMainBench Benchmark Scores & AI Model Leaderboard | BenchmarkList	2026-10-11 13:34
+https://arxiv.org/html/2602.19548v1	Beyond a Single Extractor: Re-thinking HTML-to-Text Extraction for LLM Pretraini	2026-10-11 13:34
+https://dokk.org/documentation/trafilatura/v1.1.0/evaluation	Evaluation — trafilatura 1.1.0 documentation	2026-10-11 13:34
+https://murroughfoley.com/rs-trafilatura-rust-web-content-extraction	rs-trafilatura: A Rust Web Content Extraction Library	2026-10-11 13:34
+https://github.com/markusmobius/content-extractor-benchmark	GitHub - markusmobius/content-extractor-benchmark: Benchmark to compare various 	2026-10-11 13:34
+https://pypi.org/project/trafilatura	trafilatura	2026-10-11 13:34
+https://github.com/scrapinghub/article-extraction-benchmark/issues/3	Adding more tools to the benchmark? · Issue #3 · scrapinghub/article-extraction-	2026-10-11 13:34
+https://github.com/scrapinghub/article-extraction-benchmark/blob/master/README.rst	README.rst	2026-10-11 13:34
+https://contextractor.com/trafilatura-vs-readability-vs-newspaper	Trafilatura vs. Readability vs. Newspaper4k 🧰	2026-10-11 13:34
+https://f.hubspotusercontent10.net/hubfs/4367560/In-depth%20analysis%20and%20evaluation%20on%20the%20quality%20of%20article%20body%20extraction.pdf	In-depth analysis and evaluation on the quality of article body extraction	2026-10-11 13:34
+https://github.com/scrapinghub/article-extraction-benchmark/tree/master	GitHub - scrapinghub/article-extraction-benchmark: Article extraction benchmark:	2026-10-11 13:34
+https://en.wikipedia.org/wiki/Article_(grammar)	Article (grammar ) - Wikipedia	2026-10-11 13:34
+https://serp.fast/guides/web-extraction-benchmarks	Web Content Extraction Benchmarks: How to Evaluate Scraping ...	2026-10-11 13:34
+https://github.com/lihuibng/WebMainBench	lihuibng/WebMainBench	2026-10-11 13:34
+https://exa.ai/library/publication/5qmvf4ccch7	Multilingual Evaluation of Main Content Extractors for Web Pages	2026-10-11 13:34
+https://github.com/edkrueger/article-extraction-benchmark	edkrueger/article-extraction-benchmark	2026-10-11 13:34
+https://exa.ai/library/publication/8yvstkdxq9z	Nemotron-CC: Transforming Common Crawl into a Refined Long-Horizon Pretraining D	2026-10-11 13:34
+https://pypi.org/project/webmainbench	webmainbench · PyPI	2026-10-11 13:34
+https://trafilatura.readthedocs.io/en/stable/extraction-overview.html	How extraction works — Trafilatura 2.3.0 documentation	2026-10-11 13:34
+https://de.wikipedia.org/wiki/Wei%C3%9Fer_Main	Weißer Main – Wikipedia	2026-10-11 13:34
+https://alphaxiv.org/abs/2503.01151	ReaderLM-v2: Small Language Model for HTML to Markdown and JSON | alphaXiv	2026-10-11 13:34
+https://hyper.ai/en/papers/2503.01151	ReaderLM-v2: Small Language Model for HTML to Markdown and JSON | Papers | Hyper	2026-10-11 13:34
+https://ritvik19.medium.com/papers-explained-348-readerlm-v2-b5bed3f57fbe	Papers Explained 348: ReaderLM-v2 | by Ritvik Rastogi	2026-10-11 13:34
+https://dl.acm.org/doi/pdf/10.1145/3805622.3810787	Benchmarking MLLM-based Web Understanding: Reasoning, Robustness and Safety	2026-10-11 13:34
+https://llm-explorer.com/model/jinaai%2FReaderLM-v2,7ySzQn7xGJgwNySD7D41bH	ReaderLM V2 by jinaai — VRAM 3.1GB, 500K context | LLM Explorer	2026-10-11 13:34
+https://arxiv.deeppaper.ai/papers/2503.01151v1	ReaderLM-v2: Small Language Model for HTML to Markdown and JSON | Arxiv - DeepPa	2026-10-11 13:34
+https://free2aitools.com/model/jinaai/readerlm-v2	Readerlm V2 - AI Model Insights & Benchmarks	2026-10-11 13:34
+https://jina.ai/models/ReaderLM-v2	ReaderLM-v2 - Search Foundation Models	2026-10-11 13:34
+https://web.de/email	E-Mail -Adresse erstellen kostenlos | FreeMail - WEB .DE	2026-10-11 13:34
+https://anmelden.web.de	WEB .DE Login - ganz einfach	2026-10-11 13:34
+https://agentset.ai/rerankers/jina-reranker-v2-base-multilingual	Jina Reranker v2 Base Multilingual | Reranker Details & Performance	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual	jinaai/jina-reranker-v2-base-multilingual · Hugging Face	2026-10-11 13:34
+https://local-ai-zone.github.io/guides/best-ai-reranker-models-ultimate-ranking-2026.html	Top Reranker AI Models 2026: Precision Retrieval	2026-10-11 13:34
+https://futureagi.com/blog/best-rerankers-for-rag-2026	Best Rerankers for RAG 2026: 7 Compared	2026-10-11 13:34
+https://learn.engineering.vips.edu/compare/mixedbread-mxbai-rerank-large-v1-vs-bge-reranker-v2-m3	mxbai-rerank-large-v1 vs bge-reranker-v2-m3 | VIPS Learn	2026-10-11 13:34
+https://localaimaster.com/blog/reranking-cross-encoders-guide	Reranking & Cross-Encoders for RAG: BGE, Cohere, Jina (2026)	2026-10-11 13:34
+https://docs.bswen.com/blog/2026-02-25-best-reranker-models	Best Reranker Models for RAG: Open-Source vs API Comparison (2026) | BSWEN	2026-10-11 13:34
+https://bge-model.com/tutorial/5_Reranking/5.2.html	BGE Reranker — BGE documentation	2026-10-11 13:34
+https://huggingface.co/BAAI/bge-reranker-v2-m3	BAAI/bge-reranker-v2-m3 · Hugging Face	2026-10-11 13:34
+https://siliconflow.com/articles/best-reranker-for-multilingual-search	Ultimate Guide - Best Reranker for Multilingual Search in 2026 - SiliconFlow	2026-10-11 13:34
+https://xybrid.ai/blog/onnx-runtime-6x-faster-apple-silicon-coreml	How We Made ONNX Runtime 6.8x Faster on Apple Silicon with CoreML - Xybrid Blog	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/blob/main/README.md	README.md · jinaai/jina-reranker-v2-base-multilingual at main	2026-10-11 13:34
+https://jina.ai/models/jina-reranker-v2-base-multilingual	jina-reranker-v2-base-multilingual - Search Foundation Models	2026-10-11 13:34
+https://github.com/shreyansh26/Accelerating-Cross-Encoder-Inference	GitHub - shreyansh26/Accelerating-Cross-Encoder-Inference: Leveraging ...	2026-10-11 13:34
+https://benchlm.ai/compare/bge-reranker-v2-m3-vs-mxbai-rerank-base-v2	BAAI bge-reranker-v2-m3 vs Mixedbread mxbai-rerank-base-v2	2026-10-11 13:34
+https://bge-model.com/bge/bge_reranker_v2.html	BGE-Reranker-v2 — BGE documentation	2026-10-11 13:34
+https://recal.so/blog/best-local-reranker-models-2026	Best Local Reranker Models for RAG in 2026 · recal	2026-10-11 13:34
+https://mixpeek.com/curated-lists/best-rerankers	Best Rerankers for RAG in 2026 - Tested & Ranked | Mixpeek	2026-10-11 13:34
+https://aimultiple.com/rerankers	Reranker Benchmark: Top 8 Models Compared	2026-10-11 13:34
+https://usefulai.com/models/reranking	Best Reranker Models for RAG in 2026 - UsefulAI	2026-10-11 13:34
+https://alatirok.com/best-reranker-model-2026	Best Reranker Model 2026: Cohere vs Voyage vs Jina vs Zerank	2026-10-11 13:34
+https://siliconflow.com/articles/best-reranker-for-cross-lingual-search	Ultimate Guide - The Best Reranker for Cross-Lingual Search in 2026	2026-10-11 13:34
+https://sevenlabs.site/blogs/best-open-source-reranking-models-rag-2026	Best Open-Source Reranking Models for RAG Pipelines in 2026	2026-10-11 13:34
+https://arxiv.org/html/2510.18921v1	Benchmarking On-Device Machine Learning on Apple Silicon with MLX	2026-10-11 13:34
+https://macgpu.com/en/blog/2026-0420-mac-onnx-runtime-coreml-ep-vs-cpu-dynamic-shapes-remote.html	2026 Mac Apple Silicon ONNX Runtime: CoreML EP vs CPU EP, Fixed-Shape ...	2026-10-11 13:34
+https://github.com/aperepel/mlx-rerank/tree/main	GitHub - aperepel/mlx-rerank: MLX-native reranker service for Apple Silicon	2026-10-11 13:34
+https://arxiv.org/abs/2510.18921v1	[2510.18921v1] Benchmarking On-Device Machine Learning on Apple Silicon with MLX	2026-10-11 13:34
+https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html	Apple - CoreML | onnxruntime	2026-10-11 13:34
+https://huggingface.co/answerdotai/answerai-colbert-small-v1	answerdotai/answerai-colbert-small-v1 · Hugging Face	2026-10-11 13:34
+https://answer.ai/posts/2024-08-13-small-but-mighty-colbert.html	Small but Mighty: Introducing answerai-colbert-small – Answer.AI	2026-10-11 13:34
+https://ainomam.com/post/colbert-reranker-2026	ColBERT Reranker: Why Late Interaction Beats Cross-Encoders for RAG	2026-10-11 13:34
+https://reranker.uk/guides/late-interaction-rerank.html	Late-interaction reranking — ColBERTv2 & when to skip cross-encoders ...	2026-10-11 13:34
+https://sachinsharma.dev/blogs/colbertv2-late-interaction-vs-cross-encoders-rag-reranking-2026	ColBERTv2 Late Interaction vs Cross-Encoders: Millisecond RAG Reranking ...	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/commit/f2199bc82a968b64a5898d0ba0a6949d4fbdeb6e	docs: update benchmark · jinaai/jina-reranker-v2-base-multilingual at f2199bc	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/commit/dbeacd7412974d1df0ef4e71805254045dde33c3	docs: update benchmark · jinaai/jina-reranker-v2-base-multilingual at dbeacd7	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/commit/667e9cba1ff32dad2c6c314207553f05d6b9f7eb	fix: markdown table · jinaai/jina-reranker-v2-base-multilingual at 667e9cb	2026-10-11 13:34
+https://jina.ai/news/jina-reranker-v2-for-agentic-rag-ultra-fast-multilingual-function-calling-and-code-search	Jina Reranker v2 for Agentic RAG: Ultra-Fast, Multilingual, Function-Calling & C	2026-10-11 13:34
+https://marketplace.microsoft.com/en-mt/product/jinaai.jina-reranker-v2-base-multilingual-vm	Jina Reranker v2 Base - Multilingual | Microsoft Marketplace	2026-10-11 13:34
+https://agentset.ai/rerankers/compare/baaibge-reranker-v2-m3-vs-jina-reranker-v2-base-multilingual	BAAI/BGE Reranker v2 M3 vs Jina Reranker v2 Base Multilingual | Reranker Compari	2026-10-11 13:34
+https://github.com/claude-dev-suite/knowledge_base/blob/main/knowledge/rag/reranking/providers-comparison.md	knowledge_base/knowledge/rag/reranking/providers-comparison.md at main · claude-	2026-10-11 13:34
+https://iotdigitaltwinplm.com/rag-reranker-benchmark-cohere-bge-jina-colbert-2026	RAG Reranker Benchmark: Cohere vs BGE vs Jina vs ColBERT	2026-10-11 13:34
+https://mixedbread.com/blog/mxbai-rerank-v2	N/A	2026-10-11 13:34
+https://adaptiverecall.com/cognitive-scoring/best-open-source-reranker.php	What Is the Best Open-Source Reranking Model - Adaptive Recall	2026-10-11 13:34
+https://faun.dev/toolbox/bge-reranker-vs-mxbai-rerank	BGE Reranker vs mxbai Rerank: Reranking Models Comparison (2026)	2026-10-11 13:34
+https://besthub.dev/articles/choosing-the-right-embedding-and-rerank-models-for-rag-interview-ready-guide-3e8965f2cd48	Choosing the Right Embedding and Rerank Models for RA… | BestHub	2026-10-11 13:34
+https://vibereference.com/ai-development/reranking-providers	Reranking Providers & Models: Cohere Rerank, Voyage Rerank, Jina Rerank, BGE Rer	2026-10-11 13:34
+https://medium.com/@xiweizhou/speed-showdown-reranker-1f7987400077	Speed Showdown for your RAG improvement: Reranker performance ... - Medium	2026-10-11 13:34
+https://siliconflow.com/articles/best-reranker-model-for-multilingual-enterprises	Ultimate Guide - Best Reranker Models for Multilingual Enterprises in 2026 - Sil	2026-10-11 13:34
+https://finance.yahoo.com/news/elastic-adds-high-precision-multilingual-165800547.html	Elastic Adds High-Precision Multilingual Reranking to Elastic Inference Service 	2026-10-11 13:34
+https://presenc.ai/research/best-open-weight-reranker-models-2026	Best Open-Weight Reranker Models 2026 | Presenc AI	2026-10-11 13:34
+https://arxiv.org/pdf/2607.18152	jina-reranker-v3.5: An Efficient Listwise Rerankerwith Hybrid Attention and Self	2026-10-11 13:34
+https://huggingface.co/Horizon-Labs/multilingual-reranker-base	Horizon-Labs/multilingual-reranker-base · Hugging Face	2026-10-11 13:34
+https://huggingface.co/Querit/Querit-4B	Querit/Querit-4B · Hugging Face	2026-10-11 13:34
+https://arxiv.org/abs/2606.19037	[2606.19037] Querit-Reranker: Training Compact Multilingual Rerankers via Effici	2026-10-11 13:34
+https://llms.blog/posts/reranking-engines-in-production-rag-comparing-bge-reranker-qwen3-reranker-cohere-rerank-jina-colbert-and-flashrank-architecture-latency-quality-and-self-hosted-economics	Reranking Engines in Production RAG: Comparing BGE-Reranker, Qwen3-Reranker, Coh	2026-10-11 13:34
+https://arxiv.science/abs/2606.22807	KaLM-Reranker-V1: Fast but Not Late Interaction for Compressed Document Rerankin	2026-10-11 13:34
+https://arxiv.org/html/2607.22042v2	LAMAR: An Open Language-Aware Multilingual Alignment Reranker	2026-10-11 13:34
+https://originshq.com/blog/apple-mlx-benchmark	Revolutionizing ML: Apple's MLX Outperforms in Benchmark Tests | Origins AI	2026-10-11 13:34
+https://github.com/john-rocky/apple-silicon-llm-bench	GitHub - john-rocky/apple-silicon-llm-bench: Neutral, reproducible benchmark for	2026-10-11 13:34
+https://medium.com/@msridharansundaram/i-optimized-ml-inference-on-apple-silicon-for-weeks-the-bottleneck-was-never-the-model-8ac7049a0aa2	I Optimized ML Inference on Apple Silicon for Weeks. The Bottleneck Was Never th	2026-10-11 13:34
+https://zachrattner.com/projects/ai-mac-cluster/mlx-vs-ollama	MLX vs Ollama on Apple silicon: measured benchmarks	2026-10-11 13:34
+https://github.com/TristanBilot/mlx-benchmark	GitHub - TristanBilot/mlx-benchmark: Benchmark of Apple MLX operations on all Ap	2026-10-11 13:34
+https://github.com/Steffenhir/GraXpert/issues/252	Alternative CoreML inference approach for macOS users (Reduces processing time b	2026-10-11 13:34
+https://github.com/lemon07r/Vera/issues/19	CoreML reranker falls back to CPU on Apple Silicon	2026-10-11 13:34
+https://github.com/199-biotechnologies/zerank-2-mlx	199-biotechnologies/zerank-2-mlx	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v3-mlx	jinaai/jina-reranker-v3-mlx · Hugging Face	2026-10-11 13:34
+https://github.com/vectorize-io/hindsight/commit/1caf5ec9ee9061607db8a72fc13145735c3c194d	1caf5ec feat: add jina-mlx reranker provider for Apple Silicon (#542)	2026-10-11 13:34
+https://huggingface.co/tcashel/bge-reranker-base-coreml/blob/main/README.md	README.md · tcashel/bge-reranker-base-coreml at main	2026-10-11 13:34
+https://huggingface.co/tooktang/Qwen3-Reranker-4B-CoreML	tooktang/Qwen3-Reranker-4B-CoreML · Hugging Face	2026-10-11 13:34
+https://huggingface.co/jinaai/jina-reranker-v3.5-mlx	jinaai/jina-reranker-v3.5-mlx · Hugging Face	2026-10-11 13:34
+https://huggingface.co/jak-pan/kalm-reranker-v1-nano-mlx	jak-pan/kalm-reranker-v1-nano-mlx · Hugging Face	2026-10-11 13:34
+https://inferensys.com/differences/federated-learning-for-multi-party-ai/on-device-training-runtimes/core-ml-vs-onnx-runtime-mobile	Core ML vs ONNX Runtime Mobile | In-Depth Comparison | Inference Systems	2026-10-11 13:34
+https://ragweld.com/blog/posts/learning-reranker-qwen3-mlx	Qwen3 LoRA Learning Reranker on Apple Silicon — ragweld blog	2026-10-11 13:34
+https://michael-rifkin.de/blog/retriever-vs-reranker-was-ist-der-unterschied	Retriever vs. Reranker – was ist der Unterschied? - Michael Rifkin	2026-10-11 13:34
+https://researchgate.net/publication/396787286_Benchmarking_On-Device_Machine_Learning_on_Apple_Silicon_with_MLX	(PDF) Benchmarking On-Device Machine Learning on Apple ...	2026-10-11 13:34
+https://superlinked.com/docs/score/models	Reranker Models | SIE	2026-10-11 13:34
+https://medium.com/@aimichael/cross-encoders-colbert-and-llm-based-re-rankers-a-practical-guide-a23570d88548	Cross-Encoders, ColBERT, and LLM-Based Re-Rankers: A Practical Guide	2026-10-11 13:34
+https://medium.com/@ThinkingLoop/reranking-with-colbert-precision-without-pain-b390dda517f0	Reranking with ColBERT: Precision Without Pain | by Thinking Loop | Medium	2026-10-11 13:34
+https://linkedin.com/posts/a-roucher_%F0%9D%97%9B%F0%9D%97%BC%F0%9D%98%84-%F0%9D%98%81%F0%9D%97%BC-%F0%9D%97%BF%F0%9D%97%B2-%F0%9D%97%BF%F0%9D%97%AE%F0%9D%97%BB%F0%9D%97%B8-%F0%9D%98%86%F0%9D%97%BC%F0%9D%98%82%F0%9D%97%BF-%F0%9D%98%80%F0%9D%97%BB%F0%9D%97%B6-activity-7253036861458190336-Cz0B	𝗛𝗼𝘄 𝘁𝗼 𝗿𝗲-𝗿𝗮𝗻𝗸 𝘆𝗼𝘂𝗿 𝘀𝗻𝗶𝗽𝗽𝗲𝘁𝘀 𝗶𝗻 𝗥𝗔𝗚 ⇒ ColBERT vs Rerankers vs Cross-Encoders ⚔️ 	2026-10-11 13:34
+https://towardsdatascience.com/advanced-rag-retrieval-cross-encoders-reranking	Advanced RAG Retrieval: Cross-Encoders & Reranking | Towards Data Science	2026-10-11 13:34
+https://lancedb.com/blog/a-practical-guide-to-training-custom-rerankers	A Practical Guide to Training Custom Rerankers	2026-10-11 13:34
+https://bigdataboutique.com/blog/rag-reranking-improving-retrieval-quality-with-cross-encoders	RAG Reranking: Improving Retrieval Quality with Cross-Encoders	2026-10-11 13:34
+https://frutik.github.io/awesome-search/Articles/Cross-Encoders-ColBERT-and-LLM-Based-Re-Rankers	Cross-Encoders, ColBERT, and LLM-Based Re-Rankers: A Practical Guide	2026-10-11 13:34
+https://note.com/i38t7/n/nff65799a9d7f?hl=en	[RAG] ColBERT vs. cross-encoder: Which is more effective with short ...	2026-10-11 13:34
+https://mehaisi.com/blog/colbert-vs-cross-encoders-reranking	Reranking at Scale: Why ColBERT Beats Cross-Encoders	2026-10-11 13:34
+https://huggingface.co/answerdotai/answerai-colbert-small-v1/discussions/2	answerdotai/answerai-colbert-small-v1 · A couple Qs for the model	2026-10-11 13:34
+https://arxiv.org/html/2510.09689v3	When Search Goes Wrong: Red-Teaming Web-Augmented Large Language Models	2026-10-11 13:35
+https://lead-spot.net/research/llm-retrieval-behavior-and-realtime-web-scanning-how-rag-enables-generative-ai-to-cite-your-content	How LLMs Choose Content to Cite: RAG Explained - LeadSpot	2026-10-11 13:35
+https://journal.code4lib.org/articles/18555	The Code4Lib Journal – Retrieval-Augmented Generation for Web Archives: A Compar	2026-10-11 13:35
+https://firecrawl.dev/blog/best-web-search-apis	Best Web Search APIs for AI Applications in 2026	2026-10-11 13:35
+https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context	Deeper insights into retrieval augmented generation: The role of sufficient cont	2026-10-11 13:35
+https://pub.towardsai.net/unveiling-llm-enhanced-search-technologies-0b7031dc2f59	Unveiling LLM-Enhanced Search Technologies	2026-10-11 13:35
+https://openreview.net/forum?id=POxV67j3L9	Do Metadata and Appearance of the Retrieved Webpages ...	2026-10-11 13:35
+https://mdpi.com/2673-2688/6/9/226	Retrieval-Augmented Generation (RAG) in Healthcare: A Comprehensive Review	2026-10-11 13:35
+https://mpost.io/googles-analysis-reveals-surprising-insights-into-llms-and-search-engine-accuracy	Google's Analysis Reveals Surprising Insights into LLMs and Search Engine Accura	2026-10-11 13:35
+https://finance.yahoo.com/news/startup-andi-releases-semantic-content-140000444.html	Startup Andi Releases Semantic Content Engine that Further Improves Accuracy of 	2026-10-11 13:35
+https://arxiv.org/html/2407.12468v2	Search Engines, Large Language Models or Both? ...	2026-10-11 13:35
+https://llms.nimbleway.com/nimble-vs-tavily-exa-parallel-firecrawl-bright-data	Nimble vs. Tavily, Exa, Parallel, Firecrawl, Bright Data, and Built-in LLM Searc	2026-10-11 13:35
+https://pmc.ncbi.nlm.nih.gov/articles/PMC11894092	Evaluating search engines and large language models for answering health questio	2026-10-11 13:35
+https://finance.yahoo.com/news/com-launches-apis-connect-llms-150046347.html	You.com launches new APIs to connect LLMs to the web	2026-10-11 13:35
+https://qaskills.sh/blog/rag-testing-chunk-size-ablation	RAG Testing Chunk Size Ablation: A Reproducible Workflow	2026-10-11 13:35
+https://linkedin.com/posts/zainhas_what-text-chunk-size-should-we-use-in-our-activity-7142201163847770112-Y58b	❓What text chunk size should we use in our RAG workflows? How does chunk size im	2026-10-11 13:35
+https://theaiengineer.substack.com/p/what-is-chunking	What is Chunking in RAG? Chunk Size, Overlap, Strategy	2026-10-11 13:35
+https://unstructured.io/blog/chunking-for-rag-best-practices	Chunking Strategies for RAG: Best Practices and Key Methods | Unstructured	2026-10-11 13:35
+https://reddit.com/r/Rag/comments/1qocxu9/ran_30_rag_chunking_experiments_found_that_chunk	Ran 30 RAG chunking experiments - found that chunk SIZE ...	2026-10-11 13:35
+https://reddit.com/r/Rag/comments/1ov0pzk/i_tested_different_chunks_sizes_and_retrievers	I tested different chunks sizes and retrievers for RAG and ...	2026-10-11 13:35
+https://hps.vi4io.org/_media/research/labs/2026/2026-01-corinna_liley-chunk_level_retrieval_evaluation_in_rag_systems_a_case_study_onuniversity_regulations-report.pdf	Chunk-level Retrieval Evaluation in RAG Systems	2026-10-11 13:35
+https://trychroma.com/research/evaluating-chunking	Evaluating Chunking Strategies for Retrieval | Chroma	2026-10-11 13:35
+https://keirolabs.cloud/Deep-search	Deep search on SimpleQA — 95.3% retrieval, no reader model — Keirolabs · Keirola	2026-10-11 13:36
+https://github.com/h-a-r-s-h-s-r-a-h/benchmark	keirolabs/benchmark	2026-10-11 13:36
+https://github.com/LearningCircuit/local-deep-research/blob/4a6a9088/src/local_deep_research/web_search_engines/engines/search_engine_arxiv.py	src/local_deep_research/web_search_engines/engines/search_engine_arxiv.py at 4a6	2026-10-11 13:36
+https://pypi.org/project/langchain-arxiv-retriever	langchain-arxiv-retriever v1.0.0	2026-10-11 13:36
+https://info.arxiv.org/help/api/user-manual.html	arXiv API User's Manual - arXiv info	2026-10-11 13:36
+https://arxiv.org/pdf/2607.10198	Equal Accuracy, Unequal Evidence: Search APIs as Decision Surfaces for Tool-Usin	2026-10-11 13:36
+https://firecrawl.dev/blog/introducing-our-most-accurate-search-yet	Introducing our most accurate search yet (SimpleQA ...	2026-10-11 13:36
+https://exa.ai/blog/api-evals	Web Search API Evals: Exa's Neural ...	2026-10-11 13:36
+https://arxiv.org/abs/2411.02959	[2411.02959] HtmlRAG: HTML is Better Than Plain Text for ...	2026-10-11 13:36
+https://arxiv.org/html/2411.02959v2	HtmlRAG: HTML is Better Than Plain Text for Modeling Retrieved Knowledge in RAG 	2026-10-11 13:36
+https://arxiv.org/pdf/2411.02959	HtmlRAG: HTML is Better Than Plain Text for Modeling ...	2026-10-11 13:36
+https://arxiv.org/html/2411.02959v1	HtmlRAG: HTML is Better Than Plain Text for Modeling Retrieved Knowledge in RAG 	2026-10-11 13:36
+https://playbigdata.ruc.edu.cn/dou/publication/2025_WWW_HtmlRAG.pdf	HtmlRAG: HTML is Better Than Plain Text for Modeling Retrieved Knowledge in RAG 	2026-10-11 13:36
+https://huggingface.co/papers/2411.02959	Paper page - HtmlRAG: HTML is Better Than Plain Text for Modeling Retrieved Know	2026-10-11 13:36
+https://ui.adsabs.harvard.edu/abs/2024arXiv241102959T/abstract	HtmlRAG: HTML is Better Than Plain Text for Modeling Retrieved Knowledge in RAG 	2026-10-11 13:36
+https://github.com/plageon/HtmlRAG	plageon/HtmlRAG	2026-10-11 13:36
+https://arxiv.org/html/2605.28721v1	LiveBrowseComp: Are Search Agents Searching, or Just Verifying What They Already	2026-10-11 13:36
+https://openai.com/index/browsecomp	BrowseComp: a benchmark for browsing agents | OpenAI	2026-10-11 13:36
+https://arxiv.org/html/2508.06600v1	BrowseComp-Plus: A More Fair and Transparent Evaluation Benchmark of Deep-Resear	2026-10-11 13:36
+https://arxiv.science/abs/2504.12516	BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents | arXiv Scien	2026-10-11 13:36
+https://arxiv.org/abs/2608.02097v1	[2608.02097v1] Fetch-then-Explore: Decoupling Selection from Extraction over a P	2026-10-11 13:36
+https://aclanthology.org/2026.acl-long.1023.pdf	BrowseComp-Plus: A Fair and Disentangled Evaluation Benchmark for Deep Search Ag	2026-10-11 13:36
+https://arxiv.org/pdf/2504.12516	N/A	2026-10-11 13:36
+https://arxiv.org/html/2607.10557	UniBrowse: A Data-to-Agent Framework for Multimodal BrowseComp	2026-10-11 13:36
+https://arxiv.org/abs/2402.03367	[2402.03367] RAG-Fusion: a New Take on Retrieval- ...	2026-10-11 13:36
+https://arxiv.org/html/2509.02837v1	HF-RAG: Hierarchical Fusion-based RAG with Multiple Sources and Rankers	2026-10-11 13:36
+https://arxiv.org/html/2402.03367	RAG-Fusion: a New Take on Retrieval-Augmented Generation	2026-10-11 13:36
+https://ar5iv.labs.arxiv.org/html/2210.11934	[2210.11934] An Analysis of Fusion Functions for Hybrid Retrieval	2026-10-11 13:36
+https://arxiv.org/html/2406.05733v1	MrRank: Improving Question Answering Retrieval System through Multi-Result Ranki	2026-10-11 13:36
+https://arxiv.org/html/2406.00231	LLM-RankFusion: Mitigating Intrinsic Inconsistency in LLM-based Ranking	2026-10-11 13:36
+https://ar5iv.labs.arxiv.org/html/2607.24799	[2607.24799] Multimodal Hybrid Retrieval-Augmented Generation for Scientific Doc	2026-10-11 13:36
+https://exa.ai/library/publication/yjj0dz8n92q	MMLF: Multi-query Multi-passage Late Fusion Retrieval	2026-10-11 13:36
+https://arxiv.org/html/2411.13154v1	DMQR-RAG: Diverse Multi-Query Rewriting for Retrieval- ...	2026-10-11 13:36
+https://arxiv.org/pdf/2506.21384	N/A	2026-10-11 13:36
+https://arxiv.org/abs/2404.00610v1	[2404.00610v1] RQ-RAG: Learning to Refine Queries for Retrieval Augmented Genera	2026-10-11 13:36
+https://aclanthology.org/2025.acl-srw.32.pdf	Question Decomposition for Retrieval-Augmented ...	2026-10-11 13:36
+https://arxiv.org/html/2505.19189v2	POQD: Performance-Oriented Query Decomposer for Multi-vector retrieval	2026-10-11 13:36
+https://arxiv.org/html/2509.06544	Reason to Retrieve: Enhancing Query Understanding through Decomposition and Inte	2026-10-11 13:36
+https://arxiv.org/html/2609.05637v1	Complementary Query Rewriting Under a Strong RAG ...	2026-10-11 13:36
+https://arxiv.org/html/2606.08577v1	When Should Queries Be Decomposed? A Stage-Aware Study of Query Decomposition fo	2026-10-11 13:36
+https://arxiv.org/html/2407.12101	Dartboard: Better RAG using Relevant Information Gain	2026-10-11 13:36
+https://arxiv.org/pdf/2503.11126v1	N/A	2026-10-11 13:36
+https://arxiv.org/html/2502.09017v1	Diversity Enhances an LLM’s Performance in RAG and Long-context Task	2026-10-11 13:36
+https://arxiv.org/pdf/2601.17212	N/A	2026-10-11 13:36
+https://arxiv.org/html/2409.13992v1	SMART-RAG: Selection using Determinantal Matrices for ...	2026-10-11 13:36
+https://aclanthology.org/2026.findings-eacl.150.pdf	DF-RAG: Query-Aware Diversity for Retrieval-Augmented ...	2026-10-11 13:36
+https://arxiv.org/html/2503.09249v1	Considering Length Diversity in Retrieval-Augmented Summarization	2026-10-11 13:36
+https://arxiv.org/html/2602.00238v1	Diversity-Enhanced Retrieval-Augmented Generation for ...	2026-10-11 13:36
+https://brave.com/search/api	Brave Search API | Brave	2026-10-11 13:36
+https://youtube.com/watch?v=o_Q8Iofk1Lk	How Tavily Got to 1M Users Without Sending One Cold Email	2026-10-11 13:36
+https://developer-tech.com/news/brave-search-api-revamp-makes-web-search-useful-for-ai-apps	Brave Search API update makes web search useful for AI apps	2026-10-11 13:36
+https://jina.ai/en-US/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch	Snippet Selection and URL Ranking in DeepSearch/DeepResearch	2026-10-11 13:36
+https://you.com/resources/real-time-web-search-api	You.com | Real-Time Web Search API: Freshness That Holds Up	2026-10-11 13:36
+https://youtube.com/watch?v=Gjzf7HpsOW0	The "Internet of AI Agents" is Here (feat. Tavily CEO) | People Who Ship Episode	2026-10-11 13:36
+https://tavily.com	Tavily	2026-10-11 13:36
+https://aws.amazon.com/blogs/storage/how-tavily-reduced-ai-search-caching-costs-by-95-with-amazon-s3-express-one-zone	How Tavily reduced AI search caching costs by 95% with ...	2026-10-11 13:36
+https://mongodb.com/company/blog/innovation/how-tavily-uses-mongodb-to-enhance-agentic-workflows	How Tavily Uses MongoDB To Enhance Agentic Workflows  | MongoDB	2026-10-11 13:36
+https://listennotes.com/podcasts/the-nebius-for/how-tavily-got-to-1m-users-Q6LUesotnJW	How Tavily Got to 1M Users Without Sending One Cold Email	2026-10-11 13:36
+https://linkedin.com/posts/tavily_tavily-search-built-for-ai-agents-activity-7475254915410505728-bm-z	Tavily's AI-Native Search Journey with Rotem Weiss | Tavily posted on the topic 	2026-10-11 13:36
+https://linkedin.com/in/rotem-weiss	Rotem Weiss - Founder & CEO @ Tavily (a Nebius company) | LinkedIn	2026-10-11 13:36
+https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch	Snippet Selection and URL Ranking in DeepSearch/DeepResearch	2026-10-11 13:36
+https://fareedkhan-dev.github.io/rag-cookbook-2026/recipes/02-chunking-and-indexing/late-chunking-jina	Late chunking jina - The RAG Cookbook 2026	2026-10-11 13:36
+https://jina.ai/news/late-chunking-in-long-context-embedding-models	Late Chunking in Long-Context Embedding Models	2026-10-11 13:36
+https://welcome.ai/content/jinas-deepsearch-innovations-enhance-retrieval-accuracy-and-efficiency	Jina's DeepSearch Innovations Enhance Retrieval Accuracy and Efficiency	2026-10-11 13:36
+https://deepwiki.com/jina-ai/node-DeepResearch/5.3-embeddings-and-late-chunking	Embeddings and Late Chunking | jina-ai/node-DeepResearch | DeepWiki	2026-10-11 13:36
+https://deepwiki.com/jina-ai/late-chunking/1.1-late-chunking-concept	Late Chunking Concept | jina-ai/late-chunking | DeepWiki	2026-10-11 13:36
+https://everydev.ai/tools/you-com	You.com - Web Search API for AI Agents | EveryDev.ai	2026-10-11 13:36
+https://orthogonal.com/blog/you-com-web-search-apis-for-ai	You.com: Web Search APIs for AI Agents · Orthogonal	2026-10-11 13:36
+https://podcasts.apple.com/us/podcast/ep-146-redefining-web-access-for-ai-agents-ft-philippe/id1598808865?i=1000712404517	Ep #146: Redefining Web Access… - The Hyperengage Podcast - Apple Podcasts	2026-10-11 13:36
+https://ivoox.com/en/philippe-mizrahi-linkup-building-the-web-search-audios-mp3_rf_175349905_1.html	Philippe Mizrahi (Linkup) : Building the Web Search Layer for AI Agents 🔍 - Zero	2026-10-11 13:36
+https://inferensys.com/differences/agentic-operating-system-and-agent-runtime-platforms/agent-browser-and-computer-use-platforms/tavily-vs-exa	Tavily vs Exa: AI Search API Comparison Guide | Inference Systems	2026-10-11 13:36
+https://link.sc/blog/exa-vs-tavily-which-ai-search-api	Exa vs Tavily: Which Search API Is Better for AI Agents? | link.sc blog	2026-10-11 13:36
+https://apipick.com/blog/exa-vs-tavily-search-api-for-ai-agents	Exa vs Tavily: Which Search API for Your AI Agent? (2026)	2026-10-11 13:36
+https://openbenchmarks.com/web-search/fastest-search-api	Fastest Web Search API for AI (2026): Latency Comparison & Benchmark	2026-10-11 13:36
+https://serp.fast/guides/ai-search-apis-compared	AI Search APIs Compared: Exa vs Tavily vs Perplexity vs Linkup (2026)	2026-10-11 13:36
+https://buildrlabs.ai/tool-guide/tavily	What is Tavily? · Research Tool Guide	2026-10-11 13:36
+https://linkedin.com/posts/rotem-weiss_when-we-started-tavily-we-werent-just-building-activity-7417608246342963201-MHsd	When we started Tavily, we weren’t just building a product. We were a team commi	2026-10-11 13:36
+https://pod.co/the-nebius-for-startups-podcast/how-tavily-got-to-1m-users-without-sending-one-cold-email	How Tavily Got to 1M Users Without Sending One Cold Email - The Nebius for Start	2026-10-11 13:36
+https://exa.ai/library/podcast/lpjgkc0nvw6/episode/wqwz51vhp2t	How Tavily Got to 1M Users Without Sending One Cold Email	2026-10-11 13:36
+https://castbox.fm/episode/How-Tavily-Got-to-1M-Users-Without-Sending-One-Cold-Email-id7151007-id960398576	How Tavily Got to 1M Users Without Sending One Cold Email	2026-10-11 13:36
+https://calcalistech.com/ctechnews/article/bjtrn2fw11l	What Nebius really bought when it bought Tavily | Ctech	2026-10-11 13:36
+https://linkedin.com/posts/rotem-weiss_today-we-released-the-worlds-fastest-search-activity-7414007841767931905-V1-l	Rotem Weiss' Post - LinkedIn	2026-10-11 13:36
+https://calcalistech.com/ctechnews/article/bj9q00tgdee	Tavily raises $20M Series A to build the Google of AI agents | Ctech	2026-10-11 13:36
+https://insightpartners.com/ideas/tavily-raises-25-million-to-power-the-internet-of-agents	Tavily Raises $25 Million to Power the Internet of Agents | Insight Partners	2026-10-11 13:36
+https://techcrunch.com/2025/08/06/tavily-raises-25m-to-connect-ai-agents-to-the-web	Tavily raises $25M to connect AI agents to the web | TechCrunch	2026-10-11 13:36
+https://tooldirectory.ai/tools/tavily	Tavily: Real-Time Web Search & Extraction APIs for AI Agents	2026-10-11 13:36
+https://github.com/tavily-ai/tavily-cookbook	GitHub - tavily-ai/tavily-cookbook: Code and guides designed to help developers 	2026-10-11 13:36
+https://github.com/tavily-ai/tavily-agent-wab	GitHub - tavily-ai/tavily-agent-wab: Web agent presented at Fully ...	2026-10-11 13:36
+https://artificial-intelligence-wiki.com/ai-tools/ai-search-engines/tavily-ai-search-api	Tavily AI Search API Guide - Ai Search Engines | AI Wiki	2026-10-11 13:36
+https://tavily.com/product	Tavily	2026-10-11 13:36
+https://aiwiki.ai/wiki/tavily	Tavily - AI Wiki	2026-10-11 13:36
+https://nolist.ai/item/brave-search-api	Brave Software Brave Search API — Review (Score: 61/100) - nolist.ai	2026-10-11 13:36
+https://brightdata.com/blog/ai/bright-data-vs-brave-search-api	Bright Data vs. Brave Search API: Which Should You Use?	2026-10-11 13:36
+https://news.ycombinator.com/item?id=35730711	Every web search result in Brave Search is now served by our own index | Hacker 	2026-10-11 13:36
+https://openbenchmarks.com/web-search/brave-vs-tavily	Brave Search vs Tavily: web search API comparison (2026) | Openbenchmarks	2026-10-11 13:36
+https://api-dashboard.search.brave.com/documentation	Documentation - Brave Search API	2026-10-11 13:36
+https://alternativeto.net/news/2026/2/brave-updates-its-search-api-with-a-new-llm-context-endpoint-for-ai-and-new-pricing	Brave updates its Search API with a new LLM context endpoint ...	2026-10-11 13:36
+https://buildmvpfast.com/blog/brave-search-api-rag-grounding-small-models	Brave Search API RAG Grounding: Small Models Beat GPT-5 in 2026	2026-10-11 13:36
+https://pondhouse-data.com/blog/advanced-rag-late-chunking	Late Chunking: Improving RAG Performance with Context-Aware Embeddings	2026-10-11 13:36
+https://arxiv.org/html/2509.25085v1	jina-reranker-v3: Last but Not Late Interaction for Document Reranking	2026-10-11 13:36
+https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch	A Practical Guide to Implementing DeepSearch/DeepResearch	2026-10-11 13:36
+https://jina.ai/en-US/deepsearch	DeepSearch - Jina AI	2026-10-11 13:36
+https://github.com/jina-ai/node-DeepResearch/blob/d44cec65/src/tools/jina-latechunk.ts	src/tools/jina-latechunk.ts	2026-10-11 13:36
+https://jina.ai/news/using-deepseek-r1-reasoning-model-in-deepsearch	Using DeepSeek R1 Reasoning Model in DeepSearch	2026-10-11 13:36
+https://deepwiki.com/jina-ai/node-DeepResearch/4-search-and-content-discovery	Search and Content Discovery | jina-ai/node-DeepResearch | DeepWiki	2026-10-11 13:36
+https://github.com/jina-ai/late-chunking/blob/main/README.md	late-chunking/README.md at main · jina-ai/late-chunking · GitHub	2026-10-11 13:36
+https://github.com/jina-ai/late-chunking	GitHub - jina-ai/late-chunking: Code for explaining and evaluating late ...	2026-10-11 13:36
+https://you.com/resources/api-latency	You.com | API Latency Explained	2026-10-11 13:36
+https://you.com/resources/what-is-a-web-search-api	What Is a Web Search API? How It Works and How to Choose One | You.com	2026-10-11 13:36
+https://tianpan.co/blog/2026/04/17/live-web-grounding-production-pipeline	Live Web Grounding in Production: Why Calling a Search API Is Only the Beginning	2026-10-11 13:36
+https://you.com/docs/api-reference/search/v1-search	Search | You.com | Documentation	2026-10-11 13:36
+https://you.com/docs/guides/retrieve-page-content	Retrieve Page Content | You.com Web Search API | You.com | Documentation	2026-10-11 13:36
+https://you.com/docs/examples/simple-search.md	Simple Search	2026-10-11 13:36
+https://zenioai.com/tool/you-com	You.com  –  AI search infrastructure and APIs for enterprise agentic application	2026-10-11 13:36
+https://about.you.com	You.com - The Leading Web Search APIs for AI	2026-10-11 13:36
+https://mozzabytes.substack.com/p/linkup-interview-de-philippe-mizrahi	LinkUp : Interview de Philippe Mizrahi, CEO [Podcast]	2026-10-11 13:36
+https://podcasts.apple.com/us/podcast/philippe-mizrahi-linkup-building-the-web-search-layer/id1578365506?i=1000772038276&l=pt-BR	Philippe Mizrahi (Linkup) : Bu… — Zero to One — Apple Podcasts	2026-10-11 13:36
+https://podcasts.apple.com/us/podcast/philippe-mizrahi-linkup-building-the-web-search-layer/id1578365506?i=1000772038276	Philippe Mizrahi (Linkup) : Bu… - Zero to One - Apple Podcasts	2026-10-11 13:36
+https://linkup.so/blog/how-we-crawl-the-web-for-ai-search	Linkup - Building Web Search for AI  #1 Mercator	2026-10-11 13:36
+https://aistories.buzzsprout.com/1861907/episodes/16897550-how-he-developed-the-world-s-best-search-agent-with-philippe-mizrahi-59	How He Developed the World's Best Search Agent with Philippe Mizrahi #59	2026-10-11 13:36
+https://podcasts.apple.com/us/podcast/how-he-developed-the-worlds-best-search-agent/id1588432358?i=1000702002141	How He Developed the World's B… - AI Stories - Apple Podcasts	2026-10-11 13:36
+https://podcast.ausha.co/mozza-bytes/ep26-philippe-mizrahi-ceo-de-linkup	EP27 - Philippe Mizrahi, CEO de Linkup | Mozza Bytes | Ausha	2026-10-11 13:36
+https://fastcrw.com/alternatives/exa-vs-tavily	Exa vs Tavily — Neural Search vs Agent Web Access (2026) | fastCRW	2026-10-11 13:36
+https://dev.to/jangwook_kim_e31e7291ad98/exa-vs-tavily-in-2026-our-agent-web-search-benchmark-3mib	Exa vs Tavily in 2026: Our Agent Web Search Benchmark - DEV Community	2026-10-11 13:36
+https://exa.ai/enterprise	Enterprise Web Search API | Exa	2026-10-11 13:36
+https://omidsaffari.com/blog/perplexity-vs-exa-vs-tavily-search-api-cost-2026	Perplexity vs Exa vs Tavily Search API Cost 2026 | Omid Saffari	2026-10-11 13:36
+https://exa.ai/docs/reference/search-api-guide.md	Exa Search API	2026-10-11 13:36
+https://github.com/exa-labs/search-latency-bench	exa-labs/search-latency-bench	2026-10-11 13:36
+https://youtube.com/watch?v=qvwjHF3_J84	How to Build Web Search for AI Agents at Scale - Inside Exa’s Agent Search Archi	2026-10-11 13:36
+https://docs.tavily.com/sdk/python/reference	SDK Reference - Tavily Docs	2026-10-11 13:37
+https://docs.tavily.com/documentation/api-reference/endpoint/extract	Tavily Extract - Tavily Docs	2026-10-11 13:37
+https://docs.tavily.com/documentation/best-practices/best-practices-extract	Best Practices for Extract - Tavily Docs	2026-10-11 13:37
+https://docs.console.zenlayer.com/api-reference/ai/mcpg/web-search/tavily	Tavily | API References	2026-10-11 13:37
+https://docs.tavily.com/documentation/api-reference/endpoint/search	Tavily Search	2026-10-11 13:37
+https://docs.langchain.com/oss/javascript/integrations/tools/tavily_search	Tavily search integration - Docs by LangChain	2026-10-11 13:37
+https://exa.ai/docs/contents/quickstart	Contents API - Exa	2026-10-11 13:37
+https://exa.ai/docs/search/best-practices	Search Best Practices - Exa	2026-10-11 13:37
+https://exa.ai/docs/changelog	Changelog - Exa	2026-10-11 13:37
+https://tessl.io/registry/skills/github/stevenknowswhy/ProfessionalBuyer/build-with-exa	Tessl • The package manager for agent skills	2026-10-11 13:37
+https://docs.openclaw.ai/tools/exa-search	Exa search - OpenClaw	2026-10-11 13:37
+https://mindcloud.co/docs/universal/rest/exa/0.0.6/actions/get-contents	Get Contents - Exa API - Universal API	2026-10-11 13:37
+https://youtube.com/watch?v=ihSiRrOUwmg	Advanced RAG 01: Small-to-Big Retrieval with LlamaIndex	2026-10-11 13:37
+https://stackai.com/insights/chunking-strategies-for-rag-how-to-optimize-document-retrieval	Chunking Strategies for RAG: How to Optimize Document Retrieval - StackAI · AI A	2026-10-11 13:37
+https://dev.to/rushanksavant/sentence-window-retrieval-212d	Sentence Window Retrieval - DEV Community	2026-10-11 13:37
+https://gpt-trainer.com/blog/rag+chunking+strategy	RAG Chunking Strategy<!-- --> | GPT-trainer Blog	2026-10-11 13:37
+https://arxiv.org/html/2501.09940v1	Passage Segmentation of Documents for Extractive Question Answering	2026-10-11 13:37
+https://arxiv.org/pdf/2409.04701	Late Chunking	2026-10-11 13:37
+https://jina.ai/news/still-need-chunking-when-long-context-models-can-do-it-all	Still Need Chunking When Long-Context Models Can Do It All?	2026-10-11 13:37
+https://milvus.io/blog/smarter-retrieval-for-rag-late-chunking-with-jina-embeddings-v2-and-milvus.md	Smarter Retrieval for RAG: Late Chunking with Jina Embeddings v2 and Milvus
+ - M	2026-10-11 13:37
+https://jina.ai/news/what-late-chunking-really-is-and-what-its-not-part-ii	What Late Chunking Really Is & What It’s Not: Part II	2026-10-11 13:37
+https://elastic.co/search-labs/blog/late-chunking-elasticsearch-jina-embeddings	Late chunking in Elasticsearch with Jina Embeddings v2 | Elasticsearch Labs	2026-10-11 13:37
+https://searchengineland.com/could-google-passage-indexing-be-leveraging-bert-342975	Could Google passage indexing be leveraging BERT?	2026-10-11 13:37
+https://searchenginejournal.com/google-passage-ranking-martin-splitt/388206	What Is Google Passage Ranking: 16 Key Points You Should Know	2026-10-11 13:37
+https://thatware.co/multi-passage-ranking-models	Multi-Passage Ranking Models: Ranks Individual Passages	2026-10-11 13:37
+https://laurelinlabs.com/search-systems/bert	BERT Google | topical authority content | BERT natural language understanding se	2026-10-11 13:37
+https://blog.google/products-and-platforms/products/search/search-language-understanding-bert	Understanding searches better than ever before	2026-10-11 13:37
+https://deanlong.io/blog/google-passage-indexing-and-bert	Google Passage Indexing and BERT | DEANLONG.io	2026-10-11 13:37
+https://researchgate.net/publication/262287866_Reducing_information_redundancy_in_search_results	Reducing information redundancy in search results	2026-10-11 13:37
+https://mixpeek.com/docs/retrieval/stages/mmr	MMR (Maximal Marginal Relevance)	2026-10-11 13:37
+https://linkedin.com/posts/bhavsarpratik_maximal-marginal-relevance-mmr-is-a-method-activity-7065315734888792064-Kzmb	Maximal Marginal Relevance MMR is a method used to avoid redundancy while retrie	2026-10-11 13:37
+https://qdrant.tech/blog/mmr-diversity-aware-reranking	Balancing Relevance and Diversity with MMR Search - Qdrant	2026-10-11 13:37
+https://community.fullstackretrieval.com/retrieval-methods/maximum-marginal-relevance	Maximum Marginal Relevance (MMR) | Full Stack Retrieval	2026-10-11 13:37
+https://farzzy.hashnode.dev/enhancing-rag-with-maximum-marginal-relevance-mmr-in-azure-ai-search	Enhancing RAG with Maximum Marginal Relevance (MMR) in Azure AI Search	2026-10-11 13:37
+https://adechristanto.de/en/blog/rag-chunking-strategy-evaluation-semantic-vs-fixed-size	RAG Chunking Strategy Evaluation: Semantic vs. Fixed-Size | Ade Christanto	2026-10-11 13:37
+https://avchauzov.github.io/blog/2025/chunk-size-optimization-rag-systems	The chunk size dilemma: identifying the optimal value in RAG systems | Andrey Ch	2026-10-11 13:37
+https://app.ailog.fr/en/blog/guides/fixed-size-chunking	Fixed-Size Chunking: Fast and Reliable | Ailog RAG	2026-10-11 13:37
+https://buildmvpfast.com/blog/chunking-strategies-rag-semantic-fixed-size-recursive-2026	RAG Chunking Strategies: Semantic vs Fixed-Size vs Recursive	2026-10-11 13:37
+https://usewire.io/blog/best-chunk-size-for-rag-what-research-shows	What chunk size should you use for RAG? | Wire Blog	2026-10-11 13:37
+https://devleader.ca/2026/03/16/chunking-strategies-for-rag-with-semantic-kernel-in-c-fixed-size-sentence-and-semantic-chunking	Chunking Strategies for RAG with Semantic Kernel in C#: Fixed-Size, Sentence, an	2026-10-11 13:37
+https://stackoverflow.com/questions/8555320/is-there-a-wikipedia-api-just-for-retrieve-the-content-summary	Is there a Wikipedia API just for retrieve the content summary? - Stack Overflow	2026-10-11 13:37
+https://github.com/api-evangelist/wikipedia	GitHub - api-evangelist/wikipedia: Wikipedia / MediaWiki — independent third-par	2026-10-11 13:37
+https://wikipedia-api.readthedocs.io	Wikipedia API — Wikipedia Python API 0.16.0 documentation	2026-10-11 13:37
+https://help.livelyapps.com/pocketquery-for-confluence-server/wikipedia-rest-api	Wikipedia REST API | Documentation	2026-10-11 13:37
+https://dev.to/zuplo/what-is-the-wikipedia-api-how-to-use-it-and-alternatives-j4o	What is the Wikipedia API? How to Use It and Alternatives - DEV Community	2026-10-11 13:37
+https://enterprise.wikimedia.com/blog/structured-contents-wikipedia-infobox	Wikipedia API Parsed Infobox. Introducing Structured Contents	2026-10-11 13:37
+https://ar5iv.labs.arxiv.org/html/2404.01037	[2404.01037] ARAGOG: Advanced RAG Output Grading - ar5iv	2026-10-11 13:37
+https://arxiv.org/html/2610.09412	Finding the Right Balance: Relevance and Diversity in LLM Retrieval	2026-10-11 13:37
+https://arxiv.org/html/2505.01842	Exploring the Role of Diversity in Example Selection for In-Context Learning	2026-10-11 13:37
+https://arxiv.org/abs/2604.02554v1	[2604.02554v1] Principled and Scalable Diversity-Aware Retrieval via Cardinality	2026-10-11 13:37
+https://arxiv.org/abs/2608.13956	[2608.13956] How retriever redundancy and diversity impact RAG effectiveness	2026-10-11 13:37
+https://arxiv.org/html/2602.00238v2	DIVERGE: Diversity-Enhanced Retrieval-Augmented Generation for Open-Ended Inform	2026-10-11 13:37
+https://arxiv.org/pdf/2604.03240	N/A	2026-10-11 13:37
+https://isc.sans.edu/diary/15541	The HTTP "Range" Header - SANS Internet Storm Center	2026-10-11 13:37
+https://zeng.dev/post/2023-http-range-and-play-mp4-in-browser	Http Range Request and MP4 Video Play in Browser - ZengXu's BLOG	2026-10-11 13:37
+https://ietf.org/archive/id/draft-ietf-httpbis-p5-range-09.html	HTTP/1.1, part 5: Range Requests and Partial Responses	2026-10-11 13:37
+https://httpwg.org/specs/rfc7233.html	RFC 7233 - Hypertext Transfer Protocol (HTTP/1.1): Range Requests	2026-10-11 13:37
+https://stackoverflow.com/questions/71986656/fetch-api-how-to-use-http-header-range-without-if-range	`fetch`-API, how to use http-header `Range` without `If-Range`	2026-10-11 13:37
+https://smoores.dev/post/http_range_requests	smoores.dev - Serving Video with HTTP Range Requests	2026-10-11 13:37
+https://arxiv.org/html/2309.07382v2	Less is More for Long Document Summary Evaluation by LLMs	2026-10-11 13:38
+https://bhaskar-mitra.github.io/files/978-3-030-99739-7_18.pdf	Less is Less: When are Snippets Insufficient for Human vs Machine Relevance Esti	2026-10-11 13:38
+https://arxiv.org/pdf/2201.08721v1	N/A	2026-10-11 13:38
+https://arxiv.org/pdf/2608.02097	Fetch-then-Explore: Decoupling Selection from Extraction over a Persistent Works	2026-10-11 13:38
+https://arxiv.org/html/2605.10848v1	Rethinking Agentic Search with Pi-Serini:Is Lexical Retrieval Sufficient?	2026-10-11 13:38
+https://dl.acm.org/doi/pdf/10.1145/3805712.3809913	Answer First, Evidence Second? Uncovering Hidden Risks in Well-Structured AI Sea	2026-10-11 13:38
+https://dl.acm.org/doi/pdf/10.1145/3816713.3819786	Evidence Retention Is Not Sufficient for Answerability: A Diagnostic Study of Co	2026-10-11 13:38
+https://exa.ai/docs/search/highlights	Highlights - Exa	2026-10-11 13:38
+https://aclanthology.org/2022.emnlp-main.197.pdf	Effective and Efficient Query-aware Snippet Extraction for Web Search	2026-10-11 13:38
+https://parallel.ai/articles/web-scraping-vs-search-api	Web Scraping vs. Search API: Which Fits Your LLM App? | Parallel	2026-10-11 13:38
+https://exa.ai/blog/highlights-for-agents	Exa Highlights | Exa Blog	2026-10-11 13:38
+https://arxiv.org/html/2605.29676v1	A Benchmark Study of Token-Optimized Formats in Agentic ...	2026-10-11 13:38
+https://bittide.aicompass.dev/article/07e5659e-4747-4b1c-9bc3-9a4852fc21ff?cache=1	Select-And-Extract: A Lightweight Plugin for Retrieval-Augmented Generation	2026-10-11 13:38
+https://krabarena.com/claims/only-exa-is-both-precise-and-complete-vs-an-independent-extractor-keenable-s	Only Exa is both precise AND complete vs an independent extractor — Keenable's s	2026-10-11 13:38
+https://aws.amazon.com/blogs/machine-learning/building-web-search-enabled-agents-with-strands-and-exa	Building web search-enabled agents with Strands and Exa | Artificial Intelligenc	2026-10-11 13:38
+https://scitepress.org/Papers/2017/65028/65028.pdf	[PDF] Passage Level Evidence for Effective Document Level Retrieval	2026-10-11 13:38
+https://aclanthology.org/D19-1352.pdf	Cross-Domain Modeling of Sentence-Level Evidence for ...	2026-10-11 13:38
+https://webdoc.sub.gwdg.de/edoc/aw/libres/libre8n1/williams.html	An Evaluation of Passage-Level Indexing Strategies for a Technical Report Archiv	2026-10-11 13:38
+https://libres-ejournal.info/wp-content/uploads/2014/06/Vol08_I1_Williams.pdf	An Evaluation of Passage-Level Indexing Strategies for a ...	2026-10-11 13:38
+https://ciir.cs.umass.edu/pubfiles/ir-268.pdf	Passage Retrieval Based On Language Models	2026-10-11 13:38
+https://aclanthology.org/P08-1080.pdf	Improving Search Results Quality by Customizing ...	2026-10-11 13:38
+https://people.ischool.berkeley.edu/~hearst/papers/acl08.pdf	Improving Search Results Quality by Customizing ...	2026-10-11 13:38
+https://boyter.org/static/abusing-aws-lambda/snippet/Fast_generation_of_result_snippets_in_web_search.pdf	Fast generation of result snippets in web search	2026-10-11 13:38
+https://aclanthology.org/D14-1073.pdf	A Task-Based Evaluation of Query Biased Summarization ...	2026-10-11 13:38
+https://hughewilliams.com/2012/04/02/snippets-the-unsung-heroes-of-web-search	Snippets: The unsung heroes of web search | Hugh E. Williams	2026-10-11 13:38
+https://krawlops.com/blog/google-cached-pages	Google Cached Pages: What Replaced Them, and What Did Not	2026-10-11 13:38
+https://mavlers.com/blog/google-cache-missing	Google Cache Gone: Impact on SEOs & Alternatives to Explore	2026-10-11 13:38
+https://semrush.com/blog/google-cached-pages	Removal of Google Cached Pages: Impact and Alternatives	2026-10-11 13:38
+https://linkedin.com/pulse/google-fully-discontinues-cache-feature-significant-shift-badhan-rzc1c	Google Fully Discontinues Cache Feature: A Significant ...	2026-10-11 13:38
+https://searchenginejournal.com/google-removes-cache-search-operator-documentation/528022	Google Removes Cache: Search Operator Documentation	2026-10-11 13:38
+https://mediawiki.org/wiki/Topic:Wuw1yi6lcck2fujy	Rate limiting of page/html API endpoint on Talk:Wikimedia REST API/Flow	2026-10-11 13:38
+https://phabricator.wikimedia.org/T307610	⚓ T307610 I am hitting a rate limit on REST API endpoint	2026-10-11 13:38
+https://apis.io/providers/wikimedia	Wikimedia | APIs.io Providers	2026-10-11 13:38
+https://getmaxim.ai/articles/solving-the-lost-in-the-middle-problem-advanced-rag-techniques-for-long-context-llms	Solving the 'Lost in the Middle' Problem: Advanced RAG Techniques for Long-Conte	2026-10-11 13:38
+https://pristren.com/blog/lost-in-middle-attention-paper	Lost in the Middle: Why LLMs Struggle With Long Contexts (2025)	2026-10-11 13:38
+https://machinelearningmastery.com/5-techniques-for-efficient-long-context-rag	5 Techniques for Efficient Long-Context RAG - MachineLearningMastery.com	2026-10-11 13:38
+https://medium.com/@rajveer.rathod1301/the-lost-in-the-middle-problem-in-llms-b0d88e13f025	The “Lost in the Middle” Problem in LLMs	2026-10-11 13:38
+https://promptingguide.ai/research/rag	Retrieval Augmented Generation (RAG) for LLMs | Prompt Engineering Guide<!-- -->	2026-10-11 13:38
+https://medium.com/@reliabledataengineering/building-production-rag-with-anthropics-contextual-retrieval-complete-python-implementation-f8a436095860	Building Production RAG with Anthropic’s Contextual Retrieval: Complete Python I	2026-10-11 13:38
+https://linkedin.com/posts/denyslinkov_anthropic-shares-some-benchmarks-on-contextual-activity-7242887943512584192-bsIW	Denys Linkov's Post	2026-10-11 13:38
+https://simonwillison.net/2024/Sep/20/introducing-contextual-retrieval	Introducing Contextual Retrieval	2026-10-11 13:38
+https://anthropic.com/engineering/contextual-retrieval	Contextual Retrieval in AI Systems \ Anthropic	2026-10-11 13:38
+https://youtube.com/watch?v=tmiBae2goJM	The Best RAG Technique Yet? Anthropic’s Contextual Retrieval Explained!	2026-10-11 13:38
+https://alphaxiv.org/abs/1611.09268v3	MS MARCO: A Human Generated MAchine Reading COmprehension Dataset | alphaXiv	2026-10-11 13:38
+https://microsoft.github.io/msmarco	MS MARCO	2026-10-11 13:38
+https://semanticscholar.org/paper/MS-MARCO%3A-A-Human-Generated-MAchine-Reading-Dataset-Campos-Nguyen/dd95f96e3322dcaee9b1e3f7871ecc3ebcd51bfe	[PDF] MS MARCO: A Human Generated MAchine Reading ...	2026-10-11 13:38
+https://github.com/IndexFziQ/MSMARCO-MRC-Analysis	GitHub - IndexFziQ/MSMARCO-MRC-Analysis: Analysis on the MS-MARCO leaderboard re	2026-10-11 13:38
+https://ppc.land/google-slashes-web-crawl-limit-by-86-7-as-cost-pressures-mount	Google slashes web crawl limit by 86.7% as cost pressures mount	2026-10-11 13:39
+https://seobility.net/en/blog/google-reduces-crawl-limit-to-2-mb	Google reduces its crawl limit to 2 MB: What this means	2026-10-11 13:39
+https://seroundtable.com/googlebot-file-limits-40876.html	Googlebot File Limit Is 15MB, 2MB & 64MB For PDF	2026-10-11 13:39
+https://linkedin.com/posts/kaloyan-yankulov_google-is-reducing-the-html-crawl-limit-to-activity-7425296411799228416-yGsM	Google is reducing the HTML crawl limit to barely 2 MB per page. 
+
+Apart from St	2026-10-11 13:39
+https://nitropack.io/blog/googlebot-crawls-indexes-first-15-mb-html-content	Googlebot Crawls and Indexes First 15MB HTML Content ...	2026-10-11 13:39
+https://community.cloudflare.com/t/timeout-with-fetch/25249	Timeout with fetch - Cloudflare Workers	2026-10-11 13:39
+https://developers.cloudflare.com/durable-objects/examples/readable-stream	Use ReadableStream with Durable Object and Workers · Cloudflare Durable Objects 	2026-10-11 13:39
+https://community.cloudflare.com/t/cloudflare-worker-fetch-ignores-byte-request-range-on-initial-request/395047	Cloudflare worker fetch ignores byte request range on initial request - Develope	2026-10-11 13:39
+https://github.com/cloudflare/cloudflare-os/issues/27	webFetch's 30s timeout does not cover the response body read · Issue #27 · cloud	2026-10-11 13:39
+https://community.cloudflare.com/t/cloudflare-worker-fetch-ignores-byte-request-range-on-initial-request/395047/4	Cloudflare worker fetch ignores byte request range on ...	2026-10-11 13:39
+https://thunderbit.com/blog/selectolax-review	selectolax, Measured: A Fast HTML Parser That Beats Beautifu	2026-10-11 13:39
+https://aows.jpt.sh/parsing	6  Parsing HTML – Art of Web Scraping	2026-10-11 13:39
+https://rushter.com/blog/python-fast-html-parser	Extracting text from HTML in Python: a very fast approach | Artem Golubin	2026-10-11 13:39
+https://context.dev/blog/selectolax-vs-lxml-vs-parsel-vs-beautifulsoup	selectolax vs lxml vs Parsel vs BeautifulSoup	2026-10-11 13:39
+https://github.com/rushter/selectolax	GitHub - rushter/selectolax: Python binding to Modest and Lexbor engines. Fast H	2026-10-11 13:39
+https://github.com/tavily-ai/tavily-search-evals	GitHub - tavily-ai/tavily-search-evals: A public repository for running search b	2026-10-11 13:40
+https://menuagentic.com/blogs/brave-vs-exa-vs-tavily-vs-parallel-search-apis	Brave vs Exa vs Tavily vs Parallel - menuagentic.com	2026-10-11 13:40
+https://openbenchmarks.com/web-search/exa-vs-tavily-vs-brave-vs-perplexity	Exa vs Tavily vs Brave vs Perplexity, Independently Benchmarked, 2026 | Openbenc	2026-10-11 13:40
+https://tavily.com/blog/tavily-vs-exa-vs-parallel-vs-firecrawl-vs-perplexity-vs-brave-choosing-the-right-web-search-api	Tavily, Exa, Parallel, Firecrawl, Perplexity, and Brave: Choosing the Right Web 	2026-10-11 13:40
+https://exa.ai/blog/best-ai-search-apis	The 8 best AI search APIs in 2026 | Exa Blog	2026-10-11 13:40
+https://michaellivs.com/blog/web-search-for-agents-2026	Web Search for Agents in 2026	2026-10-11 13:40
+https://jamesin.substack.com/p/comparing-the-ai-native-search-apis	Comparing the AI-native search APIs - - by Jamesin Seidel	2026-10-11 13:40
+https://dev.to/supertrained/exa-vs-tavily-vs-serper-vs-brave-search-for-ai-agents-an-score-comparison-2l1g	Exa vs Tavily vs Serper vs Brave Search for AI Agents — AN Score Comparison - DE	2026-10-11 13:40
+https://firecrawl.dev/blog/tavily-alternatives	5 Tavily Alternatives for Better Pricing, Performance, and Extraction Depth	2026-10-11 13:40
+https://o-mega.ai/articles/top-10-ai-search-apis-for-agents-2026	Top 10 AI Search APIs for Agents 2026 | Articles | o-mega	2026-10-11 13:40
+https://parallel.ai/benchmarks	Web Search API Quality Benchmarks | Parallel	2026-10-11 13:40
+https://alatirok.com/ai-agent-search-apis-2026-exa-vs-tavily-vs-perplexity-vs-brave-vs-linkup	AI Agent Search APIs 2026: Exa vs Tavily vs More - alatirok.com	2026-10-11 13:40
+https://openbenchmarks.com/web-search/best-search-tools-for-ai-agents	Best Search Tools for AI Agents (2026): Web Search API Benchmark	2026-10-11 13:40
+https://parallel.ai/articles/best-ai-search-for-agents	Best AI Search for Agents: 6 APIs Compared (2026) | Parallel	2026-10-11 13:40
+https://tavily.com/blog/exa-vs-parallel-benchmarking-retrieval-apis-for-ai-agents-in-2026	Exa vs Parallel: Benchmarking Retrieval APIs for AI Agents in 2026 | Tavily Blog	2026-10-11 13:40
+https://exa.ai/versus/parallel	Exa vs Parallel: Search API Benchmarks and Comparison	2026-10-11 13:40
+https://parallel.ai/articles/openai-web-search-vs-parallel-vs-exa-vs-tavily-how-to-choose	OpenAI Web Search vs Parallel vs Exa vs Tavily: Best API | Parallel	2026-10-11 13:40
+https://parallel.ai/articles/best-web-search-api	The Best Web Search API in 2026: 5 Tools Compared | Parallel	2026-10-11 13:40
+https://the-decoder.com/new-benchmark-ranks-search-apis-for-ai-agents-on-quality-cost-and-speed	New benchmark ranks search APIs for AI agents on quality, cost, and speed	2026-10-11 13:40
+https://parallel.ai/blog/introducing-parallel	Introducing Parallel | Web Search Infrastructure for AIs | Parallel	2026-10-11 13:40
+https://codeables.dev/article/exa-vs-tavily-vs-perplexity-sonar-vs-other-web-search-apis-for-agents	Exa vs Tavily vs Perplexity Sonar vs other web search APIs for agents (accuracy,	2026-10-11 13:40
+https://parallel.ai/articles/how-we-evaluate-web-search-apis	Search API Benchmark: How We Evaluate Web Search APIs | Parallel	2026-10-11 13:40
+https://artificialanalysis.ai/articles/search-api	Announcing the Artificial Analysis Search Index: Same ...	2026-10-11 13:40
+https://openbenchmarks.com/web-search-for-coding-agents	Best Web Search APIs for Developers & Coding Agents (2026): Comparison, Independ	2026-10-11 13:40
+https://parallel.ai/blog/deep-research-browsecomp	State of the Art Deep Research APIs | Parallel	2026-10-11 13:40
+https://openbenchmarks.com/web-search/most-accurate-search-api	Most Accurate Web Search API (2026): Comparison, Independently Benchmarked	2026-10-11 13:40
+https://openbenchmarks.com/web-search/best-web-search-api-for-ai	Best Web Search APIs for AI Agents: 2026 Comparison, Independently Benchmarked	2026-10-11 13:40
+https://deepwiki.com/parallel-web/parallel-llms-txt/15.2-search-api-benchmarks	Search API Benchmarks | parallel-web/parallel-llms-txt | DeepWiki	2026-10-11 13:40
+https://stack-archive.com/blog/search-api-benchmark-ai-agents-parallel-exa-firecrawl-2026	Search APIs for AI Agents: The First Head-to-Head Benchmark Has a Clear ...	2026-10-11 13:40
+https://linkup.so/blog/evaluating-ai-search-systems-on-complex-queries	Linkup - Evaluating AI search systems on complex queries	2026-10-11 13:40
+https://linkup.so/benchmarks	Linkup - Benchmarks	2026-10-11 13:40
+https://github.com/LinkupPlatform/standard-benchmark	LinkupPlatform/standard-benchmark	2026-10-11 13:40
+https://humai.blog/ai-search-apis-compared-tavily-vs-exa-vs-perplexity	AI Search APIs Compared: Tavily vs Exa vs Perplexity	2026-10-11 13:40
+https://reddit.com/r/Rag/comments/1gr8jnr/which_search_api_should_i_use_between_tavilycom	Which search API should I use between Tavily.com, Exa.ai ...	2026-10-11 13:40
+https://tavily.com/blog/tavily-ranks-1-on-sealqa-and-simpleqa	Tavily Ranks #1 on SealQA and SimpleQA | Tavily Blog	2026-10-11 13:40
+https://github.com/LinkupPlatform/eval-simpleQA	LinkupPlatform/eval-simpleQA	2026-10-11 13:40
+https://linkup.so/blog/linkup-establishes-sota-performance-on-simpleqa	Linkup - Linkup has achieved SOTA performance	2026-10-11 13:40
+https://openbenchmarks.com/web-search/linkup-vs-tavily	Linkup vs Tavily: web search API comparison (2026) | Openbenchmarks	2026-10-11 13:40
+https://github.com/alanbuxton/news-comparison	alanbuxton/news-comparison	2026-10-11 13:40
+https://github.com/openbenchmarks-labs/web-search-for-coding-agents	GitHub - openbenchmarks-labs/web-search-for-coding-agents: Open, independent ben	2026-10-11 13:40
+https://dreaming.press/posts/2026-06-21-tavily-vs-exa-vs-linkup-web-search.html	Tavily vs Exa vs Linkup: Picking a Web Search API for AI Agents	2026-10-11 13:40
+https://openbenchmarks.com/web-search	Web Search API Benchmark, Independently Benchmarked (2026)	2026-10-11 13:40
+https://github.com/perodriguezl/python-http-libraries-benchmark	GitHub - perodriguezl/python-http-libraries-benchmark: Performance benchmarks co	2026-10-11 13:40
+https://decodo.com/blog/httpx-vs-requests-vs-aiohttp	HTTPX vs. Requests vs. AIOHTTP: How to Choose (2026)	2026-10-11 13:40
+https://ai.plainenglish.io/i-compared-5-python-async-http-libraries-in-2026-one-destroyed-the-rest-6eec269bca48	One Python HTTP Library Crushed All Others in 2026 Speed Tests	2026-10-11 13:40
+https://oxylabs.io/blog/httpx-vs-requests-vs-aiohttp	HTTPX vs Requests vs AIOHTTP	2026-10-11 13:40
+https://github.com/oxylabs/httpx-vs-requests-vs-aiohttp	GitHub - oxylabs/httpx-vs-requests-vs-aiohttp: See how HTTPX, Requests, and AIOH	2026-10-11 13:40
+https://pypi.org/project/curl-cffi	curl-cffi	2026-10-11 13:40
+https://blog.stackademic.com/python-requests-vs-httpx-vs-aiohttp-i-benchmarked-all-3-on-real-traffic-b1987e9ab624	Medium	2026-10-11 13:40
+https://curl-cffi.readthedocs.io/en/v0.5.8	curl_cffi	2026-10-11 13:40
+https://github.com/lexiforest/curl_cffi/blob/main/benchmark/multiple_workers.csv	benchmark/multiple_workers.csv	2026-10-11 13:40
+https://github.com/lexiforest/curl_cffi/blob/main/benchmark/README.md	benchmark/README.md	2026-10-11 13:40
+https://github.com/lexiforest/curl_cffi/blob/main/benchmark/benchmark.py	benchmark/benchmark.py at main · lexiforest/curl_cffi	2026-10-11 13:40
+https://github.com/lexiforest/curl_cffi/tree/main/benchmark	curl_cffi/benchmark at main · lexiforest/curl_cffi · GitHub	2026-10-11 13:40
+https://reddit.com/r/Python/comments/1jnlrdl/i_benchmarked_pythons_top_http_clients_requests	I benchmarked Python's top HTTP clients (requests, httpx, aiohttp, etc.) and ope	2026-10-11 13:40
+https://github.com/dalf/pyhttp-benchmark/blob/027fc353ba1157000de5bff9077c71514298cbcc/results/output.md	results/output.md	2026-10-11 13:40
+https://async-concurrency.com/network-io-protocol-handling/async-http-clients-servers/choosing-between-httpx-and-aiohttp	Choosing Between httpx and aiohttp	2026-10-11 13:40
+https://deepwiki.com/lexiforest/curl_cffi/1.3-feature-comparison	Feature Comparison | lexiforest/curl_cffi | DeepWiki	2026-10-11 13:40
+https://github.com/gfx/benchmark-python-httpx-vs-aiohttp	GitHub - gfx/benchmark-python-httpx-vs-aiohttp: httpx (async) is 100x slower tha	2026-10-11 13:40
+https://dev.to/0012303/requests-vs-httpx-vs-aiohttp-i-benchmarked-all-3-results-surprised-me-4gco	requests vs httpx vs aiohttp — I Benchmarked All 3 (Results Surprised Me) - DEV 	2026-10-11 13:40
+https://ai.plainenglish.io/python-requests-vs-httpx-vs-aiohttp-i-benchmarked-all-3-on-real-traffic-77eb20545476	Python Requests vs httpx vs aiohttp. I Benchmarked All 3 on Real ...	2026-10-11 13:40
+https://proxy-cheap.com/blog/best-python-http-clients	Best Python HTTP clients for 2026, tested and compared	2026-10-11 13:40
+https://rola-ip.co/blog/httpx-vs-requests-vs-aiohttp	HTTPX vs Requests vs aiohttp: Features, Performance, and Python Use ...	2026-10-11 13:40
+https://websearchapi.ai/blog/compare-tavily-google-search-exa-perplexity	Compare Tavily, Perplexity API, Google Search Grounding, Exa with LLM-as-Judge i	2026-10-11 13:41
+https://openbenchmarks.com/web-search/exa-vs-tavily	Exa vs Tavily: Web Search API Comparison, Pricing, Independently Benchmarked (20	2026-10-11 13:41
+https://coldiq.com/blog/tavily-vs-exa	Exa vs Tavily (2026): Which AI Search API Wins? (47 chara...	2026-10-11 13:41
+https://bestwebsearchapis.com/comparisons/exa-vs-tavily	Exa vs Tavily (2026): Web Search API comparison | Best Web Search APIs	2026-10-11 13:41
+https://effloow.com/articles/exa-vs-tavily-agent-web-search-benchmark-2026	Exa vs Tavily in 2026: Our Agent Web Search Benchmark	2026-10-11 13:41
+https://clawnewbie.com/compare/exa-vs-tavily-2026	Exa vs Tavily 2026: AI Search APIs Compared - clawnewbie.com	2026-10-11 13:41
+https://you.com/resources/tavily-vs-exa	You.com | Tavily vs Exa: AI Search APIs Compared (2026)	2026-10-11 13:41
+https://tavily.com/blog/7-best-exa-alternatives-for-ai-agents-in-2026	7 Best Exa Alternatives for AI Agents in 2026 | Tavily Blog	2026-10-11 13:41
+https://github.com/tavily-ai/tavily-search-evals/blob/main/run_evaluation.py	run_evaluation.py at main · tavily-ai/tavily-search-evals	2026-10-11 13:41
+https://glasser.ai/blog/exa-vs-tavily	Exa vs Tavily: Search Modes, Costs & How to Choose — Glasser	2026-10-11 13:41
+https://github.com/tavily-ai/tavily-search-evals/blob/main/README.md	README.md at main · tavily-ai/tavily-search-evals	2026-10-11 13:41
+https://openbenchmarks.com/web-search/exa-vs-tavily-vs-perplexity	Exa vs Tavily vs Perplexity, Independently Benchmarked, 2026 | Openbenchmarks	2026-10-11 13:41
+https://data4ai.com/blog/tool-comparisons/exa-ai-vs-tavily	Exa.ai vs. Tavily - AI Semantic Search API for LLM - Data4AI	2026-10-11 13:41
+https://dev.to/romdevin/pythons-http-client-gap-addressing-requests-library-stagnation-with-modern-alternatives-1a81	Python's HTTP Client Gap: Addressing Requests Library ...	2026-10-11 13:41
+https://github.com/bolinocroustibat/benchmark_http_clients	GitHub - bolinocroustibat/benchmark_http_clients: Compare Python HTTP clients (r	2026-10-11 13:41
+https://deepwiki.com/jawah/niquests/11.2-performance-comparison	Performance Comparison | jawah/niquests | DeepWiki	2026-10-11 13:41
+https://news.ycombinator.com/item?id=47516383	We have switched to niquests in my company and yes I can confirm that it's 10x b	2026-10-11 13:41
+https://github.com/Ousret/niquests-stats	GitHub - Ousret/niquests-stats: Find Niquests at https://github.com/jawah/niques	2026-10-11 13:41
+https://pytutorial.com/aiohttp-vs-httpx-vs-requests	aiohttp vs httpx vs requests - PyTutorial	2026-10-11 13:41
+https://proxywing.com/blog/httpx-vs-requests-vs-aiohttp-feature-performance-comparison-guide	HTTPX vs Requests vs AIOHTTP: Feature & Performance ...	2026-10-11 13:41
+https://brightdata.com/blog/web-data/requests-vs-httpx-vs-aiohttp	Requests vs. HTTPX vs. AIOHTTP: Which One to Choose?	2026-10-11 13:41
+https://youtube.com/watch?v=ztiUdTIHymY&xstg=CAMSBhUDze3xHw%3D%3D	niquests - a Modern Python HTTP Library!	2026-10-11 13:41
+https://blog.stackademic.com/i-compared-4-python-http-libraries-one-shocked-me-completely-126f51bba917	I Compared 4 Python HTTP Libraries. One Shocked Me ...	2026-10-11 13:41
+https://youtube.com/watch?v=OPyoXx0yA0I	Requests vs HTTPX vs Aiohttp	2026-10-11 13:41
+https://github.com/jawah/niquests/issues/83	http2 bottleneck?	2026-10-11 13:41
+https://github.com/jawah/niquests/issues/356	Understanding benchmarking	2026-10-11 13:41
+https://gist.github.com/jtbaker/61061d27949ef48ac31e85ff28c24eb6	Benchmark httpx, httpx2, niquests — concurrent async dispatch, PEP 723 standalon	2026-10-11 13:41
+https://github.com/ousret/niquests-stats	Ousret/niquests-stats	2026-10-11 13:41
+https://github.com/jawah/niquests	jawah/niquests	2026-10-11 13:41
+https://niquests.readthedocs.io/en/latest/index.html	N/A	2026-10-11 13:41
+https://stackoverflow.com/questions/67822235/benchmark-http1-1-http2-in-python	pycurl - benchmark HTTP1.1/HTTP2 in python	2026-10-11 13:41
+https://niquests.readthedocs.io/en/latest/dev/httpx.html	HTTPX → Niquests guide - Niquests Documentation - Drop-in replacement ...	2026-10-11 13:41
+https://dev.to/leapcell/comparing-requests-aiohttp-and-httpx-which-http-client-should-you-use-3784	Comparing requests, aiohttp, and httpx: Which HTTP client should you ...	2026-10-11 13:41
+https://tavily.com/blog/tavily-evaluation-part-1-tavily-achieves-sota-on-simpleqa-benchmark	Tavily Evaluation Part 1: Tavily Achieves SOTA on SimpleQA Benchmark | Tavily Bl	2026-10-11 13:41
+https://you.com/compare/you-com-vs-tavily	You.com | You.com vs. Tavily	2026-10-11 13:41
+https://reddit.com/r/vectordatabase/comments/1v7gdrk/benchmark_exa_vs_tavily_vs_firecrawl_for_llm	Exa vs. Tavily vs. Firecrawl for LLM Retrieval & Data Scraping	2026-10-11 13:41
+https://connect-your-llm-to-the-web.ghost.io/tavily-evaluation-part-1-tavily-achieves-sota-on-simpleqa-benchmark	Tavily Evaluation Part 1: Tavily Achieves SOTA on SimpleQA Benchmark	2026-10-11 13:41
+https://deepwiki.com/tavily-ai/tavily-search-evals/2.1-simpleqa-benchmark	SimpleQA Benchmark | tavily-ai/tavily-search-evals | DeepWiki	2026-10-11 13:41
+https://scrapbox.io/nikkie-memos/Tavily_Evaluation_Part_1:_Tavily_Achieves_SOTA_on_SimpleQA_Benchmark	Tavily Evaluation Part 1: Tavily Achieves SOTA on SimpleQA Benchmark - nikkie-me	2026-10-11 13:41
+https://openai.com/index/introducing-simpleqa	Introducing SimpleQA - OpenAI	2026-10-11 13:41
+https://github.com/2397275995/LLm-/blob/main/tavily-search-evals/README.md	LLm-/tavily-search-evals/README.md at main · 2397275995/LLm- · GitHub	2026-10-11 13:41
+https://github.com/lexiforest/curl_cffi	GitHub - lexiforest/curl_cffi: Python binding for curl-impersonate fork via cffi	2026-10-11 13:41
+https://blog.datahut.co/post/web-scraping-without-getting-blocked-curl-cffi	How to Bypass Cloudflare When Web Scraping (curl_cffi ...	2026-10-11 13:41
+https://github.com/lexiforest/curl_cffi/issues/476	Async Session Gets Blocked by Cloudflare While Sync Session Works Fine	2026-10-11 13:41
+https://stackoverflow.com/questions/79678330/getting-blocked-by-cloudflare-with-curl-cffi	Getting blocked by cloudflare with curl_cffi - python	2026-10-11 13:41
+https://reddit.com/r/webscraping/comments/1tqtqct/curl_cffis_tlsspoofing_detected_by_cloudflare	curl_cffi's TLS-spoofing detected by Cloudflare sometimes - Reddit	2026-10-11 13:41
+https://stackoverflow.com/stack-content/questions/79877820	Bypassing Cloudflare WAF and Akamai in Python Using TLS Fingerprinting: The curl	2026-10-11 13:41
+https://curl-cffi.readthedocs.io/en/latest	How to Bypass Cloudflare When Web Scraping (curl_cffi Guide) [2026]	2026-10-11 13:41
+https://ianlpaterson.com/blog/anti-detect-browser-benchmark-patchright-nodriver-curl-cffi	Anti-Detect Browser Benchmark 2026: 7 Tools, 651 Verdicts	2026-10-11 13:41
+https://scrapeops.io/web-scraping-playbook/how-to-bypass-cloudflare	How To Bypass Cloudflare When Web Scraping (2026) | ScrapeOps	2026-10-11 13:41
+https://curl-cffi.readthedocs.io/en/v0.5.8.1/api/curl_cffi.requests	curl_cffi.requests - curl_cffi	2026-10-11 13:41
+https://curl-cffi.readthedocs.io/en/v0.9.0	Welcome to curl_cffi’s documentation! — curl_cffi documentation	2026-10-11 13:41
+https://scrapingbee.com/blog/how-to-use-curl-cffi	How to use curl_cffi for web scraping in Python	2026-10-11 13:41
+https://github.com/lexiforest/curl_cffi/blob/main/curl_cffi/requests/session.py	curl_cffi/requests/session.py at main · lexiforest/curl_cffi	2026-10-11 13:41
+https://curl-cffi.readthedocs.io/en/stable/quick_start.html	Quick Start — curl_cffi  documentation	2026-10-11 13:41
+https://github.com/lexiforest/curl_cffi/blob/main/curl_cffi/requests/impersonate.py	curl_cffi/requests/impersonate.py at main · lexiforest/curl_cffi	2026-10-11 13:41
+https://zenrows.com/blog/curl-cffi	How to Use Curl_cffi for Web Scraping	2026-10-11 13:41
+https://dev.to/amendamax2025/bypassing-cloudflare-waf-and-akamai-in-python-using-tls-fingerprinting-the-curlcffi-guide-53l7	Cloudflare 403 on SOFA API from Python: cloudscraper 1.2.71 fails, curl ...	2026-10-11 13:41
+https://proxycove.com/en/blog/how-to-bypass-tls-ja4-fingerprint-curl-cffi-2026	GitHub - lexiforest/curl_cffi: Python binding for curl-impersonate fork via cffi	2026-10-11 13:41
+https://apiserpent.com/blog/bypass-cloudflare-datadome-scraping	Bypass Cloudflare & DataDome 2026: TLS Fingerprints	2026-10-11 13:41
+https://curl-cffi.readthedocs.io	curl_cffi’s documentation	2026-10-11 13:41
+https://async-concurrency.com/network-io-protocol-handling/tls-and-dns/connecting-with-happy-eyeballs-in-asyncio	Connecting with Happy Eyeballs in asyncio | Python Async	2026-10-11 13:41
+https://github.com/aio-libs/aiohappyeyeballs	GitHub - aio-libs/aiohappyeyeballs: Happy Eyeballs for pre-resolved ...	2026-10-11 13:41
+https://pypi.org/project/aiohappyeyeballs	aiohappyeyeballs · PyPI	2026-10-11 13:41
+https://freshports.org/net/py-aiohappyeyeballs	FreshPorts -- net/py-aiohappyeyeballs: Happy Eyeballs for asyncio	2026-10-11 13:41
+https://async-concurrency.com/network-io-protocol-handling/connection-pooling-and-keepalive/caching-dns-lookups-in-async-http-clients	Caching DNS Lookups in Async HTTP Clients ¶	2026-10-11 13:41
+https://docs.aiohttp.org/en/v3.8.1/client_advanced.html	Advanced Client Usage — aiohttp 3.8.1 documentation	2026-10-11 13:41
+https://datatracker.ietf.org/doc/html/draft-pauly-happy-happyeyeballs-v3-00	draft-pauly-happy-happyeyeballs-v3-00	2026-10-11 13:41
+https://blog.apnic.net/2025/10/07/analysing-the-state-of-happy-eyeballs-implementations	Analysing the state of Happy Eyeballs implementations | APNIC Blog	2026-10-11 13:41
+https://github.com/saghul/aiodns/issues/39	Caching? · Issue #39 · aio-libs/aiodns	2026-10-11 13:41
+https://metacpan.org/dist/IO-Socket-HappyEyeballs/view/README.md	IO-Socket-HappyEyeballs-0.002 - RFC 8305 Happy Eyeballs v2 connection algorithm 	2026-10-11 13:41
+https://docs.aiohttp.org/en/stable/_modules/aiohttp/connector.html	aiohttp.connector — aiohttp 3.14.3 documentation	2026-10-11 13:41
+https://docs.aiohttp.org/en/v3.8.0	Welcome to AIOHTTP — aiohttp 3.8.0 documentation	2026-10-11 13:41
+https://docs.aiohttp.org/en/v3.7.2	Welcome to AIOHTTP — aiohttp 3.7.2 documentation	2026-10-11 13:41
+https://deepwiki.com/arloor/rust_http_proxy/5.6-dns-resolution-and-happy-eyeballs	DNS Resolution and Happy Eyeballs - DeepWiki	2026-10-11 13:41
+https://en.wikipedia.org/wiki/Main_Page	Wikipedia , the free encyclopedia	2026-10-11 13:41
+https://de.wikipedia.org/wiki/Wikipedia	Wikipedia – Wikipedia	2026-10-11 13:41
+https://pypi.org/project/aiodns	aiodns · PyPI	2026-10-11 13:41
+https://github.com/pydantic/httpx2/issues/827	`httpx.AsyncClient` has much worse performance than `aiohttp.ClientSession` with	2026-10-11 13:41
+https://stackoverflow.com/questions/78516655/why-is-httpx-so-much-worse-than-aiohttp-when-facing-high-concurrent-requests	Why is httpx so much worse than aiohttp when facing high concurrent requests?	2026-10-11 13:41
+https://miguel-mendez-ai.com/2024/10/20/aiohttp-vs-httpx	Httpx vs Aiohttp: Handling High-Concurrency Requests in Async Python	2026-10-11 13:41
+https://anonymous-proxies.net/posts/httpx-vs-requests-vs-aiohttp	HTTPX vs Requests vs AIOHTTP: Which One Should You ...	2026-10-11 13:41
+https://github.com/encode/httpx/discussions/3457	Unexpected Performance Results: httpx Async Slower than aiohttp and httpx Sync ·	2026-10-11 13:41
+https://async-concurrency.com/concurrent-execution-worker-patterns/threading-vs-multiprocessing-vs-asyncio/asyncio-vs-threading-for-1000-concurrent-http-requests	asyncio vs threading for 1000 concurrent HTTP requests	2026-10-11 13:41
+https://scrapingant.com/blog/requests-vs-httpx	Requests vs HTTPX in 2026: Measured Differences and Migration Gotchas | Scraping	2026-10-11 13:41
+https://marsproxies.com/blog/httpx-vs-requests-vs-aiohttp	HTTPX vs Requests vs AIOHTTP: Features & Performance	2026-10-11 13:41
+https://parallel.ai/blog/parallel-search-api	Upgrades to the Parallel Search & Extract APIs | Parallel	2026-10-11 13:41
+https://parallel.ai/blog/search-api-benchmark	A state-of-the-art search API purpose-built for agents | Parallel	2026-10-11 13:41
+https://parallel.ai/products/search	Search API - The Best Web Search for Your AI | Parallel	2026-10-11 13:41
+https://openbenchmarks.com/web-search/exa-vs-parallel-vs-tavily	Exa vs Parallel vs Tavily, Independently Benchmarked, 2026 | Openbenchmarks	2026-10-11 13:41
+https://findskill.ai/blog/web-infrastructure-for-ai-agents-parallel-vs-exa-tavily-brave	Web Infrastructure for AI Agents: Parallel vs Exa vs Tavily vs Brave	2026-10-11 13:41
+https://linkup.so/blog/cheapest-ai-search-api-benchmark	Linkup - Cheapest AI Search API? A Benchmark of Exa, Tavily, Perplexity, and Lin	2026-10-11 13:41
+https://linkedin.com/posts/philippe-mizrahi_linkup-just-set-a-new-state-of-the-art-performance-activity-7298692548154322944-BP2o	Linkup beats Perplexity on SimpleQA with GPT-4o mini	2026-10-11 13:41
+https://deepmind.google/research/evals	Evals — Google DeepMind	2026-10-11 13:42
+https://github.com/kabirrgrover/exa-websets-mcp	GitHub - kabirrgrover/exa-websets-mcp: Unified MCP Gateway for Exa ...	2026-10-11 13:42
+https://tpc-websets.exa.ai/single-universal-api-search-retrieval-enrichment-structured	Exa Websets: Universal API for Search, Enrichment & Knowledge	2026-10-11 13:42
+https://aiwiki.io/tools/exa	Exa — Web search API, website crawler, and deep research engine built for AI age	2026-10-11 13:42
+https://deepwiki.com/exa-labs/exa-py/3-websets-system	Websets System | exa-labs/exa-py | DeepWiki	2026-10-11 13:42
+https://exa.ai/blog/exa-deep	Introducing Exa Deep: An Agent for Every Search | Exa Blog	2026-10-11 13:42
+https://x.com/ExaAILabs/status/1976710000933584912	"Introducing Exa 2.0 Breakthroughs in our AI research and ...	2026-10-11 13:42
+https://exa.ai/blog/deep-max	Introducing Deep Max: State-of-the-Art Agentic Search | Exa Blog	2026-10-11 13:42
+https://exa.ai/blog/evals-at-exa	Our AI Research: How We Evaluate Semantic Search Technology | Exa Blog	2026-10-11 13:42
+https://exa.ai/blog/websets-evals	Websets vs. Google: The Most Powerful AI Research Agent | Exa Blog	2026-10-11 13:42
+https://arxiv.org/html/2503.20201v1	Democratizing Search with Open-source Reasoning Agents	2026-10-11 13:42
+https://github.com/exa-labs/benchmarks	exa-labs/benchmarks	2026-10-11 13:42
+https://exa.ai/blog/webcode	WebCode: Search Evals for Coding Agents | Exa Blog	2026-10-11 13:42
+https://arxiv.org/html/2310.03214v1	FreshLLMs: Refreshing Large Language Models with Search Engine Augmentation	2026-10-11 13:42
+https://aclanthology.org/2024.findings-acl.813.pdf	Refreshing Large Language Models with Search Engine ...	2026-10-11 13:42
+https://docs.nvidia.com/aiq-blueprint/2.0.0/evaluation/benchmarks/freshqa.html	FreshQA Evaluator — NVIDIA AI-Q Blueprint	2026-10-11 13:42
+https://deepwiki.com/freshllms/freshqa/3.1-freshqa-dataset	FreshQA Dataset | freshllms/freshqa | DeepWiki	2026-10-11 13:42
+https://github.com/NVIDIA-AI-Blueprints/aiq/blob/develop/frontends/benchmarks/freshqa/README.md	deep-researcher-agent/frontends/benchmarks/freshqa/README.md at develop · NVIDIA	2026-10-11 13:42
+https://propensityai.com/search/benchmarks/freshqa	FreshQA Benchmark Results	2026-10-11 13:42
+https://huggingface.co/papers/2310.03214	Paper page - FreshLLMs: Refreshing Large Language Models with Search Engine
+  Au	2026-10-11 13:42
+https://github.com/freshllms/freshqa?tab=readme-ov-file	freshllms/freshqa	2026-10-11 13:42
+https://github.com/freshllms/freshqa/blob/main/README.md	README.md	2026-10-11 13:42
+https://arxiv.org/pdf/2310.03214	FreshLLMs: Refreshing Large Language Models with Search Engine Augmentation	2026-10-11 13:42
+https://docs.nvidia.com/aiq-blueprint/2.2.1/evaluation/benchmarks/freshqa.html	FreshQA Evaluator — NVIDIA AI-Q Blueprint	2026-10-11 13:42
+https://arxiv.org/html/2310.03214v2	FreshLLMs: Refreshing Large Language Models with Search Engine Augmentation	2026-10-11 13:42
+https://huggingface.co/datasets/bojanbabic/freshqa_072825	bojanbabic/freshqa_072825 · Datasets at Hugging Face	2026-10-11 13:42
+https://aclanthology.org/2024.findings-acl.813	FreshLLMs: Refreshing Large Language Models with Search Engine ...	2026-10-11 13:42
+https://github.com/yuimo/freshqa-/blob/main/LICENSE	freshqa-/LICENSE at main · yuimo/freshqa- · GitHub	2026-10-11 13:42
+https://docs.nvidia.com/aiq-blueprint/1.2.1/evaluation/benchmarks/freshqa.html	FreshQA Evaluator — NVIDIA AI-Q Blueprint	2026-10-11 13:42
+https://academy.dair.ai/papers/freshllms-freshqa	FreshLLMs (FreshQA) | DAIR.AI Academy | DAIR.AI Academy	2026-10-11 13:42
+https://arxiv.org/pdf/2310.03214v1	FRESHLLMS REFRESHING LARGE LANGUAGE MODELS S ENGINE AUGMENTATION	2026-10-11 13:42
+https://deepwiki.com/freshllms/freshqa/7-license	License | freshllms/freshqa | DeepWiki	2026-10-11 13:42
+https://arxiv.org/abs/2501.07572	WebWalker: Benchmarking LLMs in Web Traversal	2026-10-11 13:42
+https://arxiv.org/pdf/2501.07572	WebWalker: Benchmarking LLMs in Web Traversal - arXiv.org	2026-10-11 13:42
+https://aclanthology.org/2025.acl-long.508	WebWalker: Benchmarking LLMs in Web Traversal - ACL Anthology	2026-10-11 13:42
+https://topaitracker.com/comparisons/2026-08-08-exa-vs-tavily-ai-search-api-head-to-head	Exa vs Tavily: AI Search API Head-to-Head — Top AI Tracker	2026-10-11 13:42
+https://arxiv.org/pdf/2501.07572v3.pdf	WebWalker: Benchmarking LLMs in Web Traversal	2026-10-11 13:42
+https://exa.ai/library/publication/j39p1k7qssb	WebWalker: Benchmarking LLMs in Web Traversal	2026-10-11 13:42
+https://sota2.com/research/sota/web-based-question-answering-on-webwalkerqa-multi-source	Web-based Question Answering on WebWalkerQA Multi-source benchmark leaderboard ·	2026-10-11 13:42
+https://github.com/AkihikoWatanabe/paper_notes/issues/2851	[Paper Note] WebWalker: Benchmarking LLMs in Web Traversal ... - GitHub	2026-10-11 13:42
+https://github.com/SevenPlusPlus/WebWalker	WebWalker: Benchmarking LLMs in Web Traversal - GitHub	2026-10-11 13:42
+https://openreview.net/forum?id=cVI9lAfkuK	WebWalker: Benchmarking LLMs in Web Traversal - OpenReview	2026-10-11 13:42
+https://emergentmind.com/topics/browsecomp-plus	BrowseComp-Plus Benchmark	2026-10-11 13:42
+https://aclanthology.org/2026.acl-long.1023	BrowseComp-Plus: A Fair and Disentangled Evaluation Benchmark for Deep Search Ag	2026-10-11 13:42
+https://github.com/texttron/BrowseComp-Plus	GitHub - texttron/BrowseComp-Plus: BrowseComp-Plus: A More Fair and Transparent 	2026-10-11 13:42
+https://github.com/MrNeo01/BSP/tree/main	GitHub - MrNeo01/BSP: BrowseComp-Plus: A More Fair and Transparent Evaluation Be	2026-10-11 13:42
+https://openreview.net/pdf?id=YJAA2PzfDi	BrowseComp-Plus: A More Fair and Transparent Evaluation Benchmark of ...	2026-10-11 13:42
+https://emergentmind.com/topics/browsecomp-plus-benchmark	BrowseComp-Plus Benchmark Overview	2026-10-11 13:42
+https://huggingface.co/datasets/Tevatron/browsecomp-plus	Tevatron/browsecomp-plus · Datasets at Hugging Face	2026-10-11 13:42
+https://huggingface.co/datasets/Tevatron/browsecomp-plus-corpus	Tevatron/browsecomp-plus-corpus · Datasets at Hugging Face	2026-10-11 13:42
+https://hornet.dev/blog/deep-research-is-a-retrieval-problem	Deep research is a retrieval problem - Hornet	2026-10-11 13:42
+https://huggingface.co/datasets/Tevatron/browsecomp-plus-corpus/blob/main/README.md	README.md · Tevatron/browsecomp-plus-corpus at main	2026-10-11 13:42
+https://arxiv.org/pdf/2508.06600v1	BrowseComp-Plus: A More Fair and Transparent Evaluation Benchmark of ...	2026-10-11 13:42
+https://huggingface.co/datasets/google/simpleqa-verified	google/simpleqa-verified · Datasets at Hugging Face	2026-10-11 13:42
+https://modelscope.cn/datasets/google/simpleqa-verified	simpleqa-verified - Dataset details	2026-10-11 13:42
+https://huggingface.co/datasets/google/simpleqa-verified/blob/main/README.md	README.md · google/simpleqa-verified at main	2026-10-11 13:42
+https://metatext.io/datasets/google/simpleqa-verified	google/simpleqa-verified Dataset — Question Answering	2026-10-11 13:42
+https://kaggle.com/datasets/deepmind/simpleqa-verified	SimpleQA Verified - Kaggle	2026-10-11 13:42
+https://linkedin.com/posts/kaggle_new-benchmark-launch-simpleqa-verified-activity-7371561234418151424-C-ma	New Benchmark Launch: SimpleQA Verified by Google DeepMind | Kaggle posted on th	2026-10-11 13:42
+https://llmlearner.com/rankings/simpleqa-verified	SimpleQA Verified Leaderboard (Oct 2026) | LLMLearner	2026-10-11 13:42
+https://benchlm.ai/benchmarks/simpleqa-verified	SimpleQA Verified Leaderboard & Scores — October 2026 | BenchLM.ai	2026-10-11 13:42
+https://huggingface.co/datasets/google/simpleqa-verified/blob/44f08eba5bc1393be086ede8ff8b17181a2496df/README.md	README.md · google/simpleqa-verified at 44f08eba5bc1393be086ede8ff8b17181a2496df	2026-10-11 13:42
+https://huggingface.co/api/resolve-cache/datasets/google/simpleqa-verified/0dc97e0d28d8233463e005cdc4475cc2a13ba2dc/README.md?download=true&etag=%22b33330bc6c10eb3cd531a47a699bc8efed873d23%22	N/A	2026-10-11 13:42
+https://huggingface.co/datasets/google/simpleqa-verified/blob/ed392714d14fa5225b07c2b456453983bc75f690/README.md	README.md · google/simpleqa-verified at ed392714d14fa5225b07c2b456453983bc75f690	2026-10-11 13:42
+https://github.com/runshengdu/simpleqa_verified	GitHub - runshengdu/simpleqa_verified	2026-10-11 13:42
+https://arxiv.org/html/2509.07968v2	SimpleQA Verified: A Reliable Factuality Benchmark to Measure Parametric Knowled	2026-10-11 13:42
+https://openreward.ai/Google/simpleqaverified	Google/simpleqaverified | OpenReward	2026-10-11 13:42
+https://quantiles.io/benchmark-hub/benchmark/simpleqa-verified	SimpleQA Verified Benchmark | Quantiles	2026-10-11 13:42
+https://modelscope.cn/datasets/google/simpleqa-verified.md	www.modelscope.cn	2026-10-11 13:42
+https://speedvitals.com/blog/zstd-vs-brotli-vs-gzip	ZSTD vs Brotli vs GZip Comparison | SpeedVitals Blog	2026-10-11 13:42
+https://blog.cloudflare.com/new-standards	New standards for a faster and more private Internet | Cloudflare Blog	2026-10-11 13:42
+https://paulcalvano.com/2024-03-19-choosing-between-gzip-brotli-and-zstandard-compression	Choosing Between gzip, Brotli and zStandard Compression | Paul Calvano	2026-10-11 13:42
+https://debugbear.com/blog/http-compression-gzip-brotli	Brotli vs. GZIP: Improve Page Speed With HTTP Compression | DebugBear	2026-10-11 13:42
+https://blog.openresty.com/en/edge-zstd	Zstd Compression in OpenResty Edge: Faster, Lighter Than Gzip and Brotli - OpenR	2026-10-11 13:42
+https://github.com/photoprism/photoprism/issues/5550	Server: Add zstd compression support · Issue #5550	2026-10-11 13:42
+https://webspeed.pro/en/research/is-your-html-compressed	Is Your HTML Compressed? gzip, Brotli and Zstandard Across 428 Sites | WebSpeed	2026-10-11 13:42
+https://corewebvitals.io/state-of-cwv/explorer/metrics.network.compression	25.5% of text responses use Brotli | The State of Web Vitals 2026	2026-10-11 13:42
+https://pagespeed-optimierung.de/en/blog/brotli-zstandard-text-compression-2026	Brotli or Zstandard: Faster Web Compression 2026	2026-10-11 13:42
+https://koder.ai/blog/zstd-vs-brotli-vs-gzip-api-compression	ZSTD vs Brotli vs GZIP: Choosing API Compression | Koder.ai	2026-10-11 13:42
+https://acceptencoding.com/browser-compatibility	Browser Support for gzip, Brotli & Zstd: Accept-Encoding by Browser	2026-10-11 13:42
+https://acceptencoding.com	Accept-Encoding & HTTP Compression Guide: gzip, Brotli, zstd	2026-10-11 13:42
+https://warmup.rocks/compression-test	Brotli Test — check Brotli, Gzip & Zstandard compression of any URL — warmup.roc	2026-10-11 13:42
+https://specification.website/spec/performance/compression	Compression (gzip, brotli, zstd) · Website Spec	2026-10-11 13:42
+https://bigiron.cc/guides/brotli-vs-zstd-vs-gzip-http-compression-the-2026-pick	Brotli vs Zstd vs gzip: the HTTP compression pick for 2026	2026-10-11 13:42
+https://aclanthology.org/2021.tacl-1.82.pdf	MKQA: A Linguistically Diverse Benchmark for Multilingual ...	2026-10-11 13:42
+https://machinelearning.apple.com/research/mkqa	MKQA: A Linguistically Diverse Benchmark for Multilingual ...	2026-10-11 13:42
+https://assets.amazon.science/50/87/e75228424679af2c97b12bf6a828/mintaka-a-complex-natural-and-multilingual-dataset-for-end-to-end-question-answering.pdf	[PDF] Mintaka: A Complex, Natural, and Multilingual Dataset for End-to ...	2026-10-11 13:42
+https://benchlm.ai/benchmarks/mkqa11	MKQA-11 Leaderboard & Scores — October 2026 | BenchLM.ai	2026-10-11 13:42
+https://kaggle.com/datasets/thedevastator/multilingual-question-answering-dataset	Mintaka by AmazonScience (Multilingual Q&A)	2026-10-11 13:42
+https://semanticscholar.org/paper/MKQA%3A-A-Linguistically-Diverse-Benchmark-for-Open-Longpre-Lu/750274c61a0936c9c9db32da659cddbcb227cf32	MKQA: A Linguistically Diverse Benchmark for Multilingual ...	2026-10-11 13:42
+https://hyper.ai/en/papers/2007.15207/resources	Resources - MKQA: A Linguistically Diverse Benchmark for ...	2026-10-11 13:42
+https://aclanthology.org/2022.coling-1.138	Mintaka: A Complex, Natural, and Multilingual Dataset for End-to-End Question An	2026-10-11 13:42
+https://huggingface.co/datasets/apple/mkqa	apple/mkqa · Datasets at Hugging Face	2026-10-11 13:42
+https://github.com/apple/ml-mkqa	apple-aiml-research/ml-mkqa	2026-10-11 13:42
+https://huggingface.co/datasets/AmazonScience/mintaka	AmazonScience/mintaka · Datasets at Hugging Face	2026-10-11 13:42
+https://github.com/apple-aiml-research/ml-mkqa	GitHub - apple-aiml-research/ml-mkqa: We introduce MKQA, an open-domain question	2026-10-11 13:42
+https://github.com/amazon-science/mintaka	GitHub - amazon-science/mintaka: Dataset from the paper "Mintaka: A Complex, Nat	2026-10-11 13:42
+https://arxiv.org/abs/2007.15207	[2007.15207] MKQA: A Linguistically Diverse Benchmark for Multilingual Open Doma	2026-10-11 13:42
+https://researchgate.net/publication/356933797_MKQA_A_Linguistically_Diverse_Benchmark_for_Multilingual_Open_Domain_Question_Answering	(PDF) MKQA: A Linguistically Diverse Benchmark for Multilingual Open ...	2026-10-11 13:42
+https://arxiv.org/abs/2210.01613	[2210.01613] Mintaka: A Complex, Natural, and Multilingual Dataset for ...	2026-10-11 13:42
+https://eprint.iacr.org/2019/228	Session Resumption Protocols and Efficient Forward Security for TLS 1.3 0-RTT	2026-10-11 13:43
+https://blog.cloudflare.com/introducing-0-rtt	Introducing Zero Round Trip Time Resumption (0-RTT) | Cloudflare Blog	2026-10-11 13:43
+https://secblog.it/blog/tls-session-resumption	TLS Session Resumption: Session IDs, Session Tickets, and 0-RTT Security	2026-10-11 13:43
+https://systeminternals.dev/tls/handshake	TLS 1.3 Handshake — 1-RTT, 0-RTT, Key Schedule & Session Resumption	2026-10-11 13:43
+https://martinuke0.github.io/posts/2026-05-24-implementing-tls-13-zero-round-trip-resumption-architecture-security-trade-offs-and-performance-optimization	Implementing TLS 1.3 Zero Round-Trip Resumption: Architecture, Security ...	2026-10-11 13:43
+https://keycdn.com/blog/tls-1-3-support	KeyCDN Launches TLS 1.3 with 0-RTT Support - KeyCDN	2026-10-11 13:43
+https://frontiersin.org/journals/computer-science/articles/10.3389/fcomp.2026.1848687/full	Frontiers | A Hybrid Quantum-Resistant Resumption framework for zero-RTT TLS 1.3	2026-10-11 13:43
+https://thousandeyes.com/blog/optimizing-web-performance-tls-1-3	Optimizing Web Performance with TLS 1.3 | ThousandEyes	2026-10-11 13:43
+https://youtube.com/watch?v=scW9Q6O9oNE	The Fast Lane: A Deep Dive into TLS 1.3 Session Resumption and 0-RTT	2026-10-11 13:43
+https://youtube.com/watch?v=scW9Q6O9oNE&xstg=CAMSBhUDze3xHw%3D%3D	The Fast Lane: A Deep Dive into TLS 1.3 Session Resumption and 0-RTT	2026-10-11 13:43
+https://shoppercove.com/blog/openssl-tls-handshake-full-vs-resume-localhost-lab	TLS Handshake Full vs Resume Lab (Real Numbers) — ShopperCove	2026-10-11 13:43
+https://stackoverflow.com/questions/51627507/tls-session-resumption-in-python-tls-socket	TLS session resumption in python TLS socket	2026-10-11 13:43
+https://github.com/urllib3/urllib3/issues/1898	TLS session resumption by default in urllib3 · Issue #1898	2026-10-11 13:43
+https://arxiv.org/html/1902.02531v1	Enhanced Performance for the encrypted Webthrough TLS ...	2026-10-11 13:43
+https://github.com/DefencedNL/TLS-session-resumption	GitHub - DefencedNL/TLS-session-resumption: Python script to test TLS ...	2026-10-11 13:43
+https://certguard.app/blog/tls-13-session-resumption-performance	TLS 1.3 Session Resumption: Why Your CDN Cares More Than You	2026-10-11 13:43
+https://link.springer.com/article/10.1007/s00145-021-09385-0	Session Resumption Protocols and Efficient Forward Security ...	2026-10-11 13:43
+https://martinuke0.github.io/posts/2026-05-20-implementing-tls-13-zero-round-trip-resumption-architecture-security-trade-offs-and-production-ready-performance-tips	Implementing TLS 1.3 Zero Round-Trip Resumption: Architecture ...	2026-10-11 13:43
+https://developers.cloudflare.com/bots/additional-configurations/ja3-ja4-fingerprint	JA3/JA4 fingerprint · Cloudflare bot solutions docs	2026-10-11 13:43
+https://webclaw.io/blog/tls-fingerprint-vs-browser-cloudflare	JA4 Fingerprints Decoded: Format, Bot Score, curl 403s	2026-10-11 13:43
+https://scrapfly.io/blog/posts/ja3-ja4-tls-fingerprinting-guide-to-detection-and-evasion	JA3/JA4 TLS Fingerprinting Guide for Web Scraping	2026-10-11 13:43
+https://nslsolver.com/blog/cloudflare-403-forbidden-python	Cloudflare 403 Forbidden Python Requests — NSLSolver	2026-10-11 13:43
+https://aziqdev.com/blog/bypassing-cloudflare-ja3-fingerprints	Bypass Cloudflare JA3 Fingerprinting with Python - aziqdev.com	2026-10-11 13:43
+https://webdecoy.com/blog/ja4-fingerprinting-ai-scrapers-practical-guide	JA4 Fingerprinting: Detect AI Scrapers by TLS - WebDecoy	2026-10-11 13:43
+https://blog.cloudflare.com/ja4-signals	Advancing Threat Intelligence: JA4 fingerprints and inter-request signals | Clou	2026-10-11 13:43
+https://blog.scrapeup.com/cf-bypass-minimal-meta	How to Bypass Cloudflare When Web Scraping in 2026	2026-10-11 13:43
+https://stackoverflow.com/questions/62684468/pythons-requests-triggers-cloudflares-security-while-urllib-does-not	Python's requests triggers Cloudflare's security while urllib ...	2026-10-11 13:43
+https://github.com/acaprino/claude-code-daodan/blob/master/plugins/grabber-development/agents/http-fingerprint-expert.md	plugins/grabber-development/agents/http-fingerprint-expert.md	2026-10-11 13:43
+https://krowdev.com/article/cloudflare-ja3-ja4-bot-detection	How Cloudflare Uses JA3 and JA4 TLS Fingerprinting — krowdev	2026-10-11 13:43
+https://github.com/Bennykillua/cloudflare-bot-detection-2026	GitHub - Bennykillua/cloudflare-bot-detection-2026: Reproduce every layer of Clo	2026-10-11 13:43
+https://github.com/Bennykillua/cloudflare-bot-detection-2026/blob/main/README.md	cloudflare-bot-detection-2026/README.md at main · Bennykillua/cloudflare-bot-det	2026-10-11 13:43
+https://scrapeops.io/web-scraping-playbook/403-forbidden-error-web-scraping	How To Solve 403 Forbidden Errors When Web Scraping (2026) | ScrapeOps	2026-10-11 13:43
+https://dataresearchtools.com/selectolax-vs-lxml-speed-benchmarks-for-html-parsing-2026	Selectolax vs lxml Speed Benchmarks for HTML Parsing (2026)	2026-10-11 13:43
+https://dataresearchtools.com/best-python-html-parsers-2026-lxml-vs-beautifulsoup-vs-selectolax	Best Python HTML Parsers 2026: lxml vs BeautifulSoup vs Selectolax	2026-10-11 13:43
+https://krabarena.com/claims/trafilatura-wins-markdown-extraction-f1-0-858-vs-jina-and-firecrawl-v2-records	Trafilatura wins markdown extraction F1 (0.858) vs Jina and Firecrawl; v2 record	2026-10-11 13:43
+https://bytetunnels.com/posts/fastest-python-web-scraping-library-benchmarks	Fastest Python Web Scraping Library: Benchmarks and ...	2026-10-11 13:43
+https://github.com/murrough-foley/rs-trafilatura	Murrough-Foley/rs-trafilatura	2026-10-11 13:43
+https://deepwiki.com/rushter/selectolax/8.2-performance-benchmarks	Performance Benchmarks | rushter/selectolax | DeepWiki	2026-10-11 13:43
+https://github.com/mwbyeon/trafilatura-selectolax	GitHub - mwbyeon/trafilatura-selectolax: Python & command-line tool to ...	2026-10-11 13:43
+https://python-httpx.org/advanced/resource-limits	Resource Limits	2026-10-11 13:43
+https://stackoverflow.com/questions/47233547/aiohttp-uvloop-parallel-http-requests-are-slower-than-without-uvloop	aiohttp + uvloop parallel HTTP requests are slower than ...	2026-10-11 13:43
+https://async-concurrency.com/network-io-protocol-handling/connection-pooling-and-keepalive/sizing-async-connection-pools-for-throughput	Sizing Async Connection Pools for Throughput	2026-10-11 13:43
+https://medium.com/@bhagyarana80/5-uvloop-httpx-clients-that-actually-hit-high-qps-34e0d35186fe	5 uvloop + httpx Clients That Actually Hit High QPS | by Bhagya Rana | Medium	2026-10-11 13:43
+https://stackoverflow.com/questions/63447722/parallel-requests-block-infinitely-after-exactly-100-requests-using-asyncio	python - Parallel requests block infinitely after exactly 100 ...	2026-10-11 13:43
+https://docs.aiohttp.org/en/stable/http_request_lifecycle.html	The aiohttp Request Lifecycle	2026-10-11 13:43
+https://github.com/aio-libs/aiohttp/discussions/5564	repeated gets with keep-alive · aio-libs aiohttp · Discussion #5564 · GitHub	2026-10-11 13:43
+https://async-concurrency.com/network-io-protocol-handling/connection-pooling-and-keepalive/configuring-httpx-limits-and-pool-timeouts	Configuring httpx Limits and Pool Timeouts	2026-10-11 13:43
+https://docs.nvidia.com/nemo/gym/v0.3.0/infrastructure/engineering-notes/aiohttp-vs-httpx	aiohttp vs httpx | NeMo Gym - NVIDIA Documentation Hub	2026-10-11 13:43
+https://deepwiki.com/encode/httpx/6.2-connection-limits	Connection Limits | encode/httpx | DeepWiki	2026-10-11 13:43
+https://github.com/vytharion/httpx-asyncclient-pool-limits-keepalive	httpx-asyncclient-pool-limits-keepalive - GitHub	2026-10-11 13:43
+https://docs.nvidia.com/nemo/gym/infrastructure/engineering-notes/aiohttp-vs-httpx	aiohttp vs httpx | NeMo Gym - NVIDIA Documentation Hub	2026-10-11 13:43
+https://kaggle.com/benchmarks/deepmind/simpleqa-verified	SimpleQA Verified Leaderboard | Kaggle	2026-10-11 13:45
+https://arxiv.org/html/2509.07968v1	SimpleQA Verified: A Reliable Factuality Benchmark to Measure Parametric Knowled	2026-10-11 13:45
+https://researchgate.net/publication/395387806_SimpleQA_Verified_A_Reliable_Factuality_Benchmark_to_Measure_Parametric_Knowledge	(PDF) SimpleQA Verified: A Reliable Factuality Benchmark ...	2026-10-11 13:45
+https://huggingface.co/datasets/google/frames-benchmark/discussions/1/files	google/frames-benchmark · Update README.md	2026-10-11 13:45
+https://huggingface.co/datasets/google/frames-benchmark/blame/b51bf528261a2525222987d9cb0b460034e91a51/README.md	README.md · google/frames-benchmark at b51bf528261a2525222987d9cb0b460034e91a51	2026-10-11 13:45
+https://hyper.ai/en/datasets/34835	FRAMES-benchmark Retrieval Enhancement Generation Test Set | Datasets | HyperAI	2026-10-11 13:45
+https://arxiv.org/html/2409.12941v3	Fact, Fetch, and Reason: A Unified Evaluation of Retrieval-Augmented Generation	2026-10-11 13:45
+https://github.com/sahil350/frames-eval	GitHub - sahil350/frames-eval: FRAMES multi-hop reasoning eval for inspect_ai — 	2026-10-11 13:45
+https://huggingface.co/datasets/vtllms/sealqa/tree/eb5dfeb60cc9d5e3c9026eb2acaf485d9de35940	vtllms/sealqa at eb5dfeb60cc9d5e3c9026eb2acaf485d9de35940	2026-10-11 13:45
+https://huggingface.co/datasets/vtllms/sealqa/blob/55447f20d825a3c3af6c14613fe0ec13a9737fc0/seal-0.parquet	seal-0.parquet · vtllms/sealqa at 55447f20d825a3c3af6c14613fe0ec13a9737fc0	2026-10-11 13:45
+https://huggingface.co/datasets/vtllms/sealqa/blob/eb5dfeb60cc9d5e3c9026eb2acaf485d9de35940/seal-0.parquet	seal-0.parquet · vtllms/sealqa at eb5dfeb60cc9d5e3c9026eb2acaf485d9de35940	2026-10-11 13:45
+https://huggingface.co/datasets/vtllms/sealqa/blob/55447f20d825a3c3af6c14613fe0ec13a9737fc0/README.md	README.md · vtllms/sealqa at 55447f20d825a3c3af6c14613fe0ec13a9737fc0	2026-10-11 13:45
+https://huggingface.co/datasets/vtllms/sealqa	vtllms/sealqa · Datasets at Hugging Face	2026-10-11 13:45
+https://in.investing.com/news/company-news/openai-introduces-browsecomp-a-benchmark-for-ai-internet-browsing-93CH-4769927	OpenAI introduces BrowseComp, a benchmark for AI internet browsing	2026-10-11 13:45
+https://github.com/openai/simple-evals	GitHub - openai/simple-evals · GitHub	2026-10-11 13:45
+https://ukgovernmentbeis.github.io/inspect_evals/evals/assistants/browse_comp	A Simple Yet Challenging Benchmark for Browsing Agents	2026-10-11 13:45
+https://openrouter.ai/benchmarks/browsecomp	BrowseComp Leaderboard | OpenRouter	2026-10-11 13:45
+https://metatext.io/datasets/apple/mkqa	apple/mkqa Dataset — Question Answering - Metatext	2026-10-11 13:45
+https://github.com/LEL-A/EuroInstructProject	LEL-A/EuroInstructProject: Instruction datasets from ...	2026-10-11 13:45
+https://arxiv.org/html/2104.12741v1	GermanQuAD and GermanDPR: Improving Non-English Question Answering and Passage R	2026-10-11 13:45
+https://kaggle.com/datasets/kalfirst/xlmrobertabasesquad2	xlm-roberta-base-squad2	2026-10-11 13:45
+https://huggingface.co/datasets/DiscoResearch/germanrag/commit/34ca41ad3a4018f8a300dd600631e26c46895fc2	minor changes in wording · DiscoResearch/germanrag at 34ca41a	2026-10-11 13:45
+https://potatoannotator.com/showcase/germanquad-german-qa	GermanQuAD: German Extractive Question Answering - Potato	2026-10-11 13:45

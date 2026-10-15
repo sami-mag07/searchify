@@ -1,0 +1,26 @@
+# Training des Rerankers (train/), eigene Umgebung .venv-train, NICHT die des Dienstes.
+# Der Dienst (requirements.txt) braucht transformers 4.44.2, das Training 5.17.0.
+#
+# torch zuerst und getrennt installieren, mit CUDA vom PyTorch-Index (nicht von PyPI):
+#   pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu126
+# cu126 laeuft mit jedem NVIDIA-Treiber ab 560. Mit Treiber ab 580 geht auch cu130.
+# Danach:
+#   pip install -r train/requirements-train.txt
+#
+# Gegen diese Versionen geprueft am 14.10.2026 (Rauchtest prepare_data.py + train_reranker.py --quick).
+torch==2.14.1
+sentence-transformers==6.1.0
+transformers==5.17.0
+datasets==5.0.1
+accelerate==1.15.0
+huggingface-hub==1.33.0
+tokenizers==0.23.3
+safetensors==0.8.0
+numpy==2.5.4
+pyarrow==26.0.0
+pandas==3.0.6
+scipy==1.18.1
+scikit-learn==1.9.1
+fsspec==2026.6.0
+requests==2.34.2
+tqdm==4.70.1

@@ -1,0 +1,10 @@
+{"id": "f-en-1", "query": "Who won the 2026 Nobel Prize in Physics?", "lang": "en", "answer_re": "Halzen.*IceCube|IceCube.*Halzen|Halzen"}
+{"id": "f-de-2", "query": "Wie hoch ist der Mindestlohn ab dem 1. Januar 2027?", "lang": "de", "answer_re": "14,60"}
+{"id": "f-de-3", "query": "Wie hoch ist die Beitragsbemessungsgrenze der Krankenversicherung 2026 monatlich?", "lang": "de", "answer_re": "5\\.?812,50"}
+{"id": "f-de-4", "query": "Wie hoch ist die Beitragsbemessungsgrenze der Rentenversicherung 2026 monatlich?", "lang": "de", "answer_re": "8\\.?450"}
+{"id": "f-en-5", "query": "What is the default value of io_method in PostgreSQL 18?", "lang": "en", "answer_re": "\\bworker\\b"}
+{"id": "f-en-6", "query": "Which PEP made free-threaded Python officially supported and in which version?", "lang": "en", "answer_re": "PEP 779"}
+{"id": "f-en-7", "query": "Which company acquired Tavily in 2026?", "lang": "en", "answer_re": "Nebius"}
+{"id": "f-en-8", "query": "How many documents are in the BrowseComp-Plus corpus?", "lang": "en", "answer_re": "100\\s?(K|k|000|\\.000)"}
+{"id": "f-en-9", "query": "What price did Bloomberg report for the Tavily acquisition?", "lang": "en", "answer_re": "275"}
+{"id": "f-de-10", "query": "Welche Programmiersprache nutzt das Datenbanksystem SQLite für seinen Kern?", "lang": "de", "answer_re": "\\bC\\b|ANSI-C"}

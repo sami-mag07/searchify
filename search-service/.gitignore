@@ -1,0 +1,30 @@
+# Secrets / Umgebung
+.env
+.env.*
+!.env.example
+
+# Private Eval-Ausgaben (niemals committen - enthalten ggf. Tavily-Vergleich)
+eval/private/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Modelle / Caches
+.cache/
+models/
+
+# OS
+.DS_Store
+
+# Training auf dem Laptop (train/LAPTOP.md): Daten, Logs, Zwischenstaende, Pakete
+train/data/
+train/logs/
+train/checkpoints/
+.venv-train/
+*.zip

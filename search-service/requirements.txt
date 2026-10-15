@@ -1,0 +1,33 @@
+# --- Dienst (app/) ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+httpx==0.28.1
+
+# Extraktion
+trafilatura==1.12.2
+resiliparse==1.0.9
+
+# Reranker (lokaler Cross-Encoder, CUDA/MPS wenn vorhanden)
+torch==2.14.1
+transformers==4.44.2
+
+# Optional: Seiten mit Chrome-TLS-Profil laden (FETCH_CLIENT=curl_cffi)
+curl_cffi==0.16.3
+
+# Optional: Reader rendert JS-Seiten (READER_RENDER, app/compat/render.py)
+playwright==1.63.0
+
+# Optionales Such-Backend ohne Key (SEARCH_BACKEND=ddgs)
+ddgs==9.16.0
+
+# Antwort-LLM ueber OpenAI-kompatiblen Wrapper (claude-code-api)
+openai==1.59.6
+
+# --- Eval (eval/) ---
+# ragas misst Faithfulness / Answer-Relevanz auf oeffentlicher Ground-Truth.
+ragas==0.2.9
+datasets==3.2.0
+
+# optionale, nicht importkritische Helfer fuer Dedup/Vergleich
+datasketch==1.6.5

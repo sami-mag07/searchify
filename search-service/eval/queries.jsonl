@@ -1,0 +1,30 @@
+{"id": "de-fakt-1", "query": "Wann wurde die Berliner Mauer geöffnet?", "lang": "de", "ground_truth": "Die Berliner Mauer wurde am 9. November 1989 geöffnet.", "answer_re": "November 1989"}
+{"id": "de-fakt-2", "query": "Wer ist der Autor des Romans Der Prozess?", "lang": "de", "ground_truth": "Franz Kafka ist der Autor des Romans Der Prozess.", "answer_re": "Kafka"}
+{"id": "de-fakt-3", "query": "Welche Hauptstadt hat Australien?", "lang": "de", "ground_truth": "Die Hauptstadt Australiens ist Canberra.", "answer_re": "Canberra"}
+{"id": "de-tech-1", "query": "Wofür steht die Abkürzung RAG bei KI-Systemen?", "lang": "de", "ground_truth": "RAG steht für Retrieval-Augmented Generation.", "answer_re": "Retrieval[- ]Augmented[- ]Generation"}
+{"id": "de-recht-1", "query": "Was regelt die DSGVO?", "lang": "de", "ground_truth": "Die DSGVO regelt den Schutz personenbezogener Daten in der EU.", "answer_re": "personenbezogen"}
+{"id": "en-fact-1", "query": "Who wrote the theory of general relativity?", "lang": "en", "ground_truth": "Albert Einstein developed the theory of general relativity.", "answer_re": "Einstein"}
+{"id": "en-fact-2", "query": "What is the boiling point of water at sea level in Celsius?", "lang": "en", "ground_truth": "Water boils at 100 degrees Celsius at sea level.", "answer_re": "100\\s?(°|degrees|º)"}
+{"id": "en-fact-3", "query": "What is the capital of Canada?", "lang": "en", "ground_truth": "The capital of Canada is Ottawa.", "answer_re": "Ottawa"}
+{"id": "en-tech-1", "query": "What does the acronym HTTP stand for?", "lang": "en", "ground_truth": "HTTP stands for HyperText Transfer Protocol.", "answer_re": "hypertext transfer protocol"}
+{"id": "en-tech-2", "query": "Which company created the Python programming language reference implementation CPython?", "lang": "en", "ground_truth": "CPython is maintained by the Python Software Foundation; Python was created by Guido van Rossum.", "answer_re": "Python Software Foundation|Guido"}
+{"id": "de-fakt-4", "query": "Wie hoch ist die Zugspitze?", "lang": "de", "answer_re": "2[.\\s]?962"}
+{"id": "de-fakt-5", "query": "Was ist die Halbwertszeit von Kohlenstoff-14?", "lang": "de", "answer_re": "5[.\\s]?730|5[.\\s]?700"}
+{"id": "de-fakt-6", "query": "In welchem Jahr wurde die Universität Heidelberg gegründet?", "lang": "de", "answer_re": "1386"}
+{"id": "de-fakt-7", "query": "Wie viele Bundesländer hat Österreich?", "lang": "de", "answer_re": "neun|\\b9 Bundesl"}
+{"id": "de-schule-1", "query": "Was ist ein Nachteilsausgleich in der Schule?", "lang": "de", "answer_re": "Beeinträchtigung|Behinderung|Benachteiligung|Förderbedarf|Lernstörung|Legasthenie|Teilleistungsstörung"}
+{"id": "en-tech-3", "query": "What is the default port for HTTPS?", "lang": "en", "answer_re": "\\b443\\b"}
+{"id": "en-fact-4", "query": "Who founded Nvidia?", "lang": "en", "answer_re": "Jensen Huang"}
+{"id": "en-tech-4", "query": "What is the time complexity of binary search?", "lang": "en", "answer_re": "log\\s?n|log₂|logarithmic|O\\(log"}
+{"id": "en-fact-5", "query": "Which planet in the solar system has the most moons?", "lang": "en", "answer_re": "Saturn"}
+{"id": "en-tech-5", "query": "In which year was the paper Attention Is All You Need published?", "lang": "en", "answer_re": "2017"}
+{"id": "de-hart-1", "query": "Wie viele Einwohner hatte Oranienburg Ende 2023?", "lang": "de", "answer_re": "4[67][.\\s]?\\d{3}"}
+{"id": "de-hart-2", "query": "Seit wann gilt das Onlinezugangsgesetz OZG?", "lang": "de", "answer_re": "2017"}
+{"id": "de-hart-3", "query": "Wie lang ist der Rhein insgesamt in Kilometern?", "lang": "de", "answer_re": "1[.\\s]?2[0-3]\\d"}
+{"id": "de-hart-4", "query": "Welche Programmiersprache nutzt das Framework Django?", "lang": "de", "answer_re": "Python"}
+{"id": "de-hart-5", "query": "Wer erfand den Buchdruck mit beweglichen Lettern in Europa?", "lang": "de", "answer_re": "Gutenberg"}
+{"id": "en-hart-1", "query": "What is the maximum context window of the original GPT-4 model in tokens?", "lang": "en", "answer_re": "8[,.]?192|8k|32[,.]?768|32k"}
+{"id": "en-hart-2", "query": "Which element has the atomic number 74?", "lang": "en", "answer_re": "tungsten|wolfram"}
+{"id": "en-hart-3", "query": "What license is SQLite released under?", "lang": "en", "answer_re": "public domain"}
+{"id": "en-hart-4", "query": "How many bones are in the adult human body?", "lang": "en", "answer_re": "\\b206\\b"}
+{"id": "en-hart-5", "query": "Who directed the film Spirited Away?", "lang": "en", "answer_re": "Miyazaki"}

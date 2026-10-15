@@ -1,0 +1,361 @@
+Title: GitHub - jianjungki/tavily-open: Open-source replacement for Tavily, powered by SearXNG and Crawl4AI. Provides a robust search and crawling API for your AI and RAG applications.
+
+URL Source: https://github.com/jianjungki/tavily-open
+
+Markdown Content:
+## TrailSearch
+
+[](https://github.com/jianjungki/tavily-open#trailsearch)
+[![Image 1: License: MIT](https://camo.githubusercontent.com/fdf2982b9f5d7489dcf44570e714e3a15fce6253e0cc6b5aa61a075aac2ff71b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c6963656e73652d4d49542d79656c6c6f772e737667)](https://github.com/jianjungki/tavily-open/blob/main/LICENSE)[![Image 2: Python 3.9+](https://camo.githubusercontent.com/e115a70b47171326abc8f13ca55b2fafacdcafce1f251fed5b1ead0195717f56/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f707974686f6e2d332e392b2d626c75652e737667)](https://www.python.org/downloads/)
+
+[中文文档](https://github.com/jianjungki/tavily-open/blob/main/README_CN.md) | English
+
+TrailSearch is a self-hosted web search, crawl, and content extraction API. It combines low-cost search routing, local SQLite FTS reuse, SearXNG, optional Brave Search fallback, Redis caching, Reader/HTTP/browser extraction stages, and asynchronous backfill so foreground requests stay fast while difficult pages are retried later.
+
+The package and CLI name are `trailsearch`; the API exposes both the legacy `/search` response and Tavily-like `/tavily/search` and `/tavily/extract` routes.
+
+## Highlights
+
+[](https://github.com/jianjungki/tavily-open#highlights)
+*   **Low-cost search router**: query the local SQLite index first, then SearXNG, and only call Brave Search when external search is explicitly enabled.
+*   **Tavily-like API surface**: `POST /tavily/search`, `POST /tavily/extract`, optional answer generation, chunks, raw content, domain filters, and search-only mode.
+*   **Benchmark-informed extraction**: configurable staged extraction with `reader_first`, `http_first`, or `quality_gated` strategies.
+*   **Local content reuse**: successful extractions are written back to SQLite FTS and Redis, reducing repeated fetches for later queries.
+*   **Async backfill**: failed foreground crawls are queued and retried with exponential backoff instead of blocking user requests.
+*   **Distributed-ready**: Redis can be used as the shared backfill queue, while etcd can register and discover API, crawler, and Reader nodes.
+*   **Browser fallback options**: Obscura CLI, Browserless/CDP, and local Playwright are late-stage fallbacks for pages that need rendering.
+
+## Architecture
+
+[](https://github.com/jianjungki/tavily-open#architecture)
+
+```
+client
+  -> FastAPI app
+      -> SearchRouter
+          -> local SQLite FTS index
+          -> SearXNG
+          -> Brave Search, only when EXTERNAL_SEARCH_ENABLED=true
+      -> local-index content reuse for known URLs
+      -> Redis crawl/search cache
+      -> extraction pipeline
+          -> Reader, HTTP extractor, Obscura, Browserless/CDP, local Playwright
+          -> order controlled by CRAWL_EXTRACTION_STRATEGY
+      -> quality score, chunks, optional extractive answer
+      -> Redis cache + SQLite local index writeback
+      -> failed URLs queued for async backfill
+```
+
+Core modules:
+
+| Module | Role |
+| --- | --- |
+| `src/trailsearch/main.py` | FastAPI app, request models, routing, Tavily-like response shaping, lifecycle wiring |
+| `src/trailsearch/search_providers.py` | Local, SearXNG, Brave, and router search providers |
+| `src/trailsearch/crawler.py` | Staged extraction orchestration and cache-aware crawl results |
+| `src/trailsearch/extractor.py` | Lightweight HTTP/trafilatura extraction path |
+| `src/trailsearch/reader.py` | Reader service client, multi-endpoint hashing, and failover |
+| `src/trailsearch/browser.py` | Obscura, remote Browserless/CDP, and local Playwright fallback backends |
+| `src/trailsearch/local_index.py` | SQLite document index, FTS search, and local backfill job storage |
+| `src/trailsearch/backfill.py` | Background worker for retrying failed crawl jobs |
+| `src/trailsearch/backfill_queue.py` | Redis-backed distributed backfill queue |
+| `src/trailsearch/service_registry.py` | etcd service registration and discovery |
+| `src/trailsearch/cache.py` | Redis crawl and search cache |
+| `src/trailsearch/quality.py` | Content quality scoring, tokenization, and chunking |
+
+For a deeper architecture note, see [ARCHITECTURE.md](https://github.com/jianjungki/tavily-open/blob/main/ARCHITECTURE.md).
+
+## Quick Start
+
+[](https://github.com/jianjungki/tavily-open#quick-start)
+### Docker
+
+[](https://github.com/jianjungki/tavily-open#docker)
+For the complete local stack, copy the demo environment and use the dedicated Compose file:
+
+cp .env.demo.example .env.demo
+docker compose --env-file .env.demo -f docker-compose.demo.yml up -d --build
+
+This starts the API, Redis, SearXNG, Reader, and Browserless as one coherent stack. The API is the only service published to the host.
+
+| Service | URL |
+| --- | --- |
+| Main API | `http://127.0.0.1:8000` |
+| Swagger UI | `http://127.0.0.1:8000/docs` |
+| ReDoc | `http://127.0.0.1:8000/redoc` |
+
+Enable the optional Cloudflare Tunnel after setting `CLOUDFLARE_TUNNEL_TOKEN`:
+
+docker compose --env-file .env.demo -f docker-compose.demo.yml --profile tunnel up -d --build
+
+The base `docker-compose.yml` remains available for lightweight development profiles. Do not combine it with `docker-compose.demo.yml` in the same run.
+
+### Distributed Compose
+
+[](https://github.com/jianjungki/tavily-open#distributed-compose)
+
+docker compose -f docker-compose.distributed.yml up -d --build
+
+The distributed stack starts Redis, etcd, SearXNG, two Reader nodes, one public app node, and two crawler worker nodes. Redis is the shared backfill queue; etcd registers API/crawler/Reader endpoints.
+
+### Manual Install
+
+[](https://github.com/jianjungki/tavily-open#manual-install)
+
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e ".[dev]"
+cp .env.example .env
+trailsearch
+
+On macOS/Linux, activate with `source .venv/bin/activate`. The local CLI runs on `http://0.0.0.0:3000` by default.
+
+For manual local runs without a Reader service, set `READER_ENABLED=false` or point `READER_URL` / `READER_URLS` at a reachable Reader instance before starting the API.
+
+If local browser fallback is enabled, install Chromium once:
+
+python -m playwright install chromium
+
+### Legacy Search
+
+[](https://github.com/jianjungki/tavily-open#legacy-search)
+
+POST /search
+Content-Type: application/json
+
+{
+  "query": "crawler benchmark extraction",
+  "limit": 5,
+  "mode": "crawl",
+  "provider": "router",
+  "response_format": "legacy",
+  "search_depth": "basic",
+  "include_answer": false,
+  "include_raw_content": false,
+  "chunks_per_source": 0,
+  "include_domains": [],
+  "exclude_domains": [],
+  "days": 7,
+  "topic": "general"
+}
+
+**New Parameters:**
+
+*   `days` (optional): Filter search results by time range in days. Maps to SearXNG time_range: ≤1→"day", ≤7→"week", ≤30→"month", >30→"year"
+*   `topic` (optional): Classify search by topic to route to appropriate engines. Options: `general`, `news`, `academic`, `code`, `images`, `videos`, `social`, `shopping`
+
+Set `"mode": "search"` to return search hits without crawling. Set `"response_format": "tavily"` to return the Tavily-like shape from `/search`.
+
+### Tavily-like Search
+
+[](https://github.com/jianjungki/tavily-open#tavily-like-search)
+
+POST /tavily/search
+Content-Type: application/json
+
+{
+  "query": "reader benchmark extraction",
+  "max_results": 5,
+  "mode": "crawl",
+  "search_depth": "basic",
+  "include_answer": true,
+  "include_raw_content": false,
+  "chunks_per_source": 2,
+  "include_domains": [],
+  "exclude_domains": [],
+  "provider": "router",
+  "days": 7,
+  "topic": "general"
+}
+
+Set `"mode": "search"` to return provider titles and snippets without fetching result pages. The default `"crawl"` mode keeps the full HTTP, Reader, and browser extraction pipeline.
+
+Example response fields:
+
+| Field | Meaning |
+| --- | --- |
+| `query` | Original query |
+| `answer` | Optional non-LLM extractive answer assembled from top matching source sentences |
+| `results` | Ranked extracted results with `title`, `url`, `content`, `score`, and `source_stage` |
+| `chunks` | Optional per-result text chunks when `chunks_per_source > 0` |
+| `raw_content` | Optional full cleaned content when `include_raw_content=true` |
+| `failed_results` | URLs that failed foreground extraction |
+| `backfill` | Queue state when failed URLs were handed to async backfill |
+| `timings_ms` | Search, cache, extraction, text processing, and writeback timings |
+
+### Extract Known URLs
+
+[](https://github.com/jianjungki/tavily-open#extract-known-urls)
+
+POST /extract
+POST /tavily/extract
+
+{
+  "urls": ["https://example.com/article"],
+  "query": "optional relevance query",
+  "include_raw_content": true,
+  "chunks_per_source": 2
+}
+
+Successful extract results are written into the local SQLite index for later reuse.
+
+### Operations Endpoints
+
+[](https://github.com/jianjungki/tavily-open#operations-endpoints)
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /cache/stats` | Redis cache status |
+| `POST /cache/clear` | Clear cached crawl/search data |
+| `GET /backfill/stats` | Backfill queue status by job state |
+| `GET /backfill/jobs?limit=50` | Recent backfill jobs |
+| `POST /backfill/enqueue` | Manually enqueue failed or known URLs |
+| `POST /backfill/run-once` | Process one due backfill batch immediately |
+| `GET /registry/services/{service_name}` | Discover etcd-registered service instances |
+
+## Configuration
+
+[](https://github.com/jianjungki/tavily-open#configuration)
+Most settings live in [.env.example](https://github.com/jianjungki/tavily-open/blob/main/.env.example). Common groups:
+
+| Area | Variables |
+| --- | --- |
+| API | `API_HOST`, `API_PORT`, `APP_PORT`, `APP_READER_PORT` |
+| SearXNG | `SEARXNG_URL`, `SEARXNG_HOST`, `SEARXNG_PORT`, `SEARXNG_BASE_PATH`, `SEARCH_LANGUAGE` |
+| Search routing | `SEARCH_PROVIDER`, `SEARCH_ROUTE_PROVIDERS`, `EXTERNAL_SEARCH_ENABLED`, `EXTERNAL_SEARCH_FALLBACK_ONLY`, `BRAVE_SEARCH_API_KEY` |
+| Local index | `LOCAL_INDEX_ENABLED`, `LOCAL_INDEX_PATH`, `LOCAL_INDEX_MIN_RESULTS` |
+| Redis cache | `CACHE_ENABLED`, `REDIS_URL`, `CACHE_TTL_HOURS`, `SEARCH_CACHE_TTL_SECONDS` |
+| Extraction | `CRAWL_EXTRACTION_STRATEGY`, `CRAWL_QUALITY_GATE_ENABLED`, `CRAWL_MIN_QUALITY_SCORE` |
+| HTTP stage | `HTTP_EXTRACTOR_ENABLED`, `HTTP_EXTRACTOR_TIMEOUT_SECONDS`, `HTTP_EXTRACTOR_MAX_CONCURRENCY`, `HTTP_EXTRACTOR_MIN_CONTENT_LENGTH` |
+| Reader stage | `READER_ENABLED`, `READER_URL`, `READER_URLS`, `READER_TIMEOUT_SECONDS`, `READER_MAX_CONCURRENCY`, `READER_MIN_CONTENT_LENGTH` |
+| Browser fallback | `BROWSER_BACKEND`, `BROWSERLESS_WS_URL`, `BROWSER_TEXT_MODE`, `BROWSER_LIGHT_MODE`, `BROWSER_LOCAL_FALLBACK_ENABLED`, `OBSCURA_BINARY` |
+| Backfill | `BACKFILL_ENABLED`, `BACKFILL_QUEUE_BACKEND`, `BACKFILL_BATCH_SIZE`, `BACKFILL_MAX_ATTEMPTS` |
+| Service registry | `ETCD_ENABLED`, `ETCD_ENDPOINTS`, `ETCD_DISCOVER_READERS`, `ETCD_REGISTER_SELF`, `ETCD_REGISTER_READER_URLS` |
+| Anti-crawl | `ANTI_CRAWL_ENABLED`, `ENABLE_USER_AGENT_ROTATION`, `ENABLE_REQUEST_DELAY`, `PROXY_LIST` |
+
+Extraction strategies:
+
+| Strategy | Behavior |
+| --- | --- |
+| `reader_first` | Try Reader before HTTP/browser. This is the benchmark-informed quality default when Reader is available. |
+| `http_first` | Try lightweight HTTP extraction first, then Reader/browser. This is the default main Docker app behavior. |
+| `quality_gated` | Try HTTP first, but escalate low-quality content to Reader. |
+
+Browser backend choices:
+
+| Backend | Behavior |
+| --- | --- |
+| `local` | Use local Playwright fallback only when enabled |
+| `remote` | Use Browserless/CDP only |
+| `obscura` | Use Obscura CLI only |
+| `hybrid` | Try Obscura, then Browserless/CDP, then local Playwright |
+
+## Benchmark
+
+[](https://github.com/jianjungki/tavily-open#benchmark)
+The current stable benchmark report is available in [benchmark-all-stable-report.md](https://github.com/jianjungki/tavily-open/blob/main/benchmark-all-stable-report.md) and [benchmark-all-stable-report.html](https://github.com/jianjungki/tavily-open/blob/main/benchmark-all-stable-report.html).
+
+Latest checked-in stable run:
+
+| Rank | Profile | Overall | Usable | Recall | JS | Boilerplate | Median ms | URLs/s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | `reader_service` | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 15.93 | 376.65 |
+| 2 | `http_extractor` | 52.6% | 66.7% | 66.7% | 0.0% | 100.0% | 463.03 | 12.96 |
+| 3 | `scrapling_static` | 29.2% | 16.7% | 66.7% | 0.0% | 0.0% | 221.41 | 27.10 |
+| 4 | `local_playwright` | 12.6% | 16.7% | 16.7% | 0.0% | 0.0% | 5341.88 | 1.12 |
+
+Run context:
+
+| Item | Value |
+| --- | --- |
+| Rounds | `2` |
+| URL count | `6` |
+| Profiles | `http_extractor`, `reader_service`, `scrapling_static`, `local_playwright` |
+| Score weights | quality 45% + capability 25% + throughput 20% + latency 10% |
+
+Takeaways:
+
+*   Reader produced the best quality and throughput in the deterministic fixture benchmark, so `reader_first` is preferred when Reader capacity is available.
+*   HTTP extraction is still a useful static-page path and works well as the lightweight default when the Reader service is not running.
+*   Browser rendering is expensive and should remain a late fallback for pages that static/Reader extraction cannot handle.
+*   Benchmark numbers depend on environment, optional dependencies, browser availability, and site behavior. Use them as extraction-order guidance, not as absolute production guarantees.
+
+Run a local benchmark:
+
+$env:TRAILSEARCH_RUN_BENCHMARK = "1"
+$env:TRAILSEARCH_BENCHMARK_PRESET = "fast"
+$env:TRAILSEARCH_BENCHMARK_OUTPUT = "benchmark-results.json"
+pytest tests/test_benchmark.py -m benchmark -s --no-cov
+python scripts/render_benchmark_report.py benchmark-results.json --markdown benchmark-report.md --html benchmark-report.html
+
+Useful options:
+
+| Variable | Purpose |
+| --- | --- |
+| `TRAILSEARCH_BENCHMARK_PRESET=fast` | HTTP, Reader, Scrapling static, and Reader pipeline profiles |
+| `TRAILSEARCH_BENCHMARK_PRESET=quick` | Adds local Playwright comparison |
+| `TRAILSEARCH_BENCHMARK_PRESET=browser` | Focuses on browser-capable profiles |
+| `TRAILSEARCH_BENCHMARK_PRESET=all` | Runs all available profiles |
+| `TRAILSEARCH_BENCHMARK_ROUNDS=3` | Increase measurement rounds |
+| `TRAILSEARCH_BENCHMARK_INSTALL_BROWSERS=1` | Allow benchmark to install missing Playwright browsers |
+| `TRAILSEARCH_BENCHMARK_PROFILES=http_extractor,reader_service` | Select explicit profiles |
+
+Optional Scrapling profiles require:
+
+pip install "scrapling[fetchers]"
+scrapling install
+
+## Development
+
+[](https://github.com/jianjungki/tavily-open#development)
+
+pip install -e ".[dev]"
+pytest
+pytest --cov=trailsearch --cov-report=html
+ruff check src/ tests/
+black src/ tests/
+mypy src/
+
+Benchmark tests are skipped unless `TRAILSEARCH_RUN_BENCHMARK=1` is set.
+
+## Project Layout
+
+[](https://github.com/jianjungki/tavily-open#project-layout)
+
+```
+.
+├── src/trailsearch/                  # Python package
+├── tests/                          # Unit, integration, and optional benchmark tests
+├── scripts/                        # Benchmark report render/merge helpers
+├── searxng/settings.yml            # Local SearXNG config
+├── data/                           # Local SQLite index path for development
+├── docker-compose.yml              # Local stack
+├── docker-compose.distributed.yml  # Redis + etcd + multi-node stack
+├── .env.example                    # Complete environment reference
+├── CACHE_GUIDE.md                  # Cache usage notes
+├── DOCKER_PROFILES.md              # Compose profile notes
+├── ARCHITECTURE.md     # Architecture details
+└── benchmark-all-stable-report.md  # Checked-in stable benchmark report
+```
+
+## Deployment Notes
+
+[](https://github.com/jianjungki/tavily-open#deployment-notes)
+SearXNG must expose JSON search results. The local [searxng/settings.yml](https://github.com/jianjungki/tavily-open/blob/main/searxng/settings.yml) includes JSON support. If you manage your own SearXNG instance, make sure the search formats include:
+
+search:
+  formats:
+    - html
+    - json
+
+For production:
+
+*   Keep `EXTERNAL_SEARCH_ENABLED=false` unless you intentionally want Brave API fallback.
+*   Use Redis for shared crawl/search cache and distributed backfill queue.
+*   Use etcd when Reader/crawler nodes need dynamic discovery.
+*   Keep browser rendering concurrency low; it is the most expensive stage.
+*   Put a reverse proxy in front of the API for TLS, auth, request size limits, and rate limits.
+
+## License
+
+[](https://github.com/jianjungki/tavily-open#license)
+This project is licensed under the [MIT License](https://github.com/jianjungki/tavily-open/blob/main/LICENSE).

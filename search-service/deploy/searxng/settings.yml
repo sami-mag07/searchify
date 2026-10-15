@@ -1,0 +1,82 @@
+# SearXNG-Konfiguration fuer den RAG-Such-Dienst.
+# Wichtig: JSON-Ausgabe ist aktiviert (search.formats enthaelt 'json'),
+# damit app/search.py die Ergebnisse maschinell lesen kann.
+#
+# Das Secret steht NICHT hier: der Platzhalter "ultrasecretkey" wird vom
+# offiziellen searxng/searxng-Docker-Entrypoint durch den Wert der
+# Umgebungsvariable SEARXNG_SECRET ersetzt (siehe docker-compose.yml / .env).
+
+use_default_settings:
+  engines:
+    # Nur diese Engines laden (sonst fragt SearXNG ~80 Default-Engines ab).
+    keep_only:
+      - bing
+      - yahoo
+      - yandex
+      - wikipedia
+      - bing news
+
+general:
+  instance_name: "RAG Search Backend"
+  # Keine oeffentliche Instanz - nur interner Konsum durch den Dienst.
+  donation_url: false
+  contact_url: false
+
+server:
+  secret_key: "ultrasecretkey"   # Platzhalter, wird via SEARXNG_SECRET ersetzt
+  limiter: false                 # kein Rate-Limiter noetig, da nur intern
+  image_proxy: false
+  method: "GET"
+
+search:
+  # JSON zwingend, damit der Client die Ergebnisse parsen kann.
+  formats:
+    - html
+    - json
+  safe_search: 1
+  autocomplete: ""
+  default_lang: "auto"
+  # Nach einem Timeout die Engine NICHT sperren (Default 5 s): sonst bleibt fuer
+  # einige Anfragen nur Bing uebrig, und die Qualitaet faellt (gemessen 100 -> 73 %).
+  ban_time_on_fail: 0
+  max_ban_time_on_fail: 0
+
+ui:
+  static_use_hash: true
+
+outgoing:
+  # Langsame Engines nicht abwarten: Tempo vor Vollstaendigkeit.
+  request_timeout: 1.0
+  max_request_timeout: 3.0
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true
+
+# Verlaesslich ohne CAPTCHA (Test 2026 von Rechenzentrums-IPs: Seznam 34/34,
+# Yahoo 33/34, DDG 32/34). Google und Brave sperren nach wenigen Anfragen.
+# Seznam liefert, ist aber langsam (Timeouts ab 1.5 s) und SearXNG wartet auf
+# die langsamste Engine, deshalb draussen. DuckDuckGo sperrt Heim-IPs nach ~100
+# Anfragen (CAPTCHA); es bleibt ueber ddgs als Fallback im Dienst.
+# 1.0 s, nicht weniger: Yahoo antwortet in 0.53-0.96 s. Bei 0.7 s laeuft Yahoo oft
+# in den Timeout, SearXNG sperrt die Engine dann zeitweise, und nur Bing bleibt,
+# das bei deutschen W-Fragen Woerterbuchseiten liefert (Top-1 fiel von 100 auf 77 %).
+engines:
+  - name: bing
+    disabled: false
+  - name: yahoo
+    disabled: false
+    # Yahoo ist die langsame, aber fuer DE-Fragen wichtige Haelfte. Normal 0.5-0.95 s,
+    # in ~3 % haengt eine Anfrage laenger. Grosszuegig, weil der Dienst nach 1.0 s
+    # eine Zweitanfrage schickt (SPLIT_HEDGE_MS); die erste Antwort gewinnt.
+    timeout: 2.5
+  - name: wikipedia
+    disabled: false
+  # Fuer Spanisch/Franzoesisch: Bing liefert ueber SearXNG bei es/fr 0 Treffer und
+  # ohne Sprache Unsinn. Yandex: 15 Treffer in ~0.5 s, gute ES/FR-Quellen
+  # (gemessen 11.10.2026; Qwant CAPTCHA, DDG Timeout, Brave gedrosselt).
+  # Der Dienst fragt Yandex nur bei es/fr (SEARXNG_SPLIT_ENGINES_ES/_FR).
+  - name: yandex
+    disabled: false
+  # News fuer /serper/news und topic=news (Kategorie "news").
+  - name: bing news
+    disabled: false

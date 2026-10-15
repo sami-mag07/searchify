@@ -1,0 +1,1354 @@
+[
+ {
+  "id": "de-fakt-1",
+  "A": {
+   "wall": 669.6917499648407,
+   "server_total": 666.685,
+   "engine_total": {
+    "wikipedia": 20.154,
+    "bing": 212.432,
+    "yahoo": 665.731
+   },
+   "engine_load": {
+    "wikipedia": 19.465,
+    "bing": 207.627,
+    "yahoo": 660.782
+   },
+   "urls": [
+    "https://www.duden.de/rechtschreibung/wann_dann_wenn",
+    "https://de.wikipedia.org/wiki/Berliner_Mauer",
+    "https://www.dwds.de/wb/wann",
+    "https://www.ddr-aufarbeitung.de/fall-von-berliner-mauer-grenze/die-grenz%C3%B6ffnung/",
+    "https://www.duden.de/suchen/dudenonline/wann",
+    "https://www.einbuergerung-bitte.de/fragen/191",
+    "https://www.wortbedeutung.info/wann/",
+    "https://berlinermaueronline.de/faq/index.htm",
+    "https://de.m.wiktionary.org/wiki/wann",
+    "https://alleantworten.de/wann-wurde-die-berliner-mauer-geoeffnet",
+    "https://m.youtube.com/watch?v=x0yFbkLRfc8",
+    "https://www.stiftung-berliner-mauer.de/de/themen/die-berliner-mauer",
+    "https://korrektur.de/wann-und-wenn-unterschied",
+    "https://berlinermaueronline.de/geschichte/mauerfall.htm",
+    "https://m.youtube.com/watch?v=qe80EeU8cT8",
+    "https://en.m.wiktionary.org/wiki/wann",
+    "https://kurz.wortbedeutung.info/wann/"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 1011.9315419578925,
+   "server_total": 1008.622,
+   "engine_total": {
+    "bing": 288.943
+   },
+   "engine_load": {
+    "bing": 282.74
+   },
+   "urls": [
+    "https://www.duden.de/rechtschreibung/wann_dann_wenn",
+    "https://www.dwds.de/wb/wann",
+    "https://www.duden.de/suchen/dudenonline/wann",
+    "https://www.wortbedeutung.info/wann/",
+    "https://de.m.wiktionary.org/wiki/wann",
+    "https://m.youtube.com/watch?v=x0yFbkLRfc8",
+    "https://korrektur.de/wann-und-wenn-unterschied",
+    "https://m.youtube.com/watch?v=qe80EeU8cT8",
+    "https://en.m.wiktionary.org/wiki/wann",
+    "https://kurz.wortbedeutung.info/wann/"
+   ],
+   "unresponsive": [
+    [
+     "yahoo",
+     "timeout"
+    ]
+   ]
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 339.0,
+    "yahoo": 622.4
+   },
+   "errors": {},
+   "total_ms": 624.9,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 17,
+  "n_B": 10,
+  "n_C": 17,
+  "ov10_A": 0.8,
+  "ov10_B": 0.5,
+  "ovall_B": 1.0
+ },
+ {
+  "id": "de-fakt-2",
+  "A": {
+   "wall": 262.4139169929549,
+   "server_total": 258.655,
+   "engine_total": {
+    "wikipedia": 24.904,
+    "bing": 257.274
+   },
+   "engine_load": {
+    "wikipedia": 23.893,
+    "bing": 250.232
+   },
+   "urls": [
+    "https://www.duden.de/rechtschreibung/wer_Interrogativpronomen",
+    "https://de.wiktionary.org/wiki/wer",
+    "https://www.dwds.de/wb/wer",
+    "https://de.wikipedia.org/wiki/Wer",
+    "https://en.wikipedia.org/wiki/Wer_(film)",
+    "https://www.wortbedeutung.info/wer/",
+    "https://www.youtube.com/watch?v=qWZhyzysBpY",
+    "https://www.youtube.com/watch?v=e15fo2fZEeA",
+    "https://www.duden.de/suchen/dudenonline/wer",
+    "https://www.imdb.com/title/tt2229511/"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ],
+    [
+     "yahoo",
+     "Suspended: timeout"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 159.69858295284212,
+   "server_total": 157.42,
+   "engine_total": {
+    "bing": 156.437
+   },
+   "engine_load": {
+    "bing": 150.974
+   },
+   "urls": [
+    "https://www.duden.de/rechtschreibung/wer_Interrogativpronomen",
+    "https://de.wiktionary.org/wiki/wer",
+    "https://www.dwds.de/wb/wer",
+    "https://de.wikipedia.org/wiki/Wer",
+    "https://en.wikipedia.org/wiki/Wer_(film)",
+    "https://www.wortbedeutung.info/wer/",
+    "https://www.youtube.com/watch?v=qWZhyzysBpY",
+    "https://www.youtube.com/watch?v=e15fo2fZEeA",
+    "https://www.duden.de/suchen/dudenonline/wer",
+    "https://www.imdb.com/title/tt2229511/"
+   ],
+   "unresponsive": [
+    [
+     "yahoo",
+     "Suspended: timeout"
+    ]
+   ]
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 510.3,
+    "yahoo": 601.9
+   },
+   "errors": {},
+   "total_ms": 603.5,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 10,
+  "n_B": 10,
+  "n_C": 17,
+  "ov10_A": 0.5,
+  "ov10_B": 0.5,
+  "ovall_B": 1.0
+ },
+ {
+  "id": "de-fakt-3",
+  "A": {
+   "wall": 622.8418750688434,
+   "server_total": 618.394,
+   "engine_total": {
+    "wikipedia": 20.017,
+    "bing": 379.554,
+    "yahoo": 616.465
+   },
+   "engine_load": {
+    "wikipedia": 18.269,
+    "bing": 371.839,
+    "yahoo": 607.016
+   },
+   "urls": [
+    "https://www.duden.de/suchen/dudenonline/welche",
+    "https://de.wikipedia.org/wiki/Canberra",
+    "https://www.duden.de/sprachwissen/sprachratgeber/Welche-Form-ist-richtig-welche-welchen-oder-welches",
+    "https://de.wikipedia.org/wiki/Australien",
+    "https://de.wiktionary.org/wiki/welche",
+    "https://www.allgemein-bildung.de/fragen/wie-heisst-die-hauptstadt-von-australien.html",
+    "https://www.dwds.de/wb/welcher",
+    "https://en.wikipedia.org/wiki/Canberra",
+    "https://www.scribbr.de/wissenschaftliches-schreiben/welche-welcher-welches-relativpronomen/",
+    "https://www.australia.com/de-de/facts-and-planning/about-australia/cities-states-and-territories.html",
+    "https://www.wortbedeutung.info/welche/",
+    "https://de.emitain.com/australiens-hauptstadt/",
+    "https://www.youtube.com/watch?v=wzPy5Qn0yWY",
+    "https://www.wissen-24.org/hauptstadt-von-australien/",
+    "https://www.youtube.com/watch?v=1mv0Tc5UP_k",
+    "https://www.deutschplus.net/pages/Fragepronomen_welcher",
+    "https://studyflix.de/deutsch/welchen-welcher-welches-8102"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 773.2390830060467,
+   "server_total": 770.524,
+   "engine_total": {
+    "bing": 269.885,
+    "yahoo": 769.213
+   },
+   "engine_load": {
+    "bing": 262.271,
+    "yahoo": 761.688
+   },
+   "urls": [
+    "https://www.duden.de/suchen/dudenonline/welche",
+    "https://de.wikipedia.org/wiki/Canberra",
+    "https://www.duden.de/sprachwissen/sprachratgeber/Welche-Form-ist-richtig-welche-welchen-oder-welches",
+    "https://de.wikipedia.org/wiki/Australien",
+    "https://de.wiktionary.org/wiki/welche",
+    "https://www.allgemein-bildung.de/fragen/wie-heisst-die-hauptstadt-von-australien.html",
+    "https://www.dwds.de/wb/welcher",
+    "https://en.wikipedia.org/wiki/Canberra",
+    "https://www.scribbr.de/wissenschaftliches-schreiben/welche-welcher-welches-relativpronomen/",
+    "https://www.australia.com/de-de/facts-and-planning/about-australia/cities-states-and-territories.html",
+    "https://www.wortbedeutung.info/welche/",
+    "https://de.emitain.com/australiens-hauptstadt/",
+    "https://www.youtube.com/watch?v=wzPy5Qn0yWY",
+    "https://www.wissen-24.org/hauptstadt-von-australien/",
+    "https://www.youtube.com/watch?v=1mv0Tc5UP_k",
+    "https://www.deutschplus.net/pages/Fragepronomen_welcher",
+    "https://studyflix.de/deutsch/welchen-welcher-welches-8102"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 149.4,
+    "yahoo": 445.1
+   },
+   "errors": {},
+   "total_ms": 447.0,
+   "per_engine": {
+    "yahoo": 7,
+    "bing": 10
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 0.9,
+  "ov10_B": 0.9,
+  "ovall_B": 0.8823529411764706
+ },
+ {
+  "id": "de-tech-1",
+  "A": {
+   "wall": 550.3845830680802,
+   "server_total": 546.596,
+   "engine_total": {
+    "wikipedia": 21.578,
+    "bing": 178.377,
+    "yahoo": 544.58
+   },
+   "engine_load": {
+    "wikipedia": 20.698,
+    "bing": 171.47,
+    "yahoo": 535.917
+   },
+   "urls": [
+    "https://www.duden.de/rechtschreibung/wofuer",
+    "https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation",
+    "https://www.dwds.de/wb/wof%C3%BCr",
+    "https://azure.microsoft.com/de-de/resources/cloud-computing-dictionary/what-is-retrieval-augmented-generation-rag",
+    "https://www.wortbedeutung.info/wof%C3%BCr/",
+    "https://www.ibm.com/de-de/think/topics/retrieval-augmented-generation",
+    "https://de.wiktionary.org/wiki/wof%C3%BCr",
+    "https://www.iese.fraunhofer.de/blog/retrieval-augmented-generation-rag/",
+    "https://blog.leo.org/2026/09/18/ist-es-etwas-wofuer-oder-etwas-fuer-das/",
+    "https://www.moin.ai/chatbot-lexikon/retrieval-augmented-generation-rag",
+    "https://www.duden.de/suchen/dudenonline/wof%C3%BCr",
+    "https://aws.amazon.com/de/what-is/retrieval-augmented-generation/",
+    "https://alleantworten.de/sagt-man-fuer-was-oder-wofuer",
+    "https://www.redhat.com/de/topics/ai/what-is-retrieval-augmented-generation",
+    "https://deutsch-mit-anna.de/lektion/praepositionaladverbien/",
+    "https://de.hinative.com/questions/4844011",
+    "https://www.gutefrage.net/frage/was-ist-der-unterschied-zwischen-wozu-und-wofuer"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 526.001583901234,
+   "server_total": 521.938,
+   "engine_total": {
+    "bing": 193.89,
+    "yahoo": 520.668
+   },
+   "engine_load": {
+    "bing": 188.291,
+    "yahoo": 514.323
+   },
+   "urls": [
+    "https://www.duden.de/rechtschreibung/wofuer",
+    "https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation",
+    "https://www.dwds.de/wb/wof%C3%BCr",
+    "https://azure.microsoft.com/de-de/resources/cloud-computing-dictionary/what-is-retrieval-augmented-generation-rag",
+    "https://www.wortbedeutung.info/wof%C3%BCr/",
+    "https://www.ibm.com/de-de/think/topics/retrieval-augmented-generation",
+    "https://de.wiktionary.org/wiki/wof%C3%BCr",
+    "https://www.iese.fraunhofer.de/blog/retrieval-augmented-generation-rag/",
+    "https://blog.leo.org/2026/09/18/ist-es-etwas-wofuer-oder-etwas-fuer-das/",
+    "https://www.moin.ai/chatbot-lexikon/retrieval-augmented-generation-rag",
+    "https://www.duden.de/suchen/dudenonline/wof%C3%BCr",
+    "https://aws.amazon.com/de/what-is/retrieval-augmented-generation/",
+    "https://alleantworten.de/sagt-man-fuer-was-oder-wofuer",
+    "https://www.redhat.com/de/topics/ai/what-is-retrieval-augmented-generation",
+    "https://deutsch-mit-anna.de/lektion/praepositionaladverbien/",
+    "https://de.hinative.com/questions/4844011",
+    "https://www.gutefrage.net/frage/was-ist-der-unterschied-zwischen-wozu-und-wofuer"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 357.3,
+    "yahoo": 574.3
+   },
+   "errors": {},
+   "total_ms": 575.2,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 1.0,
+  "ov10_B": 1.0,
+  "ovall_B": 0.8823529411764706
+ },
+ {
+  "id": "de-recht-1",
+  "A": {
+   "wall": 750.7840000325814,
+   "server_total": 748.352,
+   "engine_total": {
+    "wikipedia": 19.505,
+    "bing": 183.044,
+    "yahoo": 746.901
+   },
+   "engine_load": {
+    "wikipedia": 19.144,
+    "bing": 179.149,
+    "yahoo": 739.699
+   },
+   "urls": [
+    "https://www.xnxx.com/search/orgias+en+familia",
+    "https://de.wikipedia.org/wiki/Datenschutz-Grundverordnung",
+    "http://mom2fuck.com/",
+    "https://www.datenschutz.org/dsgvo/",
+    "http://www.maturetubeporn.com/",
+    "https://dsgvo-gesetz.de/",
+    "https://pat.com/?f=FamilyStrokes",
+    "https://www.consilium.europa.eu/de/policies/data-protection-regulation/",
+    "https://www.imdb.com/de/title/tt32881248/",
+    "https://www.bmjv.de/DE/themen/digitales/digitale_kommunikation/dsgvo/dsgvo_node.html",
+    "https://my.mail.ru/bk/boos.vavanych/video/_myvideo/18.html",
+    "https://www.dr-datenschutz.de/dsgvo-und-datenschutz-was-muessen-sie-wissen/",
+    "https://www.bing.com/videos/riverview/relatedvideo?q=fkk+familie",
+    "https://www.dataproofed.de/dsgvo-einfach-erklaert-datenschutzgrundverordnung/",
+    "http://old-mama.com/",
+    "https://de.scribd.com/doc/45939909/Eine-Wahnsinnig-Versaute-Familie",
+    "https://nudistfun.com/"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 649.1570000071079,
+   "server_total": 646.24,
+   "engine_total": {
+    "bing": 164.343,
+    "yahoo": 644.983
+   },
+   "engine_load": {
+    "bing": 156.641,
+    "yahoo": 637.179
+   },
+   "urls": [
+    "https://www.youtube.com/?gl=DE&hl=de",
+    "https://de.wikipedia.org/wiki/Datenschutz-Grundverordnung",
+    "https://www.youtube.com/",
+    "https://www.datenschutz.org/dsgvo/",
+    "https://music.youtube.com/",
+    "https://dsgvo-gesetz.de/",
+    "https://play.google.com/store/apps/details?id=com.google.android.youtube&hl=en-US",
+    "https://www.consilium.europa.eu/de/policies/data-protection-regulation/",
+    "https://de.wikipedia.org/wiki/YouTube",
+    "https://www.bmjv.de/DE/themen/digitales/digitale_kommunikation/dsgvo/dsgvo_node.html",
+    "https://www.youtube.com/feed",
+    "https://www.dr-datenschutz.de/dsgvo-und-datenschutz-was-muessen-sie-wissen/",
+    "https://www.youtube.com/Deutschland/de-de",
+    "https://www.dataproofed.de/dsgvo-einfach-erklaert-datenschutzgrundverordnung/",
+    "https://www.youtube.com/@en.---",
+    "https://www.youtube.com/@________________.",
+    "https://www.youtube.com/@de.-_"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 149.5,
+    "yahoo": 587.8
+   },
+   "errors": {},
+   "total_ms": 589.7,
+   "per_engine": {
+    "yahoo": 7,
+    "bing": 10
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 0.3,
+  "ov10_B": 0.3,
+  "ovall_B": 0.29411764705882354
+ },
+ {
+  "id": "en-fact-1",
+  "A": {
+   "wall": 698.826500098221,
+   "server_total": 694.981,
+   "engine_total": {
+    "wikipedia": 18.782,
+    "bing": 149.078,
+    "yahoo": 693.359
+   },
+   "engine_load": {
+    "wikipedia": 17.806,
+    "bing": 143.323,
+    "yahoo": 684.441
+   },
+   "urls": [
+    "https://www.lidl.de/s/de-DE/filialen/augsburg/?msockid=0c37f76cd48c659e0754e083d5d8644d",
+    "https://en.wikipedia.org/wiki/General_relativity",
+    "https://www.lidl.de/s/de-DE/filialen/augsburg/auerstr-57-a/?msockid=0c37f76cd48c659e0754e083d5d8644d",
+    "https://en.wikipedia.org/wiki/Theory_of_relativity",
+    "https://www.kaufda.de/Filialen/Augsburg/Lidl/v-r74",
+    "https://www.britannica.com/story/how-albert-einstein-developed-the-theory-of-general-relativity",
+    "https://www.kaufda.de/Filialen/Augsburg/Lidl-Donaustrasse/v-f782715231",
+    "https://www.britannica.com/science/general-relativity",
+    "https://www.lidl.com/c/store-finder/s10089075",
+    "https://philosophy.institute/philosophy-of-science-and-cosmology/einstein-general-theory-relativity/",
+    "https://storelocatortool.com/v3/de/suche.php?marke=lidl&land=deutschland",
+    "https://wisdomanswer.com/who-wrote-relativity-theory/",
+    "https://www.meinprospekt.de/augsburg/filialen/lidl/152813",
+    "https://www.pbs.org/wgbh/aso/databank/entries/dp15ei.html",
+    "https://www.tiendeo.de/Filialen/augsburg/lidl",
+    "https://www.meinprospekt.de/augsburg/filialen/lidl/576145",
+    "https://kundenservice.lidl.de/SelfServiceDE/s/article/Wo-finde-ich-meine-n%C3%A4chste-Filiale-und-die-%C3%96ffnungszeiten"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 603.7511670729145,
+   "server_total": 599.303,
+   "engine_total": {
+    "bing": 168.984,
+    "yahoo": 597.589
+   },
+   "engine_load": {
+    "bing": 160.642,
+    "yahoo": 587.51
+   },
+   "urls": [
+    "https://www.deepl.com/de/translator",
+    "https://en.wikipedia.org/wiki/General_relativity",
+    "https://translate.google.de/?hl=en",
+    "https://en.wikipedia.org/wiki/Theory_of_relativity",
+    "https://translate.google.com/?hl=de",
+    "https://www.britannica.com/story/how-albert-einstein-developed-the-theory-of-general-relativity",
+    "https://dict.leo.org/german-english/",
+    "https://www.britannica.com/science/general-relativity",
+    "https://www.linguee.com/english-german",
+    "https://philosophy.institute/philosophy-of-science-and-cosmology/einstein-general-theory-relativity/",
+    "https://dictionary.cambridge.org/translate/english-german/",
+    "https://wisdomanswer.com/who-wrote-relativity-theory/",
+    "https://dict.leo.org/englisch-deutsch/+-",
+    "https://www.pbs.org/wgbh/aso/databank/entries/dp15ei.html",
+    "https://www.deepl.com/en/translator/l/de/en",
+    "https://www.dict.cc/",
+    "https://en.langenscheidt.com/german-english/"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 151.3,
+    "yahoo": 672.5
+   },
+   "errors": {},
+   "total_ms": 673.8,
+   "per_engine": {
+    "yahoo": 7,
+    "bing": 9
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 16,
+  "ov10_A": 0.5,
+  "ov10_B": 0.5,
+  "ovall_B": 0.4375
+ },
+ {
+  "id": "en-fact-2",
+  "A": {
+   "wall": 639.4886660855263,
+   "server_total": 635.224,
+   "engine_total": {
+    "wikipedia": 21.729,
+    "bing": 210.329,
+    "yahoo": 633.366
+   },
+   "engine_load": {
+    "wikipedia": 20.264,
+    "bing": 201.878,
+    "yahoo": 625.654
+   },
+   "urls": [
+    "https://www.lidl.de/s/de-DE/filialen/?msockid=1410a1b7aac360c72c81b658abcd6128",
+    "https://en.wikipedia.org/wiki/Boiling_point",
+    "https://www.lidl.de/?msockid=1410a1b7aac360c72c81b658abcd6128",
+    "https://sciencenotes.org/boiling-point-of-water-what-temperature-does-water-boil/",
+    "https://www.lidl.de/s/de-DE/filialen/nordrhein-westfalen/?msockid=1410a1b7aac360c72c81b658abcd6128",
+    "https://temperatures.com/guides/water-boiling-point",
+    "https://www.lidl.com/c/store-finder/s10089075",
+    "https://easytemperature.com/conversions/boiling-point-water",
+    "https://kundenservice.lidl.de/SelfServiceDE/s/article/Wo-finde-ich-meine-n%C3%A4chste-Filiale-und-die-%C3%96ffnungszeiten",
+    "https://simileshive.com/at-what-temperature-does-water-boil-at-sea-level/",
+    "https://www.lidl.de/s/de-DE/filialen/koeln/?msockid=1410a1b7aac360c72c81b658abcd6128",
+    "https://www.arhfoundation.org/boiling-point-water-celsius",
+    "https://www.lidl.de/s/de-DE/filialen/duesseldorf/?msockid=1410a1b7aac360c72c81b658abcd6128",
+    "https://temperatures.com/guides/boiling-points-across-temperature-scales",
+    "https://www.weekli.de/discounter/lidl/alle-filialen",
+    "https://www.offen.net/finder/lidl-594S8.html",
+    "https://www.meinprospekt.de/filialen/lidl"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 765.7933329464868,
+   "server_total": 762.071,
+   "engine_total": {
+    "bing": 151.012,
+    "yahoo": 760.608
+   },
+   "engine_load": {
+    "bing": 143.764,
+    "yahoo": 750.252
+   },
+   "urls": [
+    "https://www.linkedin.com/pub/dir/brian/frey",
+    "https://en.wikipedia.org/wiki/Boiling_point",
+    "https://www.linkedin.com/in/freybrian",
+    "https://sciencenotes.org/boiling-point-of-water-what-temperature-does-water-boil/",
+    "https://is.linkedin.com/pub/dir/Brian/+",
+    "https://temperatures.com/guides/water-boiling-point",
+    "https://www.dnb.com/business-directory/company-profiles.bio-medical_applications_of_rhode_island_inc.9cbf0f83691c09b03da715b033381602.html",
+    "https://easytemperature.com/conversions/boiling-point-water",
+    "https://www.zoominfo.com/people/Brian/Frey",
+    "https://simileshive.com/at-what-temperature-does-water-boil-at-sea-level/",
+    "https://www.dnb.com/business-directory/company-profiles.bio-medical_applications_of_rhode_island_inc.208f9c96850393a77751527c7c1ccd58.html",
+    "https://www.arhfoundation.org/boiling-point-water-celsius",
+    "https://in.linkedin.com/jobs/%27lindsey%2Bcurtis%27%2Bcurrently%2Bat%2Bbiomedical%2Bapplications%2Brhode%2Bisland%2Blinkedin%2Bin-jobs",
+    "https://temperatures.com/guides/boiling-points-across-temperature-scales",
+    "https://ca.linkedin.com/in/brian-frey-60a40676",
+    "https://ie.linkedin.com/in/brian-reid-a69b04139",
+    "https://ca.linkedin.com/jobs/brian-angus-biomedical-applications-rhode-island-jobs"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 153.3,
+    "yahoo": 700.6
+   },
+   "errors": {},
+   "total_ms": 702.3,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 0.5,
+  "ov10_B": 0.5,
+  "ovall_B": 0.4117647058823529
+ },
+ {
+  "id": "en-fact-3",
+  "A": {
+   "wall": 646.9627500046045,
+   "server_total": 643.011,
+   "engine_total": {
+    "wikipedia": 20.653,
+    "bing": 157.501,
+    "yahoo": 641.202
+   },
+   "engine_load": {
+    "wikipedia": 19.618,
+    "bing": 150.535,
+    "yahoo": 630.2
+   },
+   "urls": [
+    "https://www.capital.de/",
+    "https://en.wikipedia.org/wiki/Ottawa",
+    "https://capital.com/de-de",
+    "https://geographypin.com/capital-of-canada-ottawa/",
+    "https://shop.capital.de/de_DE/aktuelle-ausgabe/capital-magazin-aktuelle-ausgabe.html",
+    "https://www.worldatlas.com/articles/what-is-the-capital-of-canada.html",
+    "https://www.capital.de/geld-versicherungen/",
+    "https://en.wikipedia.org/wiki/Canada",
+    "https://de.wikipedia.org/wiki/Capital_(Deutschland)",
+    "https://truenorthbrief.com/politics/what-is-the-capital-of-canada/",
+    "https://www.capital.de/immobilien/",
+    "https://geographyworlds.com/blog/capital-of-canada-ottawa/",
+    "https://www.capital.de/immobilien-kompass/hirschau",
+    "https://www.mappr.co/capital-cities/canada/",
+    "https://capital.com/en-eu",
+    "https://www.zinio.com/de/publications/capital-deutschland/30924",
+    "https://shop.capital.de/de_DE/einzelhefte"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 579.1226249421015,
+   "server_total": 575.634,
+   "engine_total": {
+    "bing": 178.045,
+    "yahoo": 574.246
+   },
+   "engine_load": {
+    "bing": 169.717,
+    "yahoo": 566.045
+   },
+   "urls": [
+    "https://www.capital.de/",
+    "https://en.wikipedia.org/wiki/Ottawa",
+    "https://capital.com/de-de",
+    "https://geographypin.com/capital-of-canada-ottawa/",
+    "https://shop.capital.de/de_DE/aktuelle-ausgabe/capital-magazin-aktuelle-ausgabe.html",
+    "https://www.worldatlas.com/articles/what-is-the-capital-of-canada.html",
+    "https://www.capital.de/geld-versicherungen/",
+    "https://en.wikipedia.org/wiki/Canada",
+    "https://de.wikipedia.org/wiki/Capital_(Deutschland)",
+    "https://truenorthbrief.com/politics/what-is-the-capital-of-canada/",
+    "https://www.capital.de/immobilien/",
+    "https://geographyworlds.com/blog/capital-of-canada-ottawa/",
+    "https://www.capital.de/immobilien-kompass/hirschau",
+    "https://www.mappr.co/capital-cities/canada/",
+    "https://capital.com/en-eu",
+    "https://www.zinio.com/de/publications/capital-deutschland/30924",
+    "https://shop.capital.de/de_DE/einzelhefte"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 166.6,
+    "yahoo": 4865.4
+   },
+   "errors": {
+    "yahoo": "deadline"
+   },
+   "total_ms": 702.6,
+   "per_engine": {
+    "bing": 10
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 10,
+  "ov10_A": 0.5,
+  "ov10_B": 0.5,
+  "ovall_B": 1.0
+ },
+ {
+  "id": "en-tech-1",
+  "A": {
+   "wall": 610.9376249369234,
+   "server_total": 607.316,
+   "engine_total": {
+    "wikipedia": 18.702,
+    "bing": 151.487,
+    "yahoo": 605.644
+   },
+   "engine_load": {
+    "wikipedia": 17.816,
+    "bing": 144.033,
+    "yahoo": 595.758
+   },
+   "urls": [
+    "https://www.zhihu.com/question/24790852",
+    "https://en.wikipedia.org/wiki/HTTP",
+    "https://www.zhihu.com/question/19581089",
+    "https://www.geeksforgeeks.org/html/what-is-http/",
+    "https://zhidao.baidu.com/question/1830391065414523220.html",
+    "https://www.britannica.com/technology/HTTP",
+    "https://zhidao.baidu.com/question/1958134166005667460.html",
+    "https://www.acronymfinder.com/HTTP.html",
+    "https://www.zhihu.com/question/347202458/answers/updated",
+    "https://www.w3schools.com/whatis/whatis_http.asp",
+    "https://www.zhihu.com/question/359009187",
+    "https://www.abbreviations.com/HTTP",
+    "https://www.zhihu.com/question/21425170",
+    "https://http.dev/explained",
+    "https://www.zhihu.com/question/479609668",
+    "https://www.zhihu.com/question/28220417",
+    "https://www.zhihu.com/question/27264726"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 527.99979201518,
+   "server_total": 525.103,
+   "engine_total": {
+    "bing": 179.132,
+    "yahoo": 523.867
+   },
+   "engine_load": {
+    "bing": 172.933,
+    "yahoo": 515.554
+   },
+   "urls": [
+    "https://www.zhihu.com/question/24790852",
+    "https://en.wikipedia.org/wiki/HTTP",
+    "https://www.zhihu.com/question/19581089",
+    "https://www.geeksforgeeks.org/html/what-is-http/",
+    "https://zhidao.baidu.com/question/1830391065414523220.html",
+    "https://www.britannica.com/technology/HTTP",
+    "https://zhidao.baidu.com/question/994562419309312219.html",
+    "https://www.acronymfinder.com/HTTP.html",
+    "https://www.zhihu.com/question/359009187",
+    "https://www.w3schools.com/whatis/whatis_http.asp",
+    "https://www.zhihu.com/question/347202458/answers/updated",
+    "https://www.abbreviations.com/HTTP",
+    "https://www.zhihu.com/question/21425170",
+    "https://http.dev/explained",
+    "https://www.zhihu.com/question/479609668",
+    "https://www.zhihu.com/question/54061936?sort=created",
+    "https://www.zhihu.com/question/27264726"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 356.6,
+    "yahoo": 547.8
+   },
+   "errors": {},
+   "total_ms": 549.9,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 0.5,
+  "ov10_B": 0.5,
+  "ovall_B": 0.4117647058823529
+ },
+ {
+  "id": "en-tech-2",
+  "A": {
+   "wall": 704.115750035271,
+   "server_total": 700.727,
+   "engine_total": {
+    "wikipedia": 23.816,
+    "bing": 161.064,
+    "yahoo": 698.769
+   },
+   "engine_load": {
+    "wikipedia": 23.134,
+    "bing": 156.228,
+    "yahoo": 691.213
+   },
+   "urls": [
+    "https://en.wikipedia.org/wiki/Company",
+    "https://en.wikipedia.org/wiki/CPython",
+    "https://www.companyhouse.de/",
+    "https://www.languagelineage.org/guides/how-python-is-implemented",
+    "https://dict.leo.org/englisch-deutsch/company",
+    "https://www.geeksforgeeks.org/python/python-vs-cpython/",
+    "https://www.unternehmensregister.de/ureg",
+    "https://realpython.com/ref/glossary/cpython/",
+    "https://www.duden.de/rechtschreibung/Company",
+    "https://en.wikipedia.org/wiki/Python_(programming_language)",
+    "https://company-bike.com/",
+    "https://pydevtools.com/handbook/reference/cpython/",
+    "https://redkiwiapp.com/de/english-guide/questions/VuvXvnOcAhXA0auRKtMJ",
+    "https://www.wikiwand.com/en/CPython",
+    "https://www.companyhouse.de/MUSA-GmbH-Koefering",
+    "https://de.wikipedia.org/wiki/Unternehmen",
+    "https://firmendata.com/de"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 569.1761249909177,
+   "server_total": 564.756,
+   "engine_total": {
+    "bing": 171.708,
+    "yahoo": 563.119
+   },
+   "engine_load": {
+    "bing": 165.04,
+    "yahoo": 554.734
+   },
+   "urls": [
+    "https://en.wikipedia.org/wiki/Company",
+    "https://en.wikipedia.org/wiki/CPython",
+    "https://www.companyhouse.de/",
+    "https://www.languagelineage.org/guides/how-python-is-implemented",
+    "https://dict.leo.org/englisch-deutsch/company",
+    "https://www.geeksforgeeks.org/python/python-vs-cpython/",
+    "https://www.unternehmensregister.de/ureg",
+    "https://realpython.com/ref/glossary/cpython/",
+    "https://www.duden.de/rechtschreibung/Company",
+    "https://en.wikipedia.org/wiki/Python_(programming_language)",
+    "https://company-bike.com/",
+    "https://pydevtools.com/handbook/reference/cpython/",
+    "https://redkiwiapp.com/de/english-guide/questions/VuvXvnOcAhXA0auRKtMJ",
+    "https://www.wikiwand.com/en/CPython",
+    "https://www.companyhouse.de/MUSA-GmbH-Koefering",
+    "https://de.wikipedia.org/wiki/Unternehmen",
+    "https://firmendata.com/de"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 196.6,
+    "yahoo": 511.1
+   },
+   "errors": {},
+   "total_ms": 512.9,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 0.9,
+  "ov10_B": 0.9,
+  "ovall_B": 0.9411764705882353
+ },
+ {
+  "id": "de-fakt-4",
+  "A": {
+   "wall": 639.3072920618579,
+   "server_total": 635.385,
+   "engine_total": {
+    "wikipedia": 25.888,
+    "bing": 188.984,
+    "yahoo": 633.791
+   },
+   "engine_load": {
+    "wikipedia": 24.513,
+    "bing": 179.097,
+    "yahoo": 626.971
+   },
+   "urls": [
+    "https://de.wikipedia.org/wiki/Zugspitze",
+    "https://zugspitze.de/de/Unsere-Bergwelten/Die-Gebiete/Zugspitze",
+    "https://www.alpenverein.de/artikel/sicher-auf-die-zugspitze_d6656f66-4dc5-4e9c-bd6e-ca81704a79f5",
+    "https://www.planet-wissen.de/natur/gebirge/zugspitze/index.html",
+    "https://en.wikipedia.org/wiki/Zugspitze",
+    "https://berginstinct.de/wie-hoch-ist-die-zugspitze/",
+    "https://www.zugspitz-region.de/zugspitze",
+    "https://de.wikipedia.org/wiki/Seilbahn_Zugspitze",
+    "https://www.zugspitze.at/de/home/",
+    "https://www.wandernundmehr.at/faq/wie-hoch-liegt-die-zugspitze",
+    "https://www.visitdeutschland.info/de/zugspitze/"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 704.2509999591857,
+   "server_total": 700.753,
+   "engine_total": {
+    "bing": 171.047,
+    "yahoo": 699.688
+   },
+   "engine_load": {
+    "bing": 160.948,
+    "yahoo": 693.628
+   },
+   "urls": [
+    "https://de.wikipedia.org/wiki/Zugspitze",
+    "https://zugspitze.de/de/Unsere-Bergwelten/Die-Gebiete/Zugspitze",
+    "https://www.alpenverein.de/artikel/sicher-auf-die-zugspitze_d6656f66-4dc5-4e9c-bd6e-ca81704a79f5",
+    "https://www.planet-wissen.de/natur/gebirge/zugspitze/index.html",
+    "https://en.wikipedia.org/wiki/Zugspitze",
+    "https://berginstinct.de/wie-hoch-ist-die-zugspitze/",
+    "https://www.zugspitz-region.de/zugspitze",
+    "https://de.wikipedia.org/wiki/Seilbahn_Zugspitze",
+    "https://www.zugspitze.at/de/home/",
+    "https://www.wandernundmehr.at/faq/wie-hoch-liegt-die-zugspitze",
+    "https://www.visitdeutschland.info/de/zugspitze/"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 145.2,
+    "yahoo": 610.6
+   },
+   "errors": {},
+   "total_ms": 612.4,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 11,
+  "n_B": 11,
+  "n_C": 11,
+  "ov10_A": 0.9,
+  "ov10_B": 0.9,
+  "ovall_B": 1.0
+ },
+ {
+  "id": "de-fakt-5",
+  "A": {
+   "wall": 816.4242079947144,
+   "server_total": 811.854,
+   "engine_total": {
+    "wikipedia": 23.25,
+    "bing": 146.322,
+    "yahoo": 809.502
+   },
+   "engine_load": {
+    "wikipedia": 22.222,
+    "bing": 139.005,
+    "yahoo": 800.006
+   },
+   "urls": [
+    "https://de.wikipedia.org/wiki/Halbwertszeit",
+    "https://de.wikipedia.org/wiki/Radiokarbonmethode",
+    "https://studyflix.de/ingenieurwissenschaften/halbwertszeit-4821",
+    "https://www.radiation-dosimetry.org/de/was-ist-kohlenstoff-14-produktion-eigenschaften-zerfall-definition/",
+    "https://www.leifiphysik.de/kern-teilchenphysik/radioaktivitaet-einfuehrung/grundwissen/halbwertszeit",
+    "https://studyflix.de/ingenieurwissenschaften/c14-methode-2117",
+    "https://www.chemie.de/lexikon/Halbwertszeit.html",
+    "https://www.internetchemie.info/isotop.php?Kern=C-14",
+    "https://flexikon.doccheck.com/de/Halbwertszeit",
+    "https://de.scienceaq.com/Chemie/1006194944.html",
+    "https://studyflix.de/ingenieurwissenschaften/halbwertszeit-berechnen-1813",
+    "https://www.energie-lexikon.info/halbwertszeit.html",
+    "https://www.isotopemap.com/de/isotoop/C-14",
+    "https://mathehero.at/funktionen/exponentialfunktionen/halbwertszeit-verdoppelungszeit/",
+    "https://www.leifiphysik.de/kern-teilchenphysik/radioaktivitaet-fortfuehrung/grundwissen/zerfallsgesetz-zerfallskonstante-und-halbwertszeit",
+    "https://www.mathebibel.de/halbwertszeit"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 568.4375000419095,
+   "server_total": 564.59,
+   "engine_total": {
+    "bing": 207.537,
+    "yahoo": 563.182
+   },
+   "engine_load": {
+    "bing": 200.491,
+    "yahoo": 554.521
+   },
+   "urls": [
+    "https://de.wikipedia.org/wiki/Halbwertszeit",
+    "https://de.wikipedia.org/wiki/Radiokarbonmethode",
+    "https://studyflix.de/ingenieurwissenschaften/halbwertszeit-4821",
+    "https://www.radiation-dosimetry.org/de/was-ist-kohlenstoff-14-produktion-eigenschaften-zerfall-definition/",
+    "https://www.leifiphysik.de/kern-teilchenphysik/radioaktivitaet-einfuehrung/grundwissen/halbwertszeit",
+    "https://studyflix.de/ingenieurwissenschaften/c14-methode-2117",
+    "https://www.chemie.de/lexikon/Halbwertszeit.html",
+    "https://www.internetchemie.info/isotop.php?Kern=C-14",
+    "https://flexikon.doccheck.com/de/Halbwertszeit",
+    "https://de.scienceaq.com/Chemie/1006194944.html",
+    "https://studyflix.de/ingenieurwissenschaften/halbwertszeit-berechnen-1813",
+    "https://www.energie-lexikon.info/halbwertszeit.html",
+    "https://www.isotopemap.com/de/isotoop/C-14",
+    "https://mathehero.at/funktionen/exponentialfunktionen/halbwertszeit-verdoppelungszeit/",
+    "https://www.leifiphysik.de/kern-teilchenphysik/radioaktivitaet-fortfuehrung/grundwissen/zerfallsgesetz-zerfallskonstante-und-halbwertszeit",
+    "https://www.mathebibel.de/halbwertszeit"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 188.5,
+    "yahoo": 548.0
+   },
+   "errors": {},
+   "total_ms": 550.0,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 16,
+  "n_B": 16,
+  "n_C": 17,
+  "ov10_A": 0.9,
+  "ov10_B": 0.9,
+  "ovall_B": 0.9375
+ },
+ {
+  "id": "de-fakt-6",
+  "A": {
+   "wall": 515.618292032741,
+   "server_total": 511.779,
+   "engine_total": {
+    "wikipedia": 21.702,
+    "bing": 151.689,
+    "yahoo": 510.099
+   },
+   "engine_load": {
+    "wikipedia": 20.813,
+    "bing": 143.791,
+    "yahoo": 502.843
+   },
+   "urls": [
+    "https://gayroyal.com/",
+    "https://www.uni-heidelberg.de/de/universitaet/geschichte",
+    "https://www.gayroyal.com/Goodbye/",
+    "https://de.wikipedia.org/wiki/Ruprecht-Karls-Universit%C3%A4t_Heidelberg",
+    "https://www.w3.gayroyal.com/app/",
+    "https://www.uni-heidelberg.de/de/universitaet/geschichte/chronologie",
+    "https://play.google.com/store/apps/details?id=com.tyteapp.tyte&hl=de",
+    "https://en.wikipedia.org/wiki/Heidelberg_University",
+    "https://www.w3.gayroyal.com/app/support/",
+    "https://de.wikipedia.org/wiki/Geschichte_Heidelbergs",
+    "https://er-sucht-ihn.de/magazin/gayroyal/",
+    "https://www.625.uni-heidelberg.de/geschichte_en.html",
+    "https://www.rtl.de/tools/dating/gayroyal/",
+    "https://www.heidelberg.de/HD/Lernen+und+Forschen/Universitaet.html",
+    "https://apps.apple.com/de/app/gayroyal-dating-chat-liebe/id901795746",
+    "https://apkpure.com/de/gayroyal-dating-chat-love/com.tyteapp.tyte",
+    "https://de.trustpilot.com/review/gayroyal.com"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 525.5830000387505,
+   "server_total": 520.879,
+   "engine_total": {
+    "bing": 221.576,
+    "yahoo": 519.082
+   },
+   "engine_load": {
+    "bing": 213.468,
+    "yahoo": 511.391
+   },
+   "urls": [
+    "https://www.123recht.de/forum/kaufrecht/Kaeufer-holt-von-ihm-schon-bezahlte-Ware-nicht-ab-__f604248.html",
+    "https://www.uni-heidelberg.de/de/universitaet/geschichte",
+    "https://www.123recht.de/forum/kaufrecht/Kleinanzeigen-Kauf-Ware-angeblich-kaputt-__f605548.html",
+    "https://de.wikipedia.org/wiki/Ruprecht-Karls-Universit%C3%A4t_Heidelberg",
+    "https://www.juraforum.de/forum/t/artikel-aus-privatem-internetverkauf-ebay-kleinanzeigen-trotz-zusage-anderweitig-verkauft.522619/",
+    "https://www.uni-heidelberg.de/de/universitaet/geschichte/chronologie",
+    "https://www.juraforum.de/rechtsanwalt/anwalt-waldshut-tiengen/",
+    "https://en.wikipedia.org/wiki/Heidelberg_University",
+    "https://community.ebay.de/forum/antwoordcentrum-67/topic/hallo-waarom-kan-ik-niet-een-nederlandse-adres-opgeven-in-ebay-kleinanzeigen-10183/",
+    "https://de.wikipedia.org/wiki/Geschichte_Heidelbergs",
+    "https://community.ebay.de/forum/seller-lounge-22/topic/epr-verpackungsregistrierungsnummern-es-wird-immer-bekloppter-10453/",
+    "https://www.625.uni-heidelberg.de/geschichte_en.html",
+    "https://www.123recht.de/forum/kaufrecht/EBay-Behaelt-Geld-ein-ueber-15000-und-moechte-Eigentumsnachweis-__f610195.html",
+    "https://www.heidelberg.de/HD/Lernen+und+Forschen/Universitaet.html",
+    "https://www.123recht.de/ratgeber/urheberrecht-abmahnung/LEO-E-Commerce-Ltd-Abmahnung-ueber-von-HAVE-FEY-Rechtsanwaelte-wegen-Fotos-auf-Kleinanzeigende-erhalten-__a160152.html",
+    "https://www.123recht.de/thema/ebay.html",
+    "https://www.123recht.de/forum/internetauktionen/eBay-Kleinanzeigen-Kaeufer-zahlt-nicht-Vertag-rechtsgueltig-Weitere-Schritte-__f529373.html"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 172.5,
+    "yahoo": 609.3
+   },
+   "errors": {},
+   "total_ms": 611.1,
+   "per_engine": {
+    "yahoo": 7,
+    "bing": 10
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 0.3,
+  "ov10_B": 0.3,
+  "ovall_B": 0.23529411764705882
+ },
+ {
+  "id": "de-fakt-7",
+  "A": {
+   "wall": 571.8469161074609,
+   "server_total": 567.67,
+   "engine_total": {
+    "wikipedia": 19.433,
+    "bing": 161.063,
+    "yahoo": 566.08
+   },
+   "engine_load": {
+    "wikipedia": 18.768,
+    "bing": 153.474,
+    "yahoo": 557.187
+   },
+   "urls": [
+    "https://www.wieistmeineip.de/",
+    "https://www.regionalsuche.at/oesterreich-bundeslaender-ein-ueberblick-details/",
+    "https://www.duden.de/rechtschreibung/wie_Konjunktion_Vergleich",
+    "https://mein-lernen.at/geographie/oesterreich-geographie/oesterreich-ueberblick-info/osterreich-9-bundeslander/",
+    "https://www.dwds.de/wb/wie",
+    "https://de.wikipedia.org/wiki/Land_(%C3%96sterreich)",
+    "https://de.wiktionary.org/wiki/wie",
+    "https://awieatlas.de/bundeslaender-oesterreich/",
+    "https://www.youtube.com/watch?v=CLm6KSNKvAY",
+    "https://www.taschenhirn.de/allgemeinbildung-reisen/bundeslaender-oesterreichs/",
+    "https://www.wortbedeutung.info/wie/",
+    "https://de.wikipedia.org/wiki/%C3%96sterreich",
+    "https://de.wikipedia.org/wiki/WIE",
+    "https://www.parlament.gv.at/verstehen/politisches-system/bund-laender",
+    "https://www.lingoda.com/blog/en/wie-in-german/",
+    "https://wie.de/",
+    "https://www.scribbr.de/kommasetzung/komma-vor-wie/"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 635.0287919631228,
+   "server_total": 630.541,
+   "engine_total": {
+    "bing": 146.216,
+    "yahoo": 628.856
+   },
+   "engine_load": {
+    "bing": 140.215,
+    "yahoo": 619.105
+   },
+   "urls": [
+    "https://www.giga.de/unternehmen/mcafee/tipps/mcafee-deinstallieren-rueckstandslos-und-endgueltig-entfernen/",
+    "https://www.regionalsuche.at/oesterreich-bundeslaender-ein-ueberblick-details/",
+    "https://blog.iobit.com/de/mcafee-deinstallieren-775",
+    "https://mein-lernen.at/geographie/oesterreich-geographie/oesterreich-ueberblick-info/osterreich-9-bundeslander/",
+    "https://tippsling.de/mcafee-removal-tool-so-gehts-in-windows-11-und-10/",
+    "https://de.wikipedia.org/wiki/Land_(%C3%96sterreich)",
+    "https://www.chip.de/downloads/McAfee-Consumer-Product-Removal-Tool_49841374.html",
+    "https://awieatlas.de/bundeslaender-oesterreich/",
+    "https://www.antwort.net/a/tutorial/vollstaendige-anleitung-mcafee-von-windows-11-deinstallieren.html",
+    "https://www.taschenhirn.de/allgemeinbildung-reisen/bundeslaender-oesterreichs/",
+    "https://www.lenovo.com/de/de/glossary/how-to-uninstall-mcafee/?msockid=1d17699668196b0b07ad7e79692a6a32",
+    "https://de.wikipedia.org/wiki/%C3%96sterreich",
+    "https://www.mcafee.com/support/s/article/000001616?language=de&msockid=1d17699668196b0b07ad7e79692a6a32",
+    "https://www.parlament.gv.at/verstehen/politisches-system/bund-laender",
+    "https://tipps-tricks-kniffe.de/mcafee-entfernen-mcafee-programme-restlos-vom-pc-deinstallieren-und-loeschen/",
+    "https://howto.amkstation.com/de/so-entfernen-sie-mcafee-von-windows-11-eine-vollstaendige-schritt-fuer-schritt-anleitung/",
+    "https://www.actualapp.com/de/tutorials-de/mcafee-vollstaendig-deinstallieren-windows-mac"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 155.1,
+    "yahoo": 611.6
+   },
+   "errors": {},
+   "total_ms": 613.3,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 17,
+  "n_B": 17,
+  "n_C": 17,
+  "ov10_A": 1.0,
+  "ov10_B": 0.5,
+  "ovall_B": 0.35294117647058826
+ },
+ {
+  "id": "de-schule-1",
+  "A": {
+   "wall": 425.25979096535593,
+   "server_total": 421.218,
+   "engine_total": {
+    "wikipedia": 19.751,
+    "bing": 160.264,
+    "yahoo": 418.043
+   },
+   "engine_load": {
+    "wikipedia": 18.754,
+    "bing": 151.648,
+    "yahoo": 408.037
+   },
+   "urls": [
+    "https://de.wikipedia.org/wiki/Nachteilsausgleich",
+    "https://bk.schulamt-bw.de/site/pbs-bw-rebrush2024/get/documents_E-1713056107/KULTUS.Dachmandant/KULTUS/Schulaemter/schulamt-backnang/9-Service/Arbeitsstelle%20Kooperation/2025-5-21%20Arbeitshilfe%20Nachteilsausgleich.pdf",
+    "https://meine-begleithilfe.de/wissen/nachteilsausgleich-schule/",
+    "https://km.baden-wuerttemberg.de/de/schule/berufliche-bildung-1/schulartuebergreifende-themen/inklusion/nachteilsausgleich-und-deckung-des-foerderbedarfs",
+    "https://www.forum-verlag.com/fachwissen/bildung-und-erziehung/nachteilsausgleich/",
+    "https://www.anwalt.org/nachteilsausgleich/",
+    "https://wolkenfreiezeit.de/wissen/inklusion/was-bedeutet-der-nachteilsausgleich-in-der-schule",
+    "https://www.sovd.de/fileadmin/bundesverband/pdf/broschueren/menschen_mit_behinderung/SoVD-Brosch%C3%BCre-Nachteilsausgleiche_2021-07-09.pdf",
+    "https://worthelden.de/lrs-diagnose/nachteilsausgleich-in-der-schule-worauf-mussen-eltern-achten/",
+    "https://www.betanet.de/nachteilsausgleiche-bei-behinderung.html",
+    "https://sonderpaedagoge.de/paedagogik/lexikon/nachteilsausgleich/",
+    "https://lehrerfortbildung-bw.de/st_inklusion/fb1/8-mat/02a_KurzinfoNTA.pdf",
+    "https://learninggarden.ch/was-ist-ein-nachteilsausgleich/",
+    "https://bk.schulamt-bw.de/,Lde/Startseite/Paedagogische+Themen/Nachteilsausgleich",
+    "https://www.arbeitsagentur.de/bildung/ausbildung/pruefungserleichterungen-fuer-junge-menschen-mit-behinderungen",
+    "https://www.wegweiser-bw.de/fileadmin/user_upload/Nachteilsausgleich_deutsch.pdf"
+   ],
+   "unresponsive": [
+    [
+     "duckduckgo",
+     "Suspended: access denied"
+    ]
+   ]
+  },
+  "B": {
+   "wall": 445.751209044829,
+   "server_total": 442.805,
+   "engine_total": {
+    "bing": 298.888,
+    "yahoo": 441.161
+   },
+   "engine_load": {
+    "bing": 292.574,
+    "yahoo": 433.217
+   },
+   "urls": [
+    "https://de.wikipedia.org/wiki/Nachteilsausgleich",
+    "https://bk.schulamt-bw.de/site/pbs-bw-rebrush2024/get/documents_E-1713056107/KULTUS.Dachmandant/KULTUS/Schulaemter/schulamt-backnang/9-Service/Arbeitsstelle%20Kooperation/2025-5-21%20Arbeitshilfe%20Nachteilsausgleich.pdf",
+    "https://meine-begleithilfe.de/wissen/nachteilsausgleich-schule/",
+    "https://km.baden-wuerttemberg.de/de/schule/berufliche-bildung-1/schulartuebergreifende-themen/inklusion/nachteilsausgleich-und-deckung-des-foerderbedarfs",
+    "https://www.forum-verlag.com/fachwissen/bildung-und-erziehung/nachteilsausgleich/",
+    "https://www.anwalt.org/nachteilsausgleich/",
+    "https://wolkenfreiezeit.de/wissen/inklusion/was-bedeutet-der-nachteilsausgleich-in-der-schule",
+    "https://www.sovd.de/fileadmin/bundesverband/pdf/broschueren/menschen_mit_behinderung/SoVD-Brosch%C3%BCre-Nachteilsausgleiche_2021-07-09.pdf",
+    "https://worthelden.de/lrs-diagnose/nachteilsausgleich-in-der-schule-worauf-mussen-eltern-achten/",
+    "https://www.betanet.de/nachteilsausgleiche-bei-behinderung.html",
+    "https://sonderpaedagoge.de/paedagogik/lexikon/nachteilsausgleich/",
+    "https://lehrerfortbildung-bw.de/st_inklusion/fb1/8-mat/02a_KurzinfoNTA.pdf",
+    "https://learninggarden.ch/was-ist-ein-nachteilsausgleich/",
+    "https://bk.schulamt-bw.de/,Lde/Startseite/Paedagogische+Themen/Nachteilsausgleich",
+    "https://www.arbeitsagentur.de/bildung/ausbildung/pruefungserleichterungen-fuer-junge-menschen-mit-behinderungen",
+    "https://www.wegweiser-bw.de/fileadmin/user_upload/Nachteilsausgleich_deutsch.pdf"
+   ],
+   "unresponsive": []
+  },
+  "C": {
+   "timing_ms": {
+    "bing": 199.4,
+    "yahoo": 549.3
+   },
+   "errors": {},
+   "total_ms": 550.3,
+   "per_engine": {
+    "bing": 10,
+    "yahoo": 7
+   }
+  },
+  "n_A": 16,
+  "n_B": 16,
+  "n_C": 16,
+  "ov10_A": 0.9,
+  "ov10_B": 0.9,
+  "ovall_B": 0.9375
+ }
+]

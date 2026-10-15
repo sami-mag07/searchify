@@ -1,0 +1,50 @@
+{"id": "b-de-01", "query": "Welches Architekturbüro entwarf den Berliner Hauptbahnhof?", "lang": "de", "answer_re": "Gerkan"}
+{"id": "b-de-02", "query": "In welchem Jahr fand der erste Agentenaustausch auf der Glienicker Brücke statt?", "lang": "de", "answer_re": "1962"}
+{"id": "b-de-03", "query": "Wie lang ist der Mittellandkanal in Kilometern?", "lang": "de", "answer_re": "325[,.]\\d\\s?(km|Kilometer)"}
+{"id": "b-de-04", "query": "Welcher Baumeister errichtete Schloss Sanssouci in Potsdam?", "lang": "de", "answer_re": "Knobelsdorff"}
+{"id": "b-de-05", "query": "Wie tief ist der Bodensee an seiner tiefsten Stelle?", "lang": "de", "answer_re": "25[01](,\\d+)?\\s?(m\\b|Meter)"}
+{"id": "b-de-06", "query": "Wie hoch ist der Kölner Dom?", "lang": "de", "answer_re": "157([,.]\\d+)?\\s?(m\\b|Meter)"}
+{"id": "b-en-01", "query": "Who designed the Sydney Opera House?", "lang": "en", "answer_re": "J(ø|o|ø)rn Utzon"}
+{"id": "b-en-02", "query": "Which scientist discovered Pluto's moon Charon in 1978?", "lang": "en", "answer_re": "(James|Jim) (W\\. )?Christy"}
+{"id": "b-en-03", "query": "What was the first commercially available single-chip microprocessor?", "lang": "en", "answer_re": "Intel 4004"}
+{"id": "b-en-04", "query": "How tall is the Burj Khalifa in metres?", "lang": "en", "answer_re": "\\b828\\s?(m\\b|metres|meters)"}
+{"id": "b-en-05", "query": "In what year was the Voyager 1 space probe launched?", "lang": "en", "answer_re": "launched.{0,60}1977|1977.{0,60}launched"}
+{"id": "b-en-06", "query": "Who was the first person to reach the geographic South Pole?", "lang": "en", "answer_re": "Amundsen"}
+{"id": "b-en-07", "query": "Which architect designed the Guggenheim Museum Bilbao?", "lang": "en", "answer_re": "Gehry"}
+{"id": "b-en-08", "query": "What is the length of the main span of the Akashi Kaikyo Bridge in metres?", "lang": "en", "answer_re": "1[,.]?991\\s?(m\\b|metres|meters)"}
+{"id": "b-en-09", "query": "Who composed the opera The Magic Flute?", "lang": "en", "answer_re": "Mozart"}
+{"id": "b-de-07", "query": "Wie groß ist die Lichtgeschwindigkeit im Vakuum in Metern pro Sekunde?", "lang": "de", "answer_re": "299[.\\s  ]?792[.\\s  ]?458"}
+{"id": "b-de-08", "query": "An welchem Datum wurde das Euro-Bargeld in Deutschland eingeführt?", "lang": "de", "answer_re": "1\\.\\s?Januar 2002|01\\.01\\.2002"}
+{"id": "b-de-09", "query": "Auf wie viele Sitze ist die Regelgröße des Bundestags seit der Wahlrechtsreform von 2023 festgelegt?", "lang": "de", "answer_re": "\\b630\\b"}
+{"id": "b-de-10", "query": "Bei welcher Temperatur in Grad Celsius schmilzt Eisen?", "lang": "de", "answer_re": "1[.,\\s]?53[58]\\s?(°|Grad)"}
+{"id": "b-en-10", "query": "What is the exact value of the Planck constant in joule-seconds since the 2019 SI redefinition?", "lang": "en", "answer_re": "6\\.62607015|6\\.626\\s?070\\s?15"}
+{"id": "b-en-11", "query": "How many member states does the European Union have?", "lang": "en", "answer_re": "\\b27\\s+(member\\s+)?(states|countries)"}
+{"id": "b-en-12", "query": "On what date did Apollo 11 land on the Moon?", "lang": "en", "answer_re": "July 20,? 1969|20 July 1969"}
+{"id": "b-en-13", "query": "How many keys does a standard modern piano have?", "lang": "en", "answer_re": "\\b88\\s+keys"}
+{"id": "b-en-14", "query": "What is the atomic number of gold?", "lang": "en", "answer_re": "\\b79\\b"}
+{"id": "b-en-15", "query": "How many chromosomes does a typical human somatic cell have?", "lang": "en", "answer_re": "\\b46\\s+chromosomes|23 pairs"}
+{"id": "b-de-11", "query": "Welchen Standardport nutzt SSH?", "lang": "de", "answer_re": "Port:?\\s*22\\b|\\b22/TCP|TCP[- ]Port 22"}
+{"id": "b-de-12", "query": "Welche Standardportnummer verwendet MongoDB?", "lang": "de", "answer_re": "27017"}
+{"id": "b-de-13", "query": "Was bedeutet der HTTP-Statuscode 503?", "lang": "de", "answer_re": "Service Unavailable|Dienst nicht verf"}
+{"id": "b-en-16", "query": "What is the default TCP port of PostgreSQL?", "lang": "en", "answer_re": "\\b5432\\b"}
+{"id": "b-en-17", "query": "What is the default port used by Redis?", "lang": "en", "answer_re": "\\b6379\\b"}
+{"id": "b-en-18", "query": "What does HTTP status code 418 mean?", "lang": "en", "answer_re": "teapot"}
+{"id": "b-en-19", "query": "Which HTTP status code means Too Many Requests?", "lang": "en", "answer_re": "\\b429\\b.{0,20}Too Many Requests"}
+{"id": "b-en-20", "query": "Which Cargo command creates a new Rust package?", "lang": "en", "answer_re": "cargo new"}
+{"id": "b-en-21", "query": "Which Python PEP introduced the walrus operator (assignment expressions)?", "lang": "en", "answer_re": "PEP 572|Assignment Expressions"}
+{"id": "b-en-22", "query": "In Git, which command shows the commit history?", "lang": "en", "answer_re": "git log"}
+{"id": "b-de-14", "query": "Wie lange beträgt die regelmäßige Verjährungsfrist nach dem BGB?", "lang": "de", "answer_re": "drei Jahre|3 Jahre"}
+{"id": "b-de-15", "query": "Wo hat das Bundesverfassungsgericht seinen Sitz?", "lang": "de", "answer_re": "Karlsruhe"}
+{"id": "b-de-16", "query": "Aus wie vielen Richtern besteht das Bundesverfassungsgericht insgesamt?", "lang": "de", "answer_re": "(16|sechzehn) Richter|acht Richter"}
+{"id": "b-de-17", "query": "Ab welchem Alter ist man in Deutschland volljährig und voll geschäftsfähig?", "lang": "de", "answer_re": "18\\.? Lebensjahr|achtzehn|18 Jahre"}
+{"id": "b-de-18", "query": "Wie lange dauert die Amtszeit des Bundespräsidenten?", "lang": "de", "answer_re": "f(ü|ue)nf Jahre|5 Jahre"}
+{"id": "b-de-19", "query": "In welcher Stadt hat die Bundesagentur für Arbeit ihren Hauptsitz?", "lang": "de", "answer_re": "N(ü|ue)rnberg"}
+{"id": "b-de-20", "query": "Wie viele Werktage Mindesturlaub gibt es nach dem Bundesurlaubsgesetz bei einer Sechstagewoche?", "lang": "de", "answer_re": "24 Werktage"}
+{"id": "b-de-21", "query": "In welcher Stadt sitzt das Bundesamt für Sicherheit in der Informationstechnik (BSI)?", "lang": "de", "answer_re": "Bonn"}
+{"id": "b-de-22", "query": "Welcher Artikel des Grundgesetzes erklärt die Würde des Menschen für unantastbar?", "lang": "de", "answer_re": "Art(ikel|\\.)\\s?1\\b.{0,200}unantastbar|unantastbar"}
+{"id": "b-de-23", "query": "Welches Bundesland hat die meisten Einwohner?", "lang": "de", "answer_re": "Nordrhein-Westfalen"}
+{"id": "b-de-24", "query": "Welche Partei verpasste bei der Landtagswahl 2026 in Baden-Württemberg erstmals den Einzug in den Landtag?", "lang": "de", "answer_re": "FDP verpasste erstmals"}
+{"id": "b-de-25", "query": "In welchem Stadion fand das Finale der Fußball-WM 2026 statt?", "lang": "de", "answer_re": "MetLife"}
+{"id": "b-en-23", "query": "Which country won the 2026 FIFA World Cup final against Argentina?", "lang": "en", "answer_re": "\\bSpain\\b|Spanien"}
+{"id": "b-en-24", "query": "Which country topped the medal table at the 2026 Winter Olympics in Milan Cortina?", "lang": "en", "answer_re": "\\bNorway\\b|Norwegen"}
+{"id": "b-en-25", "query": "Which stadium hosted the opening ceremony of the 2026 Winter Olympics?", "lang": "en", "answer_re": "San Siro"}

@@ -1,0 +1,834 @@
+"""Fetch + Extraktion + Chunking.
+
+- Laden der Quell-URLs via httpx, parallel mit hartem Zeitbudget.
+- Haupttext-Extraktion via trafilatura (Apache-2.0).
+- Chunking als reine Python-Funktion (Wort-Fenster + Overlap, eigene Wahl).
+
+trafilatura wird LAZY importiert, damit dieses Modul auch ohne installierte
+Schwer-Abhaengigkeit importierbar bleibt (Tests/Dry-Run).
+"""
+
+from __future__ import annotations
+
+import hashlib
+import ipaddress
+import logging
+import multiprocessing
+import os
+import re
+import socket
+import threading
+import time
+from collections import OrderedDict
+from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
+from concurrent.futures import TimeoutError as FuturesTimeout
+from concurrent.futures.process import BrokenProcessPool
+from typing import Dict, Iterator, List, Optional, Tuple
+from urllib.parse import urljoin, urlparse
+
+import httpcore
+import httpx
+
+from .config import get_settings
+
+log = logging.getLogger("rag-search")
+
+
+def chunk_text(text: str, chunk_size: int = 350, overlap: int = 60) -> List[str]:
+    """Teilt Text in sich ueberlappende Wort-Fenster.
+
+    Reine Funktion, keine externen Abhaengigkeiten. chunk_size/overlap sind in
+    Woertern (grobe Token-Approximation). Eigener Default, bewusst NICHT an einer
+    nicht dokumentierten Tavily-Chunk-Laenge orientiert.
+    """
+    words = text.split()
+    if not words:
+        return []
+    if overlap >= chunk_size:
+        overlap = max(0, chunk_size // 4)
+
+    chunks: List[str] = []
+    step = max(1, chunk_size - overlap)
+    for start in range(0, len(words), step):
+        window = words[start : start + chunk_size]
+        if not window:
+            break
+        chunks.append(" ".join(window))
+        if start + chunk_size >= len(words):
+            break
+    return chunks
+
+
+_MIN_WORDS_FAST = 120  # darunter hat der schnelle Extraktor vermutlich zu wenig erwischt
+
+
+def _extract_fast(html: str) -> Optional[str]:
+    """resiliparse (Apache-2.0): ~1 ms je Seite. None, wenn nicht installiert."""
+    try:
+        from resiliparse.extract.html2text import extract_plain_text  # noqa: PLC0415
+        from resiliparse.parse.html import HTMLTree  # noqa: PLC0415
+    except ImportError:
+        return None
+    text = extract_plain_text(
+        HTMLTree.parse(html), main_content=True, links=False, alt_texts=False,
+        list_bullets=False, form_fields=False,
+    )
+    return _drop_ui_lines(text) or None
+
+
+def _drop_ui_lines(text: str) -> str:
+    """Navigation, Buttons, Menues raus: Zeilen unter 5 Woertern ohne Satzzeichen
+    am Ende und ohne Ziffer. resiliparse laesst solche Reste ("Zum Inhalt
+    springen", "Meine Merkliste") durch, und mit dem Seitentitel davor rankten
+    sie teils auf Platz 1. Zeilen mit Ziffern bleiben (Infobox: "Einwohner 456.692")."""
+    keep = [
+        line.strip()
+        for line in text.splitlines()
+        if len(line.split()) >= 5
+        or line.rstrip().endswith((".", "!", "?", ":"))
+        or any(ch.isdigit() for ch in line)
+    ]
+    return "\n".join(keep).strip()
+
+
+def extract_main_text(html: str, url: str = "") -> Optional[str]:
+    """Haupttext aus HTML ziehen. Lazy-Import.
+
+    Zweistufig: erst resiliparse (schnell), bei weniger als 120 Woertern
+    trafilatura (genauer bei kurzen/ungewoehnlichen Seiten).
+    Gibt None zurueck, wenn kein verwertbarer Haupttext gefunden wird.
+    """
+    fast = _extract_fast(html)
+    if fast and len(fast.split()) >= _MIN_WORDS_FAST:
+        return fast
+    try:
+        import trafilatura  # noqa: PLC0415 (bewusst lazy)
+    except ImportError as exc:  # pragma: no cover - nur ohne Installation
+        raise ImportError(
+            "trafilatura ist nicht installiert. `pip install trafilatura` "
+            "(steht in requirements.txt)."
+        ) from exc
+
+    extracted = trafilatura.extract(
+        html,
+        url=url or None,
+        include_comments=False,
+        include_tables=True,
+        no_fallback=True,  # Fallback-Extraktoren kosten ~3x Zeit bei kaum mehr Text
+    )
+    if not extracted:
+        return fast
+    return extracted.strip()
+
+
+# Aktions-Links (Anmeldung, Bewerbung, Formulare) zuerst: Fuer Programme und
+# Bewerbungen ist genau der Link hinter dem Button oft die eigentliche Antwort.
+_ACTION_RE = re.compile(
+    r"\b(anmeld\w*|registr\w*|bewerb\w*|teilnahme\w*|teilnehm\w*|formular\w*|"
+    r"antrag\w*|antr(ae|ä)ge|einreich\w*|buchen|buchung|apply|application|applications|"
+    r"register|registration|sign[ -]?up|enrol+(ment)?|submit|forms?|ausschreibung\w*|"
+    # Spanisch
+    r"inscripci(o|ó)n\w*|inscrib\w*|solicitud\w*|solicitar|registr(o|arse)|formulario\w*|"
+    r"postular\w*|postulaci(o|ó)n\w*|convocatoria\w*|matr(i|í)cula\w*|"
+    # Franzoesisch
+    r"inscri(re|ption|vez|ptions)\w*|candidat(ure|er)\w*|postuler|formulaire\w*|"
+    r"demande\w*|s.?enregistrer|appel (a|à) (projets|candidatures))\b"
+    r"|\.pdf\b",
+    re.IGNORECASE,
+)
+_MAX_LINKS = 25
+
+
+def extract_links(
+    html: Optional[str],
+    base_url: str = "",
+    limit: int = _MAX_LINKS,
+    keep_self: bool = False,
+    tree=None,
+) -> List[Dict[str, str]]:
+    """Links einer Seite als [{"text", "url"}], Aktions-Links zuerst.
+
+    Ohne javascript:/mailto:/tel: und reine Sprungmarken, absolute URLs, keine
+    Dubletten, hoechstens 25. keep_self (Lese-Modus): Links auf die Seite selbst
+    bleiben samt Sprungmarke wie beim Original, sonst fallen Knoepfe wie
+    "Apply" -> "#modal_box" als Dublette des ersten Selbstlinks weg.
+    Reine Funktion (laeuft im Extraktions-Prozess).
+    """
+    try:
+        from lxml import html as lxml_html  # noqa: PLC0415
+    except ImportError:  # pragma: no cover
+        return []
+    if tree is None:
+        try:
+            tree = lxml_html.fromstring(html)
+        except (ValueError, TypeError, lxml_html.etree.ParserError):
+            return []
+    page = base_url.split("#", 1)[0]
+    seen: set = set()
+    action: List[Dict[str, str]] = []
+    other: List[Dict[str, str]] = []
+    for el in tree.iter("a", "form"):
+        if el.tag == "form" and _is_search_form(el):
+            continue  # Suchfeld der Website ist keine Aktion
+        href = (el.get("href") if el.tag == "a" else el.get("action")) or ""
+        href = href.strip()
+        if not href or href.startswith(("javascript:", "mailto:", "tel:")):
+            continue
+        if href.startswith("#") and not keep_self:
+            continue  # Sprungmarke = Seite selbst
+        try:
+            url = urljoin(base_url, href)
+        except ValueError:
+            continue  # kaputte URL (z. B. "http://[bad") ueberspringen
+        if not keep_self:
+            url = url.split("#", 1)[0]
+        elif url.endswith("#"):
+            url = url[:-1]
+        if not url.startswith(("http://", "https://")) or url in seen:
+            continue
+        if url == page and not keep_self:
+            continue
+        text = " ".join((el.text_content() if el.tag == "a" else "Formular").split())[:120]
+        if not text:
+            text = (el.get("aria-label") or el.get("title") or "").strip()[:120]
+        if not text:
+            continue
+        seen.add(url)
+        # Ganze Woerter: "form" darf nicht in "informationen" treffen.
+        probe = f"{text} {url.replace('-', ' ').replace('_', ' ').replace('/', ' ')}"
+        (action if _ACTION_RE.search(probe) else other).append(
+            {"text": text, "url": url}
+        )
+    return (action + other)[:limit]
+
+
+def _is_search_form(form) -> bool:
+    action = (form.get("action") or "").lower()
+    if any(w in action for w in ("search", "suche", "/such")):
+        return True
+    for inp in form.iter("input"):
+        if (inp.get("type") or "").lower() == "search" or (inp.get("name") or "").lower() in (
+            "q", "s", "query", "search", "suche", "keys",
+        ):
+            return True
+    return False
+
+
+def _metadata(html: str, url: str = "", extensive: bool = True) -> Dict:
+    """title, date, author, description (trafilatura); leer bei Fehler.
+    extensive=False: Datum nur aus Meta-Angaben/Markup, ohne Freitext-Suche per
+    dateparser (die kostet beim ersten Aufruf je Sprache mehrere Sekunden)."""
+    try:
+        from trafilatura.metadata import extract_metadata  # noqa: PLC0415
+
+        m = extract_metadata(html, default_url=url or None, extensive=extensive)
+        if m is None:
+            return {}
+        return m.as_dict() if hasattr(m, "as_dict") else dict(m.__dict__)
+    except Exception:  # noqa: BLE001 - Metadaten sind Beiwerk
+        return {}
+
+
+def _doc(url: str, meta: Dict, content: Optional[str], links: List[Dict[str, str]]) -> Dict:
+    return {
+        "url": url,
+        "title": (meta.get("title") or "").strip() or None,
+        "published": meta.get("date"),
+        "author": meta.get("author"),
+        "description": meta.get("description"),
+        "content": (content or "").strip() or None,
+        "links": links,
+    }
+
+
+def extract_document(html: str, url: str = "", fmt: str = "text") -> Dict:
+    """Ganze Seite als Dokument: title, published (ISO-Datum oder None), author,
+    description, content (Text oder Markdown je `fmt`), links. Reine Funktion,
+    laeuft im Extraktions-Prozess. Grundlage der kompatiblen Endpunkte
+    (Tavily Extract, Exa contents, Jina Reader)."""
+    meta = _metadata(html, url)
+    content: Optional[str] = None
+    if fmt == "markdown":
+        try:
+            import trafilatura  # noqa: PLC0415
+
+            content = trafilatura.extract(
+                html, url=url or None, output_format="markdown", include_formatting=True,
+                include_tables=True, include_links=False, no_fallback=True,
+            )
+        except Exception:  # noqa: BLE001
+            content = None
+    if not content:
+        content = extract_main_text(html, url)
+    try:
+        links = extract_links(html, url)
+    except Exception:  # noqa: BLE001
+        links = []
+    return _doc(url, meta, content, links)
+
+
+def extract_page(html: str, url: str = "") -> Tuple[Optional[str], List[Dict[str, str]], Dict]:
+    """Haupttext, Links und Metadaten in einem Durchgang (eine Prozess-Uebergabe).
+    Die Metadaten fuellen den Dokument-Cache, damit Exa/Jina/Extract eine Seite
+    aus der Suche nicht ein zweites Mal laden. Fehler bei Links oder Metadaten
+    duerfen den Text nie kosten."""
+    text = extract_main_text(html, url)
+    try:
+        links = extract_links(html, url)
+    except Exception:  # noqa: BLE001 - Links sind Beiwerk
+        links = []
+    return text, links, _metadata(html, url)
+
+
+_USER_AGENT = "Mozilla/5.0 (compatible; rag-search-bot/0.1; +self-hosted-clean-room)"
+_MAX_BYTES = 1_000_000  # groessere Seiten werden abgeschnitten, nicht komplett geladen
+
+_CLIENT: Optional[httpx.Client] = None
+_POOL: Optional[ThreadPoolExecutor] = None
+
+
+class PageCache:
+    """Extrahierte Seitentexte im Speicher (LRU + TTL), threadsicher.
+
+    Downloads, die das Zeitbudget einer Anfrage verpassen, laufen im Hintergrund
+    zu Ende und landen hier. Die naechste Anfrage mit derselben Quelle bekommt
+    den Volltext dann sofort. Das ist der kleine, lokale Ersatz fuer einen Index.
+    """
+
+    def __init__(self, max_items: int, ttl_s: int, max_bytes: Optional[int] = None) -> None:
+        self.max_items, self.ttl_s, self.max_bytes = max_items, ttl_s, max_bytes
+        self._data: "OrderedDict[str, Tuple[float, object]]" = OrderedDict()
+        self._sizes: Dict[str, int] = {}
+        self._total = 0
+        self._lock = threading.Lock()
+
+    @staticmethod
+    def _size(value) -> int:
+        """Grobe Groesse in Zeichen: Text bzw. content + Links eines Dokuments."""
+        if isinstance(value, str):
+            return len(value)
+        if isinstance(value, dict):
+            return len(value.get("content") or "") + 120 * len(value.get("links") or [])
+        if isinstance(value, list):
+            return 120 * len(value)
+        return 0
+
+    def _drop(self, key: str) -> None:
+        self._data.pop(key, None)
+        self._total -= self._sizes.pop(key, 0)
+
+    def get(self, url: str) -> Optional[str]:
+        if self.ttl_s <= 0:
+            return None
+        with self._lock:
+            hit = self._data.get(url)
+            if not hit:
+                return None
+            stored, text = hit
+            if time.monotonic() - stored > self.ttl_s:
+                self._drop(url)
+                return None
+            self._data.move_to_end(url)
+            return text
+
+    def put(self, url: str, text: str) -> None:
+        if self.ttl_s <= 0:
+            return
+        with self._lock:
+            self._drop(url)
+            self._data[url] = (time.monotonic(), text)
+            self._sizes[url] = self._size(text)
+            self._total += self._sizes[url]
+            # Grenze nach Anzahl UND Groesse: Reader-Dokumente (ganze Seiten, viele
+            # Links) wuerden sonst bei 5000 Eintraegen mehrere GB belegen.
+            while self._data and (
+                len(self._data) > self.max_items
+                or (self.max_bytes is not None and self._total > self.max_bytes)
+            ):
+                self._drop(next(iter(self._data)))
+
+
+_INIT_LOCK = threading.Lock()
+_CACHE: Optional[PageCache] = None
+
+
+def _cache() -> PageCache:
+    global _CACHE
+    if _CACHE is None:
+        with _INIT_LOCK:
+            if _CACHE is None:
+                settings = get_settings()
+                _CACHE = PageCache(settings.page_cache_size, settings.page_cache_ttl_s)
+    return _CACHE
+
+
+def _public_ips(host: str) -> List[str]:
+    """Aufgeloeste IPs des Hosts, aber nur wenn ALLE oeffentlich sind, sonst [].
+    Loopback, private Netze, Link-Local & Co. fuehren zu []."""
+    try:
+        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+    except (socket.gaierror, UnicodeError, OSError):
+        return []
+    ips: List[str] = []
+    for info in infos:
+        raw = info[4][0].split("%")[0]
+        if not ipaddress.ip_address(raw).is_global:
+            return []
+        if raw not in ips:
+            ips.append(raw)
+    return ips
+
+
+def _host_is_public(host: str) -> bool:
+    return bool(_public_ips(host))
+
+
+class _PinnedBackend(httpcore.SyncBackend):
+    """Verbindet nur zu geprueften, oeffentlichen IPs (Schutz gegen DNS-Rebinding).
+
+    Pruefen und Verbinden passieren hier in einem Schritt: Der Host wird einmal
+    aufgeloest, geprueft und genau diese IP verbunden. Ohne das koennte ein
+    Angreifer-DNS bei der Pruefung eine oeffentliche und beim Verbinden eine
+    interne IP liefern. TLS/SNI und Zertifikat laufen weiter auf den Hostnamen.
+    """
+
+    def connect_tcp(self, host, port, timeout=None, local_address=None, socket_options=None):
+        ips = _public_ips(host)
+        if not ips:
+            raise httpcore.ConnectError(f"Interne oder unaufloesbare Adresse blockiert: {host}")
+        # Wie socket.create_connection: alle gepruefte Adressen der Reihe nach,
+        # damit ein toter erster A-Record (oder IPv6 ohne Route) den Host nicht kippt.
+        last_error: Optional[Exception] = None
+        for ip in ips:
+            try:
+                return super().connect_tcp(
+                    ip, port, timeout=timeout, local_address=local_address,
+                    socket_options=socket_options,
+                )
+            except (httpcore.ConnectError, httpcore.ConnectTimeout) as exc:
+                last_error = exc
+        raise last_error  # type: ignore[misc]
+
+
+def _block_internal(request: httpx.Request) -> None:
+    """SSRF-Schutz: Gilt fuer die erste Anfrage UND jeden Redirect, damit eine
+    Trefferseite nicht auf claude-code-api, SearXNG oder 169.254.x umleiten kann."""
+    if request.url.scheme not in ("http", "https") or not _host_is_public(request.url.host):
+        raise httpx.RequestError("Interne oder ungueltige Adresse blockiert", request=request)
+
+
+def _client() -> httpx.Client:
+    global _CLIENT
+    if _CLIENT is None:
+        with _INIT_LOCK:
+            if _CLIENT is None:
+                transport = httpx.HTTPTransport(
+                    # Lange Keep-Alive-Zeit: haeufige Hosts (Wikipedia & Co.) sparen den TLS-Aufbau.
+                    limits=httpx.Limits(
+                        max_connections=64, max_keepalive_connections=32, keepalive_expiry=120
+                    ),
+                )
+                # httpx bietet keinen offiziellen Parameter fuers Netzwerk-Backend; httpx
+                # 0.28 / httpcore 1.0 sind in requirements.txt gepinnt, Test prueft die Naht.
+                transport._pool._network_backend = _PinnedBackend()
+                _CLIENT = httpx.Client(
+                    follow_redirects=True,
+                    headers={"User-Agent": _USER_AGENT},
+                    event_hooks={"request": [_block_internal]},
+                    transport=transport,
+                )
+    return _CLIENT
+
+
+_POOL_WORKERS = 48
+# Obergrenze fuer gleichzeitig laufende + wartende Downloads. Darueber nutzt eine
+# Anfrage nur noch Snippets und Cache, statt hinter verspaeteten Downloads anzustehen.
+_MAX_INFLIGHT = 2 * _POOL_WORKERS
+_INFLIGHT: set = set()  # URLs, die gerade laden (gegen doppeltes Laden)
+_INFLIGHT_LOCK = threading.Lock()
+
+
+def _pool() -> ThreadPoolExecutor:
+    global _POOL
+    if _POOL is None:
+        with _INIT_LOCK:
+            if _POOL is None:
+                _POOL = ThreadPoolExecutor(max_workers=_POOL_WORKERS, thread_name_prefix="fetch")
+    return _POOL
+
+
+_TLS = threading.local()
+_REDIRECTS = {301, 302, 303, 307, 308}
+_BLOCKED = {403, 429, 503}  # typische Antworten von Bot-Schutz
+
+
+def _curl_session():
+    """Eine curl_cffi-Session je Thread (Sessions sind nicht threadsicher)."""
+    sess = getattr(_TLS, "curl", None)
+    if sess is None:
+        from curl_cffi import requests as curl_requests  # noqa: PLC0415 (optional)
+
+        sess = curl_requests.Session(impersonate="chrome")
+        _TLS.curl = sess
+    return sess
+
+
+def _plain_url(url: str) -> bool:
+    """Nur eindeutige http(s)-URLs fuer curl: kein Backslash, keine Leer-/Steuerzeichen,
+    keine Zugangsdaten vor dem Host. Sonst koennten urlparse und curl verschiedene
+    Hosts lesen (geprueft wird der eine, verbunden der andere)."""
+    if any(c == "\\" or ord(c) <= 0x20 or ord(c) == 0x7F for c in url):
+        return False
+    try:
+        parts = urlparse(url)
+        parts.port  # noqa: B018 - wirft bei ungueltigem Port
+    except ValueError:
+        return False
+    return parts.scheme in ("http", "https") and bool(parts.hostname) and "@" not in parts.netloc
+
+
+def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Optional[str]:
+    """Wie fetch_url, aber mit Chrome-TLS-Fingerprint (curl_cffi): weniger 403 von
+    Bot-Schutz. Redirects werden selbst verfolgt, damit jeder Sprung den
+    SSRF-Check durchlaeuft."""
+    from curl_cffi import CurlOpt  # noqa: PLC0415 (optional)
+
+    deadline = time.monotonic() + timeout
+    try:
+        for _ in range(5):
+            if not _plain_url(url):
+                return None
+            parts = urlparse(url)
+            ips = _public_ips(parts.hostname or "")
+            if not ips:
+                return None
+            # Geprueften Host auf die gepruefte IP festnageln (CURLOPT_RESOLVE), damit
+            # curl nicht selbst neu aufloest (DNS-Rebinding). Session ist je Thread.
+            port = parts.port or (443 if parts.scheme == "https" else 80)
+            sess = _curl_session()
+            pinned = ",".join(f"[{ip}]" if ":" in ip else ip for ip in ips)
+            # CONNECT_TO ohne Host/Port gilt fuer jede Verbindung: selbst wenn curl die URL
+            # anders liest als urlparse, verbindet es nur zur geprueften IP.
+            first = f"[{ips[0]}]" if ":" in ips[0] else ips[0]
+            sess.curl_options = {
+                CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"],
+                CurlOpt.CONNECT_TO: [f"::{first}:{port}"],
+            }
+            resp = sess.get(
+                url, timeout=max(0.1, deadline - time.monotonic()), allow_redirects=False, stream=True
+            )
+            try:
+                if resp.status_code in _REDIRECTS and resp.headers.get("location"):
+                    url = urljoin(url, resp.headers["location"])
+                    continue
+                if resp.status_code >= 400:
+                    return None
+                ctype = resp.headers.get("content-type", "")
+                if ctype and "html" not in ctype and "text" not in ctype:
+                    return None
+                body = bytearray()
+                for part in resp.iter_content():
+                    body.extend(part)
+                    if len(body) >= max_bytes:
+                        break
+                    if time.monotonic() > deadline:
+                        return None
+                return body.decode(resp.encoding or "utf-8", errors="replace")
+            finally:
+                resp.close()
+    except Exception:  # noqa: BLE001 - curl_cffi wirft eigene Fehlertypen
+        return None
+    return None
+
+
+def fetch_url(
+    url: str, timeout: Optional[float] = None, max_bytes: Optional[int] = None
+) -> Optional[str]:
+    """Laedt eine URL und gibt den HTML-Text zurueck (oder None bei Fehler).
+
+    `timeout` gilt fuer den GANZEN Download: httpx zaehlt nur je Lese-Schritt,
+    ein tropfender Server wuerde sonst einen Worker beliebig lange festhalten.
+    """
+    settings = get_settings()
+    timeout = timeout or settings.fetch_timeout
+    limit = max_bytes or _MAX_BYTES
+    replay = _replay_page_path(url)
+    if replay:
+        if os.path.exists(replay + ".html"):
+            with open(replay + ".html", encoding="utf-8") as fh:
+                return fh.read()[:limit]
+        if os.path.exists(replay + ".fail"):
+            return None
+        html = _fetch_live(url, timeout, limit, settings)
+        with open(replay + (".html" if html else ".fail"), "w", encoding="utf-8") as fh:
+            fh.write(html or "")
+        return html
+    return _fetch_live(url, timeout, limit, settings)
+
+
+def _replay_page_path(url: str) -> Optional[str]:
+    """REPLAY_DIR gesetzt: Aufnahme-Pfad (ohne Endung) fuer diese Seite."""
+    base = os.environ.get("REPLAY_DIR")
+    if not base:
+        return None
+    folder = os.path.join(base, "pages")
+    os.makedirs(folder, exist_ok=True)
+    return os.path.join(folder, hashlib.sha1(url.encode("utf-8")).hexdigest())
+
+
+def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]:
+    if settings.fetch_client == "curl_cffi":
+        return _fetch_url_curl(url, timeout, limit)
+    deadline = time.monotonic() + timeout
+    try:
+        with _client().stream("GET", url, timeout=timeout) as resp:
+            blocked = resp.status_code in _BLOCKED and settings.fetch_fallback
+            if not blocked:
+                resp.raise_for_status()
+                ctype = resp.headers.get("content-type", "")
+                if ctype and "html" not in ctype and "text" not in ctype:
+                    return None
+                body = bytearray()
+                for part in resp.iter_bytes():
+                    body.extend(part)
+                    if len(body) >= limit:
+                        break
+                    if time.monotonic() > deadline:
+                        return None
+                return body.decode(resp.encoding or "utf-8", errors="replace")
+    except httpx.HTTPError:
+        return None
+    # Bot-Schutz antwortet dem ehrlichen Bot-UA oft mit 403/429/503: einmal mit
+    # Chrome-TLS-Profil nachladen (gemessen 14.10.: +4,7 % der Trefferseiten lesbar).
+    remaining = deadline - time.monotonic()
+    if remaining < 0.3:
+        return None
+    return _fetch_url_curl(url, remaining, limit)
+
+
+_EXTRACT_POOL: Optional[ProcessPoolExecutor] = None
+
+
+def _extract_pool() -> ProcessPoolExecutor:
+    """Extraktion ist reine CPU-Arbeit (100-250 ms je grosser Seite). In Threads
+    laufen die Seiten wegen der GIL praktisch nacheinander, in Prozessen parallel."""
+    global _EXTRACT_POOL
+    if _EXTRACT_POOL is None:
+        with _INIT_LOCK:
+            if _EXTRACT_POOL is None:
+                workers = get_settings().extract_workers or max(2, min(8, (os.cpu_count() or 4) - 1))
+                # spawn explizit: Linux nimmt sonst fork und erbt Threads/torch-Zustand.
+                _EXTRACT_POOL = ProcessPoolExecutor(
+                    max_workers=workers, mp_context=multiprocessing.get_context("spawn")
+                )
+    return _EXTRACT_POOL
+
+
+_CLOSED = False
+
+
+def shutdown() -> None:
+    """Prozess-Pool beim Dienst-Ende sauber beenden. Danach extrahiert nichts mehr,
+    damit Hintergrund-Downloads keinen neuen Pool starten."""
+    global _EXTRACT_POOL, _CLOSED
+    with _INIT_LOCK:
+        _CLOSED = True
+        pool, _EXTRACT_POOL = _EXTRACT_POOL, None
+    if pool is not None:
+        pool.shutdown(wait=False, cancel_futures=True)
+
+
+def warm_up() -> None:
+    """Startet die Extraktions-Prozesse vorab (trafilatura-Import ~0.5 s je Prozess)."""
+    pool = _extract_pool()
+    for fut in [pool.submit(extract_page, "<p>warm</p>") for _ in range(pool._max_workers)]:
+        fut.result()
+
+
+def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], Dict]:
+    global _EXTRACT_POOL
+    if _CLOSED:
+        return None, [], {}
+    pool = _extract_pool()
+    try:
+        return pool.submit(extract_page, html, url).result(timeout=10)
+    except FuturesTimeout:
+        return None, [], {}  # pathologische Seite: nicht noch einmal im Thread rechnen
+    except BrokenProcessPool:
+        log.warning("Extraktions-Pool kaputt, wird neu angelegt")
+        with _INIT_LOCK:
+            if _EXTRACT_POOL is pool:  # nur den kaputten Pool verwerfen, nicht einen neuen
+                _EXTRACT_POOL = None
+        return extract_page(html, url)
+    except RuntimeError:  # Pool nicht verfuegbar (z. B. beim Herunterfahren)
+        return extract_page(html, url)
+
+
+_LINKS: Optional[PageCache] = None
+_DOCS: Optional[PageCache] = None
+
+
+def doc_cache() -> PageCache:
+    """Ganze Dokumente je "<format>|<url>" (genutzt von app/pages und _fetch_text)."""
+    global _DOCS
+    if _DOCS is None:
+        with _INIT_LOCK:
+            if _DOCS is None:
+                settings = get_settings()
+                _DOCS = PageCache(
+                    settings.page_cache_size, max(settings.page_cache_ttl_s, 600),
+                    max_bytes=settings.doc_cache_max_mb * 1_000_000,
+                )
+    return _DOCS
+
+
+def _links_cache() -> PageCache:
+    global _LINKS
+    if _LINKS is None:
+        with _INIT_LOCK:
+            if _LINKS is None:
+                settings = get_settings()
+                _LINKS = PageCache(settings.page_cache_size, max(settings.page_cache_ttl_s, 600))
+    return _LINKS
+
+
+def links_for(url: str) -> List[Dict[str, str]]:
+    """Links einer in dieser oder einer frueheren Anfrage geladenen Seite."""
+    return _links_cache().get(url) or []
+
+
+def _fetch_text(url: str) -> Optional[str]:
+    """Laden + Extrahieren mit dem normalen FETCH_TIMEOUT (nicht dem Anfrage-Budget),
+    damit verspaetete Seiten fertig werden und im Cache landen."""
+    try:
+        html = fetch_url(url)
+        text, links, meta = _extract(html, url) if html else (None, [], {})
+        if text:
+            _cache().put(url, text)
+            doc_cache().put(f"text|{url}", _doc(url, meta, text, links))
+        if links:
+            _links_cache().put(url, links)
+        return text
+    finally:
+        with _INFLIGHT_LOCK:
+            _INFLIGHT.discard(url)
+
+
+def _claim(url: str) -> bool:
+    """True, wenn diese Anfrage die URL laden darf (nicht schon unterwegs, Limit frei)."""
+    with _INFLIGHT_LOCK:
+        if url in _INFLIGHT or len(_INFLIGHT) >= _MAX_INFLIGHT:
+            return False
+        _INFLIGHT.add(url)
+        return True
+
+
+class PageFetcher:
+    """Laedt Seiten parallel; URLs koennen jederzeit nachgereicht werden.
+
+    `poll` liefert alles, was seit dem letzten Aufruf fertig wurde (Cache-Treffer
+    sofort). Laufende Downloads werden nie abgebrochen: Was das Budget einer
+    Anfrage verpasst, fuellt den Cache fuer spaetere Anfragen.
+    Nur aus einem Thread benutzen (dem der Anfrage).
+    """
+
+    def __init__(self) -> None:
+        self._futures: Dict[Future, int] = {}
+        self._ready: List[Tuple[int, str]] = []
+
+    def add(self, idx: int, url: str) -> None:
+        if not url:
+            return
+        text = _cache().get(url)
+        if text:
+            self._ready.append((idx, text))
+        elif _claim(url):
+            self._futures[_pool().submit(_fetch_text, url)] = idx
+
+    def has_pending(self) -> bool:
+        return bool(self._futures or self._ready)
+
+    def poll(self, timeout: float) -> List[Tuple[int, str]]:
+        """Fertige Seiten abholen; wartet hoechstens `timeout` auf die erste."""
+        batch, self._ready = self._ready, []
+        if self._futures:
+            done, _ = wait(
+                list(self._futures),
+                timeout=0 if batch else max(0.0, timeout),
+                return_when=FIRST_COMPLETED,
+            )
+            for fut in done:
+                idx = self._futures.pop(fut)
+                try:
+                    text = fut.result()
+                except Exception:  # noqa: BLE001 - kaputte Seite darf die Suche nicht kippen
+                    text = None
+                if text:
+                    batch.append((idx, text))
+        return batch
+
+
+def iter_pages(
+    candidates: List[Dict[str, str]], budget_s: Optional[float] = None
+) -> Iterator[List[Tuple[int, str]]]:
+    """Startet SOFORT alle Downloads parallel und liefert danach Buendel von
+    (index, haupttext): jeweils alles, was seit dem letzten Buendel fertig wurde.
+    So rankt der Aufrufer gleichzeitig angekommene Seiten in einem Durchgang.
+
+    Kein Generator auf oberster Ebene, damit die Downloads schon laufen, waehrend
+    der Aufrufer noch etwas anderes tut (z. B. die Snippets rankt). Harte
+    Zeitgrenze `budget_s` ab dem Aufruf: Was bis dahin nicht da ist, wird nicht
+    mehr abgewartet (die Quelle laeuft dann nur mit Snippet weiter).
+    """
+    budget = budget_s if budget_s is not None else get_settings().fetch_budget_ms / 1000
+    deadline = time.monotonic() + budget
+    fetcher = PageFetcher()
+    for i, c in enumerate(candidates):
+        fetcher.add(i, c.get("url", ""))
+
+    def _arrivals() -> Iterator[List[Tuple[int, str]]]:
+        while fetcher.has_pending():
+            remaining = deadline - time.monotonic()
+            batch = fetcher.poll(max(0.0, remaining))
+            if batch:
+                yield batch
+            elif remaining <= 0:
+                return  # Zeitbudget aufgebraucht
+
+    return _arrivals()
+
+
+def page_chunks(
+    cand: Dict[str, str],
+    full_text: Optional[str],
+    chunk_size: Optional[int] = None,
+    overlap: Optional[int] = None,
+    *,
+    with_snippet: bool = True,
+) -> List[Dict[str, str]]:
+    """Chunks einer Quelle. Das Snippet des Such-Backends ist ein eigener Chunk,
+    weil es meist genau die gesuchte Stelle trifft."""
+    settings = get_settings()
+    url, title, snippet = cand.get("url", ""), cand.get("title", ""), cand.get("content", "")
+    out: List[Dict[str, str]] = []
+    if snippet and with_snippet:
+        out.append({"url": url, "title": title, "content": snippet, "full_text": full_text or ""})
+    if full_text:
+        for piece in chunk_text(full_text, chunk_size or settings.chunk_size, overlap or settings.chunk_overlap):
+            out.append({"url": url, "title": title, "content": piece, "full_text": full_text})
+    return out
+
+
+def fetch_and_extract(
+    candidates: List[Dict[str, str]],
+    *,
+    chunk_size: Optional[int] = None,
+    overlap: Optional[int] = None,
+    budget_s: Optional[float] = None,
+) -> List[Dict[str, str]]:
+    """Alle Chunks auf einmal (fuer Eval/Skripte). Der Dienst nutzt iter_pages."""
+    texts = dict(pair for batch in iter_pages(candidates, budget_s) for pair in batch)
+    out: List[Dict[str, str]] = []
+    for i, cand in enumerate(candidates):
+        out.extend(page_chunks(cand, texts.get(i), chunk_size, overlap))
+    return out
