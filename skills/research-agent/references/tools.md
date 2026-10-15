@@ -189,6 +189,16 @@ Dateisperre). TikTok läuft im Chrome-Profil "TikTok" mit der Extension
 immer relativ zu Samis eigenen Daten (Rang "Top x %"), nie gegen
 Netz-Benchmarks.
 
+## Social-Pfad (Reddit, X, Instagram, TikTok)
+Bei Events, Programmen und Firmen immer einmal mitlaufen lassen: Leute und
+Firmen posten dort vieles, was auf keiner Website steht.
+`search.py "<query>" --social` (oder `--social reddit,x`) sucht jede Query
+einmal pro Plattform, auf deren Domains begrenzt, parallel, ohne Login. Findet
+nur, was Suchmaschinen indexiert haben. Treffer ohne Suchbegriff, NSFW und
+Plattform-Startseiten fliegen raus (Suchmaschinen füllen leere Domain-Suchen
+mit Zufallsseiten). X liefert am wenigsten. Native Zugänge mit Login (praw für
+Reddit, twscrape für X, TikTok-Api, instaloader) sind noch nicht eingebaut.
+
 ## Plattform-Lage (prüfen)
 - **Reddit** (27.09.2026): reddit.com/.json und old.reddit per curl 403,
   r.jina.ai leer, WebSearch mit reddit-Domain abgelehnt. Exa funktioniert:

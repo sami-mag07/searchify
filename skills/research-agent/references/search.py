@@ -13,6 +13,8 @@ Beispiele:
   search.py "hackathon berlin" --since 60d --lang de --n 15
   search.py "LRS App Schule" --site bildungsserver.de --site berlin.de
   search.py "accessibility hackathon" --fan --seen research/slug/seen.txt
+  search.py "hackathon berlin" --social          (Reddit, X, Instagram, TikTok)
+  search.py "jugendparlament" --social reddit,x
   search.py --status
 
 Optionen:
@@ -21,6 +23,9 @@ Optionen:
   --since 30d|2026-09-01   nur neuere Seiten (own grob als day/week/month/year,
                     own-exa, Tavily, Serper, Exa-API echt;
                     Exa-MCP und Jina nur als Hinweis im Suchtext)
+  --social [reddit,x,instagram,tiktok]   Social-Pfad: jede Query einmal pro
+                    Plattform, auf deren Domains begrenzt, parallel; ohne Login,
+                    findet nur, was Suchmaschinen indexiert haben. Ohne Liste alle vier.
   --site / --exclude       Domains ein- bzw. ausschliessen (wiederholbar)
   --lang de|en|...  Sprache/Land der Ergebnisse, wo die Suchmaschine es kann
   --news            Nachrichten statt allgemeiner Web-Suche (own, Tavily, Serper)
@@ -36,6 +41,7 @@ Dienst braucht keinen; nur wenn er mit SERVICE_API_KEY geschützt ist,
 OWN_SEARCH_KEY setzen.
 """
 import argparse
+import copy
 import fcntl
 import json
 import os
@@ -407,6 +413,49 @@ def run_query(q, o, keys, log):
     return []
 
 
+SOCIAL = {"reddit": ["reddit.com"], "x": ["x.com", "twitter.com"],
+          "instagram": ["instagram.com"], "tiktok": ["tiktok.com"]}
+
+
+def social_platforms(arg):
+    names = list(SOCIAL) if arg == "all" else [n.strip() for n in arg.split(",") if n.strip()]
+    unknown = [n for n in names if n not in SOCIAL]
+    if unknown:
+        raise SystemExit(f"--social kennt nur {','.join(SOCIAL)}, nicht {','.join(unknown)}")
+    return names
+
+
+def _terms(q):
+    return [t for t in re.findall(r"\w+", q.lower()) if len(t) >= 4 and not t.isdigit()]
+
+
+def social_relevant(h, q):
+    """Begrenzt auf eine Domain liefern Suchmaschinen ohne Treffer Zufallsseiten,
+    teils NSFW. Behalten nur, was einen Suchbegriff enthält und kein Plattform-Rahmen ist."""
+    text = f"{h.get('title', '')} {h.get('snippet', '')} {h['url']}".lower()
+    if "nsfw" in text or urllib.parse.urlsplit(h["url"]).path.strip("/") == "":
+        return False
+    terms = _terms(q)
+    return not terms or any(t in text for t in terms)
+
+
+def run_social(queries, o, keys, log):
+    """Jede Query einmal pro Plattform, auf deren Domains begrenzt, parallel."""
+    def one(job):
+        name, q = job
+        po = copy.copy(o)
+        po.site = SOCIAL[name]
+        plog = []
+        hits = [dict(h, platform=name) for h in run_query(q, po, keys, plog)
+                if h.get("url") and host_ok(h, po) and social_relevant(h, q)]
+        log.extend(f"{name}: {m}" for m in plog)
+        return hits
+    jobs = [(n, q) for n in social_platforms(o.social) for q in queries]
+    own_probe()
+    with ThreadPoolExecutor(min(8, len(jobs))) as ex:
+        return [h for part in ex.map(one, jobs) for h in part]
+
+
 def host_ok(h, o):
     """Domainfilter nachziehen, weil nicht jede Suchmaschine echt filtert."""
     host = urllib.parse.urlsplit(h["url"]).netloc.lower().removeprefix("www.")
@@ -476,6 +525,7 @@ def main():
     ap.add_argument("--seen")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--status", action="store_true")
+    ap.add_argument("--social", nargs="?", const="all")
     o = ap.parse_args()
     keys = load_keys()
     if o.status:
@@ -485,9 +535,14 @@ def main():
     o.since_d = since_date(o.since)
 
     log, hits = [], []
-    for q in o.queries:
-        hits += run_query(q, o, keys, log)
-    hits = merge([h for h in hits if h.get("url") and host_ok(h, o)])
+    if o.social:
+        hits = merge(run_social(o.queries, o, keys, log))
+        order = list(SOCIAL)
+        hits.sort(key=lambda h: order.index(h["platform"]))  # stabil: Rang je Plattform bleibt
+    else:
+        for q in o.queries:
+            hits += run_query(q, o, keys, log)
+        hits = merge([h for h in hits if h.get("url") and host_ok(h, o)])
     log = list(dict.fromkeys(log))
     if o.seen:
         mark_seen(hits, o.seen)
@@ -498,7 +553,8 @@ def main():
         for i, h in enumerate(hits, 1):
             tag = "" if "new" not in h else ("[neu] " if h["new"] else "[bekannt] ")
             date_s = f" ({h['published']})" if h["published"] else ""
-            print(f"{i}. {tag}{h['title']}{date_s} | {h['engine']}\n   {h['url']}")
+            plat = f"[{h['platform']}] " if "platform" in h else ""
+            print(f"{i}. {plat}{tag}{h['title']}{date_s} | {h['engine']}\n   {h['url']}")
             if h["snippet"]:
                 print(f"   {h['snippet'][:220]}")
         if log:

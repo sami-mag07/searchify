@@ -168,5 +168,30 @@ class ChainTest(unittest.TestCase):
         self.assertEqual(search.merge(hits)[0]["engine"], "own+own-exa")
 
 
+class SocialTest(unittest.TestCase):
+    def hit(self, title, url, snippet=""):
+        return {"title": title, "url": url, "snippet": snippet}
+
+    def test_drops_random_pages_without_query_term(self):
+        h = self.hit("Some unrelated thread", "https://www.reddit.com/r/Advice/comments/x/y")
+        self.assertFalse(search.social_relevant(h, "Jugendparlament Brandenburg"))
+
+    def test_keeps_post_matching_compound_word(self):
+        h = self.hit("#jugendparlamente - TikTok", "https://www.tiktok.com/tag/jugendparlamente")
+        self.assertTrue(search.social_relevant(h, "Jugendparlament Brandenburg"))
+
+    def test_drops_nsfw_and_bare_hosts(self):
+        nsfw = self.hit("hackathon [nsfw]", "https://www.reddit.com/r/a/comments/1/b")
+        bare = self.hit("hackathon", "https://search.twitter.com/")
+        self.assertFalse(search.social_relevant(nsfw, "hackathon"))
+        self.assertFalse(search.social_relevant(bare, "hackathon"))
+
+    def test_platform_list(self):
+        self.assertEqual(search.social_platforms("all"), list(search.SOCIAL))
+        self.assertEqual(search.social_platforms("x, reddit"), ["x", "reddit"])
+        with self.assertRaises(SystemExit):
+            search.social_platforms("facebook")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
