@@ -24,3 +24,9 @@ def _leerer_antwort_cache():
 def _camoufox_aus(monkeypatch):
     """Camoufox-Stufe (stealth.py) startet in Tests nur, wenn ein Test sie einschaltet."""
     monkeypatch.setenv("READER_STEALTH", "0")
+
+
+@pytest.fixture(autouse=True)
+def _bibliothek_aus(monkeypatch):
+    """Themen-Bibliothek (app/library.py) nur in Tests, die sie selbst einschalten."""
+    monkeypatch.setenv("LIBRARY_K", "0")

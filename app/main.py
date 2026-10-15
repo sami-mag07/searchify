@@ -27,6 +27,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from . import answer as answer_mod
 from . import extract as extract_mod
 from . import lang as lang_mod
+from . import library as library_mod
 from . import rerank as rerank_mod
 from . import search as search_mod
 from . import stream as stream_mod
@@ -221,6 +222,13 @@ def _run_search(req: SearchRequest, _relaxed: bool = False) -> "tuple[SearchResp
         if not candidates and loose:
             resp, complete = _run_search(req.model_copy(update={"query": loose}), _relaxed=True)
             return resp.model_copy(update={"query": req.query}), complete
+        # Themen-Bibliothek: Regal-Seiten wie Engine-Treffer dazu (app/library.py).
+        if candidates and settings.library_k > 0:
+            have = {rerank_mod.canonical_url(c.get("url", "")) for c in candidates}
+            candidates = candidates + [
+                h for h in library_mod.seed_hits(req, settings.library_k)
+                if rerank_mod.canonical_url(h["url"]) not in have
+            ]
         t_search = time.perf_counter()
 
         # 2+3) Seiten laden und dabei schon ranken: Die Snippets gehen sofort in den

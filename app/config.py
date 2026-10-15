@@ -96,6 +96,7 @@ class Settings:
     quality_prior_compat: bool
     min_result_score: float
     min_results_kept: int
+    library_k: int
 
 
 def get_settings() -> Settings:
@@ -147,4 +148,7 @@ def get_settings() -> Settings:
         # Echte Aufgabe 13.10.: Woerterbuecher/Shops mit gleichem Wort lagen bei score ~0.07-0.11
         min_result_score=_get_float("MIN_RESULT_SCORE", 0.12),
         min_results_kept=_get_int("MIN_RESULTS_KEPT", 3),
+        # Themen-Bibliothek (app/library.py): so viele Regal-Seiten je erkannter Frage, 0 = aus.
+        # Standard aus: A/B 15.10. site@20 +0.012/+0.015, aber mrr -0.02/-0.03 und p95 +0.3-0.4 s
+        library_k=_get_int("LIBRARY_K", 0),
     )

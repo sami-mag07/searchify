@@ -28,3 +28,6 @@ train/logs/
 train/checkpoints/
 .venv-train/
 *.zip
+
+# Gebaute Themen-Bibliothek (app/library_build.py)
+data/
