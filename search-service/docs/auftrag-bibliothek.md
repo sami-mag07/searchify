@@ -40,3 +40,10 @@ Eine Seite, am Handy lesbar, die den ganzen Scraper zeigt:
 - Je Schritt die Stellschrauben und wo man etwas dazubauen kann ("nach Wahl Sachen adden"), inkl. Platz fuer die Themen-Bibliothek.
 - Messwerte gegen die Originale (Tabelle besser/gleich/schlechter aus der README).
 - Samis Stil-Regeln beachten: keine Emojis, keine Gedankenstriche, kein Slop.
+
+## Zusatz 15.10.2026: Camoufox als letzte Lade-Stufe (Sami: "Camoufox klingt gut")
+
+- Ziel: Seiten, die nach normal, curl_cffi (FETCH_FALLBACK) und Headless-Browser noch blockiert sind, mit Camoufox (quelloffener getarnter Firefox) laden. Springt nur bei diesen Seiten an, normale Suchen werden nicht langsamer.
+- Erst messen: die ~33 Seiten, die am 14.10. blockiert blieben (3,9 % von 856, siehe loop-log 14.10. 01:18), durch Camoufox schicken und zählen, wie viele gerettet werden. Nur einbauen, wenn es spürbar rettet.
+- Einbau als eigene Stufe hinter dem Headless-Browser, mit festem Zeitlimit; SSRF-Schutz wie in render.py (nur öffentliche Ziele, jede Weiterleitung prüfen). Version pinnen, vorher vom security-Agent vetten lassen.
+- ShardBrowser NICHT einbauen (Chromium-Kern closed source vom Hersteller-CDN).
