@@ -17,5 +17,6 @@ Stand vom Mac am 15.10.2026: der Recherche-Agent, sein Skill und der eigene Such
 ## Nicht im Repo
 
 - Secrets (`.env`). Keys nur lokal.
-- Modelle und Messdaten des Suchdienstes (`models/`, große Teile von `eval/`, zusammen ca. 4,7 GB); Austausch nur per USB/AirDrop.
+- Das Sortier-Modell. Der Dienst nutzt `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` von Hugging Face (`RERANKER_MODEL` in `search-service/app/config.py`) und lädt es beim ersten Start automatisch herunter (ca. 470 MB). Die Ordner unter `models/` auf dem Mac sind verworfene Feintuning-Versuche und werden nicht gebraucht.
+- Messdaten des Suchdienstes (große Teile von `eval/`, ca. 2,4 GB); Austausch nur per USB/AirDrop.
 - `agent-reach` (Fremd-Skill, eigenständig installieren).
