@@ -26,6 +26,7 @@ from typing import Dict, List, Optional, Tuple
 from .. import extract as extract_mod
 from .. import pages as pages_mod
 from . import render as render_mod
+from . import stealth as stealth_mod
 
 FULL_PAGE_RATIO = 0.4  # offline auf 40 URLs: 0.3 bis 0.5 gleich gut, 0.6 kostet Precision
 WIKI_MIN_WORDS = 100  # darunter (Stub, Weiterleitung) zusaetzlich trafilatura
@@ -452,7 +453,7 @@ def read_pages(
         urls, fmt, timeout, extractor=reader_document, cache_prefix=_PREFIX,
         max_bytes=READER_MAX_BYTES,
     )
-    if failed and render_mod.enabled():
+    if failed and (render_mod.enabled() or stealth_mod.enabled()):
         docs, failed = _render_failed(docs, failed, fmt, urls, deadline)
     return docs, failed
 
@@ -461,39 +462,62 @@ RENDER_MAX = 2  # hoechstens so viele Seiten je Anfrage nachrendern (je 2-10 s)
 RENDER_TIMEOUT_S = 12.0  # ohne Frist des Aufrufers (x-timeout)
 RENDER_MIN_REST_S = 1.0  # weniger Restzeit lohnt keinen Browserstart
 RENDER_MIN_WORDS = 40
+STEALTH_MAX = 1  # Camoufox hoechstens einmal je Anfrage (Prozessstart, 4 bis 8 s)
+STEALTH_TIMEOUT_S = 15.0
+STEALTH_MIN_REST_S = 6.0
 _CHALLENGE_RE = re.compile(
     r"verifying (?:you are|your browser)|just a moment|enable javascript and cookies"
     r"|captcha|access denied|couldn.t load", re.IGNORECASE)
+
+
+def _usable(html: Optional[str], url: str, fmt: str) -> Optional[Dict]:
+    """Reader-Dokument aus gerendertem HTML, None bei zu wenig Text oder Bot-Pruefseite."""
+    doc = reader_document(html, url, fmt) if html else None
+    content = (doc or {}).get("content") or ""
+    if _words(content) < RENDER_MIN_WORDS or (
+            _words(content) < 300 and _CHALLENGE_RE.search(content)):
+        return None
+    return doc
 
 
 def _render_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
     deadline: Optional[float] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
-    """Reserve fuer JS-Seiten: fehlgeschlagene URLs im Headless-Browser rendern.
+    """Reserve fuer JS-Seiten: fehlgeschlagene URLs im Headless-Browser rendern,
+    was dort blockiert bleibt, als letzte Stufe in Camoufox (stealth.py).
     Bot-Schutz-Seiten (Challenge-Text, kaum Woerter) zaehlen weiter als Fehler.
     Mit `deadline` (monotonic, aus x-timeout) bekommt jeder Render nur die Restzeit;
     ist der Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen."""
     still: List[Dict] = []
     tried = 0  # echte Render-Versuche (Zeitlimit-Fehler und belegter Platz zaehlen nicht)
-    busy = False
+    stealth_tried = 0
+    busy = not render_mod.enabled()
+    stealth_busy = not stealth_mod.enabled()
     for fail in failed:
         rest = RENDER_TIMEOUT_S if deadline is None else deadline - time.monotonic()
-        if (busy or tried >= RENDER_MAX or fail.get("error") == "Zeitlimit"
-                or rest < RENDER_MIN_REST_S):
+        if fail.get("error") == "Zeitlimit" or rest < RENDER_MIN_REST_S:
             still.append(fail)
             continue
-        status, html = render_mod.try_render(fail["url"], timeout=min(rest, RENDER_TIMEOUT_S))
-        if status != "tried":
-            # Platz belegt: die uebrigen nicht auch noch je 1 s warten lassen.
-            busy = busy or status in ("busy", "off")
-            still.append(fail)
-            continue
-        tried += 1
-        doc = reader_document(html, fail["url"], fmt) if html else None
-        content = (doc or {}).get("content") or ""
-        if _words(content) < RENDER_MIN_WORDS or (
-                _words(content) < 300 and _CHALLENGE_RE.search(content)):
+        doc = None
+        if not busy and tried < RENDER_MAX:
+            status, html = render_mod.try_render(fail["url"], timeout=min(rest, RENDER_TIMEOUT_S))
+            if status == "tried":
+                tried += 1
+                doc = _usable(html, fail["url"], fmt)
+            else:
+                # Platz belegt: die uebrigen nicht auch noch je 1 s warten lassen.
+                busy = status in ("busy", "off")
+        if doc is None and not stealth_busy and stealth_tried < STEALTH_MAX:
+            rest = STEALTH_TIMEOUT_S if deadline is None else deadline - time.monotonic()
+            if rest >= STEALTH_MIN_REST_S:
+                status, html = stealth_mod.try_stealth(fail["url"], timeout=min(rest, STEALTH_TIMEOUT_S))
+                if status == "tried":
+                    stealth_tried += 1
+                    doc = _usable(html, fail["url"], fmt)
+                else:
+                    stealth_busy = status in ("busy", "off")
+        if doc is None:
             still.append(fail)
             continue
         pages_mod._docs().put(f"{_PREFIX}{fmt}|{fail['url']}", doc)

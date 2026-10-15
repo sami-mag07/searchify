@@ -1,0 +1,271 @@
+<title>Such-Dienst Bauplan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: eine Spalte wie ein Bauplan-Blatt, oben das Rezept als senkrechter Fluss, darunter Teile-Liste und Messwerte */
+:root {
+  --bg: #f2f5f7;
+  --paper: #ffffff;
+  --ink: #18242e;
+  --muted: #5a6b78;
+  --line: #d3dce3;
+  --accent: #2b6a96;
+  --slot: #e7f0f6;
+  --live: #2f7d4f;
+  --exp: #a8670f;
+  --gone: #8a4b4b;
+  --plan: #2b6a96;
+  --better: #2f7d4f;
+  --worse: #b0452f;
+  --same: #5a6b78;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11181e; --paper: #172129; --ink: #dfe7ec; --muted: #93a4b1; --line: #2b3944;
+  --accent: #7db4dc; --slot: #1c2d3a; --live: #6cc28f; --exp: #e0a24a; --gone: #d08f8f;
+  --plan: #7db4dc; --better: #6cc28f; --worse: #ef8a73; --same: #93a4b1; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11181e; --paper: #172129; --ink: #dfe7ec; --muted: #93a4b1; --line: #2b3944;
+  --accent: #7db4dc; --slot: #1c2d3a; --live: #6cc28f; --exp: #e0a24a; --gone: #d08f8f;
+  --plan: #7db4dc; --better: #6cc28f; --worse: #ef8a73; --same: #93a4b1; color-scheme: dark; }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 36px; }
+h1 { font-size: 26px; font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 12px; }
+p { margin: 0; }
+.lead { color: var(--muted); max-width: 62ch; margin-top: 6px; }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+.stand { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* Rezept */
+.flow { list-style: none; margin: 0; padding: 0; position: relative; }
+.flow::before { content: ""; position: absolute; left: 13px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+.step { position: relative; padding-left: 40px; }
+.step + .step { margin-top: 10px; }
+.num { position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%; background: var(--paper);
+  border: 2px solid var(--accent); color: var(--accent); font: 500 12px/24px var(--mono); text-align: center; }
+details { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+summary { cursor: pointer; padding: 10px 12px; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+summary::-webkit-details-marker { display: none; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sname { font-weight: 600; }
+.swhat { color: var(--muted); flex: 1 1 260px; min-width: 0; }
+.sfile { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.body { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+.knobs { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; font-size: 13px; }
+.knobs dt { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.knobs dd { margin: 0; color: var(--muted); min-width: 0; }
+.add { font-size: 13px; }
+.add b { font-weight: 600; color: var(--accent); }
+.slot { position: relative; padding-left: 40px; margin-top: 10px; }
+.slot .box { border: 2px dashed var(--plan); background: var(--slot); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+.slot .box b { color: var(--plan); }
+.slot::before { content: "+"; position: absolute; left: 7px; top: 9px; width: 16px; height: 16px; border-radius: 50%; background: var(--plan);
+  color: var(--bg); font: 600 14px/16px var(--mono); text-align: center; }
+
+/* Teile */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.filters button { font: 500 13px var(--sans); padding: 5px 12px; border-radius: 99px; border: 1px solid var(--line);
+  background: var(--paper); color: var(--ink); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.parts { list-style: none; margin: 0; padding: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+.parts li { padding: 10px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; }
+.parts li + li { border-top: 1px solid var(--line); }
+.pname { font-weight: 600; min-width: 0; }
+.pwhere { grid-column: 1 / -1; font-family: var(--mono); font-size: 12px; color: var(--accent); overflow-wrap: anywhere; }
+.pdo { grid-column: 1 / -1; color: var(--muted); font-size: 14px; }
+.pill { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 99px;
+  border: 1px solid currentColor; align-self: start; white-space: nowrap; }
+.s-live { color: var(--live); } .s-exp { color: var(--exp); } .s-gone { color: var(--gone); } .s-plan { color: var(--plan); }
+
+/* Messwerte */
+.tablebox { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 12px; color: var(--muted); font-weight: 500; }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.v { font: 500 12px var(--mono); white-space: nowrap; }
+.v-b { color: var(--better); } .v-w { color: var(--worse); } .v-s { color: var(--same); }
+.note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* Auftrag */
+.todo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.todo li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: baseline; }
+.todo .k { font: 500 12px var(--mono); color: var(--muted); }
+.todo .t { min-width: 0; }
+.todo .t span { display: block; color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Such-Dienst Bauplan</h1>
+    <p class="lead">Der lokale Nachbau von Tavily, Exa, Serper und Jina Reader. Oben der Weg einer Anfrage mit allen Stellschrauben, darunter jedes Bauteil mit Ort und Status, dann die Messwerte gegen die Originale.</p>
+    <p class="stand">Stand 15.10.2026 · Dienst :8000 · SearXNG :8888 · ~/Desktop/APP/tavily-clone</p>
+  </header>
+
+  <section>
+    <h2>Das Rezept: Weg einer Anfrage an /search</h2>
+    <p class="note" style="margin:0 0 12px">Antippen zeigt Stellschrauben (Name in .env, Standardwert) und wo man etwas dazubauen kann. Gestrichelt sind geplante Bauteile.</p>
+    <ol class="flow">
+      <li class="step"><span class="num">1</span>
+        <details><summary><span class="sname">Antwort-Cache</span><span class="swhat">Gleiche Frage in den letzten 15 Minuten kommt sofort zurück (0,005 s)</span><span class="sfile">main.run_search</span></summary>
+          <div class="body"><dl class="knobs"><dt>RESPONSE_CACHE_TTL_S</dt><dd>900, nur wenn alle Engines geantwortet haben, nie mit include_answer</dd></dl>
+          <p class="add"><b>Dazubauen:</b> Schlüssel um Nutzerprofil erweitern, sobald das Lernen pro Nutzer kommt.</p></div></details></li>
+
+      <li class="step"><span class="num">2</span>
+        <details><summary><span class="sname">Spracherkennung</span><span class="swhat">Erkennt en, de, es, fr aus der Frage, steuert Engines und Sprach-Abzug</span><span class="sfile">app/lang.py</span></summary>
+          <div class="body"><dl class="knobs"><dt>language</dt><dd>im Request überschreibt die Erkennung</dd></dl>
+          <p class="add"><b>Dazubauen:</b> Themen-Erkennung läuft genau hier mit, gleiche Art (Wortlisten, kein LLM).</p></div></details></li>
+
+      <li class="slot"><div class="box"><b>Geplant: Themen-Erkennung.</b> Ordnet die Frage einem Regal zu (Hackathon, Planspiel/MUN, Stipendien, Förderung, Jugenddelegierte ...). Ziel unter 1 ms.</div></li>
+
+      <li class="step"><span class="num">3</span>
+        <details><summary><span class="sname">Trefferlisten-Cache</span><span class="swhat">Kennt er die Frage, kommt die Liste aus dem Speicher und wird im Hintergrund aufgefrischt</span><span class="sfile">search.peek_cache</span></summary>
+          <div class="body"><dl class="knobs"><dt>SEARCH_CACHE_TTL_S</dt><dd>3600</dd></dl></div></details></li>
+
+      <li class="step"><span class="num">4</span>
+        <details><summary><span class="sname">SearXNG, Engines getrennt</span><span class="swhat">Bing und Yahoo parallel (es/fr: Yandex und Yahoo), Seiten laden schon während Engines noch antworten</span><span class="sfile">app/stream.py</span></summary>
+          <div class="body"><dl class="knobs">
+            <dt>SEARXNG_SPLIT_ENGINES</dt><dd>bing,yahoo</dd>
+            <dt>SPLIT_PER_ENGINE</dt><dd>7 Treffer je Engine</dd>
+            <dt>SPLIT_SEARCH_TIMEOUT_MS</dt><dd>2500</dd>
+            <dt>SPLIT_HEDGE_MS</dt><dd>1000, langsamste Engine bekommt eine Zweitanfrage</dd>
+            <dt>SPLIT_TAIL_MS</dt><dd>120</dd>
+            <dt>SPLIT_PAGES_WIDE</dt><dd>3 Seiten Yahoo/Yandex bei max_results über 10</dd>
+            <dt>SEARCH_FALLBACK</dt><dd>ddgs, wenn SearXNG ausfällt</dd></dl>
+          <p class="add"><b>Dazubauen:</b> weitere Engines, Rückfall-SearXNG (pausierter Agent P10). Fallen: nie categories= mit engines=, Yahoo-Timeout nie unter 1,0 s.</p></div></details></li>
+
+      <li class="slot"><div class="box"><b>Geplant: Themen-Bibliothek.</b> Das passende Regal liefert bekannte gute Seiten als zusätzliche Kandidaten. Sie laufen danach durch denselben Reranker wie die Live-Treffer, die Live-Suche läuft immer mit.</div></li>
+
+      <li class="step"><span class="num">5</span>
+        <details><summary><span class="sname">Seiten laden</span><span class="swhat">Parallel mit hartem Zeitbudget, späte Seiten landen im Cache</span><span class="sfile">extract.fetch_url</span></summary>
+          <div class="body"><dl class="knobs">
+            <dt>FETCH_BUDGET_MS</dt><dd>500 (advanced 1500)</dd>
+            <dt>FETCH_TIMEOUT</dt><dd>5 s je Seite</dd>
+            <dt>FETCH_FALLBACK</dt><dd>an: bei 403/429/503 einmal mit Chrome-TLS (curl_cffi)</dd>
+            <dt>READER_RENDER</dt><dd>an: Headless-Chromium, nur im Reader und Extract</dd>
+            <dt>PAGE_CACHE_TTL_S</dt><dd>6 h</dd></dl>
+          <p class="add"><b>Dazubauen:</b> SSRF-Schutz mit gepinnter IP ist Pflicht für jede neue Lade-Stufe. 14.10.: 81,4 % normal, +4,7 % curl, +4,3 % Browser, 3,9 % blockiert.</p></div></details></li>
+
+      <li class="slot"><div class="box"><b>Geplant: Camoufox als letzte Lade-Stufe.</b> Nur für Seiten, die nach Browser noch blockiert sind, mit festem Zeitlimit. Wird nur eingebaut, wenn er bei den 33 blockierten Seiten spürbar rettet.</div></li>
+
+      <li class="step"><span class="num">6</span>
+        <details><summary><span class="sname">Text herausziehen</span><span class="swhat">Haupttext ohne Menüs und Werbung, im Prozess-Pool</span><span class="sfile">app/extract.py</span></summary>
+          <div class="body"><dl class="knobs"><dt>EXTRACT_WORKERS</dt><dd>0 = automatisch</dd><dt>Extraktor</dt><dd>resiliparse, sonst trafilatura</dd></dl></div></details></li>
+
+      <li class="step"><span class="num">7</span>
+        <details><summary><span class="sname">Abschnitte und BM25</span><span class="swhat">Text in kurze Abschnitte, die 2 besten je Seite gehen weiter</span><span class="sfile">extract.chunk_text</span></summary>
+          <div class="body"><dl class="knobs"><dt>CHUNK_SIZE</dt><dd>50 Wörter</dd><dt>CHUNK_OVERLAP</dt><dd>12</dd><dt>RERANK_CHUNKS_PER_PAGE</dt><dd>2</dd></dl></div></details></li>
+
+      <li class="step"><span class="num">8</span>
+        <details><summary><span class="sname">Reranker</span><span class="swhat">Cross-Encoder bewertet jeden Abschnitt gegen die Frage, dazu Quellen- und Sprach-Abzüge</span><span class="sfile">app/rerank.py</span></summary>
+          <div class="body"><dl class="knobs">
+            <dt>RERANKER_MODEL</dt><dd>mmarco-mMiniLMv2-L12 auf der Mac-GPU</dd>
+            <dt>RERANK_MAX_LENGTH</dt><dd>256</dd>
+            <dt>SOURCE_PRIOR</dt><dd>an: Foren/Social -2,5, Wikipedia/Behörden/Unis +0,5</dd>
+            <dt>LANGUAGE_MISMATCH_PENALTY</dt><dd>2,0 für Abschnitte in fremder Sprache</dd>
+            <dt>QUALITY_PRIOR</dt><dd>an, Gewicht 1,0, SEO-Merkmale aus URL und Titel, nur /search</dd></dl>
+          <p class="add"><b>Dazubauen:</b> anderes Modell (bge-v2-m3 war besser, aber 1,3 bis 1,9 s langsamer). Feintuning dreimal verworfen.</p></div></details></li>
+
+      <li class="step"><span class="num">9</span>
+        <details><summary><span class="sname">Fusion</span><span class="swhat">Mischt Reranker-Rang und Engine-Rang, Engine zählt nur so viel, wie ihre Treffer taugen</span><span class="sfile">rerank.fuse_engine_rank</span></summary>
+          <div class="body"><dl class="knobs"><dt>FUSION_WEIGHT</dt><dd>0,5</dd><dt>FUSION_K</dt><dd>30</dd><dt>FUSION_TRUST_MIN</dt><dd>0,0</dd></dl></div></details></li>
+
+      <li class="step"><span class="num">10</span>
+        <details><summary><span class="sname">Je Quelle zusammenführen</span><span class="swhat">Eine Seite je Domain vorn, höchstens eine Antwortfarm oben, schwache Treffer fallen weg</span><span class="sfile">rerank.merge_by_source</span></summary>
+          <div class="body"><dl class="knobs">
+            <dt>RESULTS_PER_DOMAIN</dt><dd>1</dd>
+            <dt>demote_farms</dt><dd>nur Fragen, Farm mit seo_score ab 0,5 nur auf Platz 1</dd>
+            <dt>MIN_RESULT_SCORE</dt><dd>0,12</dd>
+            <dt>MIN_RESULTS_KEPT</dt><dd>3</dd></dl></div></details></li>
+
+      <li class="slot"><div class="box"><b>Geplant: Lern-Sortierer.</b> Kleines Modell (z. B. LightGBM) auf einfachen Merkmalen wie Seitentyp, Anmeldeseite statt Startseite, Sprache. Lernt aus übernommenen Links im research-agent und Tracker. Bleibt nur, wenn der Testteil steigt.</div></li>
+
+      <li class="step"><span class="num">11</span>
+        <details><summary><span class="sname">Antwort</span><span class="swhat">Format von Tavily, Exa, Serper oder Jina, auf Wunsch ein geschriebener Text mit Quellen</span><span class="sfile">app/compat/, answer.py</span></summary>
+          <div class="body"><dl class="knobs"><dt>include_answer</dt><dd>Standard aus wie bei Tavily; ohne LLM-Zugang in .env bleibt answer leer, nie Fehler 500</dd></dl></div></details></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Bauteile</h2>
+    <div class="filters" role="group" aria-label="Nach Status filtern">
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">Alle</button>
+      <button type="button" id="f-live" data-f="live" aria-pressed="false">Live</button>
+      <button type="button" id="f-exp" data-f="exp" aria-pressed="false">Experimentell</button>
+      <button type="button" id="f-gone" data-f="gone" aria-pressed="false">Verworfen</button>
+      <button type="button" id="f-plan" data-f="plan" aria-pressed="false">Geplant</button>
+    </div>
+    <ul class="parts" id="parts">
+      <li data-s="live"><span class="pname">Such-Dienst</span><span class="pill s-live">live</span><span class="pwhere">app/ · Port 8000 · launchd com.sami.rag-service</span><span class="pdo">Die ganze Pipeline oben, ein Prozess mit FastAPI.</span></li>
+      <li data-s="live"><span class="pname">SearXNG</span><span class="pill s-live">live</span><span class="pwhere">~/tools/searxng · Port 8888 · launchd com.sami.rag-searxng</span><span class="pdo">Fragt Bing, Yahoo, Yandex und DuckDuckGo ab.</span></li>
+      <li data-s="live"><span class="pname">Kompatible Endpunkte</span><span class="pill s-live">live</span><span class="pwhere">app/compat/ (exa, serper, jina, reader, tavily_extract)</span><span class="pdo">Gleiche Anfragen wie bei den Originalen, eigene Reihenfolge-Regeln je Tool.</span></li>
+      <li data-s="live"><span class="pname">Chrome-TLS-Nachladen</span><span class="pill s-live">live</span><span class="pwhere">extract.py · FETCH_FALLBACK</span><span class="pdo">Lädt Seiten mit 403/429/503 einmal mit curl_cffi nach.</span></li>
+      <li data-s="live"><span class="pname">Browser-Reserve</span><span class="pill s-live">live</span><span class="pwhere">app/compat/render.py · playwright Chromium</span><span class="pdo">Rendert JS-Seiten im Reader und Extract, mit SSRF-Schutz und Test.</span></li>
+      <li data-s="live"><span class="pname">SEO-Filter</span><span class="pill s-live">live</span><span class="pwhere">app/quality.py · QUALITY_PRIOR</span><span class="pdo">Erkennt Antwortfarmen an URL und Titel, ohne Domain-Liste.</span></li>
+      <li data-s="live"><span class="pname">research-agent Anbindung</span><span class="pill s-live">live</span><span class="pwhere">~/.claude/skills/research-agent/references/search.py</span><span class="pdo">Fragt zuerst own und own-exa, bezahlte Dienste nur als Reserve.</span></li>
+      <li data-s="live"><span class="pname">Messgerüst</span><span class="pill s-live">live</span><span class="pwhere">eval/ (objective.py, tool_objective.py, history_bench.py, live_round.py)</span><span class="pdo">Replay ohne Netz für dev und test, Blindtest, Tempo, Fehlerquote.</span></li>
+      <li data-s="exp"><span class="pname">Geschriebene Antwort</span><span class="pill s-exp">experimentell</span><span class="pwhere">app/answer.py · claude-code-api :8080</span><span class="pdo">Eingebaut, aber ohne LLM-Zugang in .env abgeschaltet.</span></li>
+      <li data-s="exp"><span class="pname">9 pausierte Agenten</span><span class="pill s-exp">experimentell</span><span class="pwhere">.claude/worktrees/agent-*</span><span class="pdo">ddgs, Antwort-Prompt, 8-s-Limit, bester Satz, Personen, News-Datum, Cache, Recherche-Ranking, Reserve-SearXNG. Nichts gemergt.</span></li>
+      <li data-s="exp"><span class="pname">minisearch, serp_clone</span><span class="pill s-exp">experimentell</span><span class="pwhere">experiments/</span><span class="pdo">Suche ohne SearXNG direkt bei den Engines, nicht eingebaut.</span></li>
+      <li data-s="gone"><span class="pname">Feingetunte Reranker</span><span class="pill s-gone">verworfen</span><span class="pwhere">models/reranker-*, train/</span><span class="pdo">Dreimal auf dem Mac, einmal auf dem Laptop: Testteil fiel jedes Mal.</span></li>
+      <li data-s="gone"><span class="pname">bge-reranker-v2-m3 als 2. Stufe</span><span class="pill s-gone">verworfen</span><span class="pwhere">pause-2026-10-11/tracks/bigmodel</span><span class="pdo">dev 0,881 auf 0,899, aber 1,3 bis 1,9 s langsamer.</span></li>
+      <li data-s="gone"><span class="pname">Breite Suche mit Yandex</span><span class="pill s-gone">verworfen</span><span class="pwhere">Join 1, 12.10.</span><span class="pdo">dev stieg, test fiel.</span></li>
+      <li data-s="gone"><span class="pname">ShardBrowser</span><span class="pill s-gone">verworfen</span><span class="pwhere">nicht eingebaut</span><span class="pdo">Chromium-Kern closed source vom Hersteller-CDN.</span></li>
+      <li data-s="plan"><span class="pname">Camoufox</span><span class="pill s-plan">geplant</span><span class="pwhere">letzte Lade-Stufe hinter render.py</span><span class="pdo">Erst Messung an den 33 blockierten Seiten, dann Entscheidung.</span></li>
+      <li data-s="plan"><span class="pname">Themen-Bibliothek</span><span class="pill s-plan">geplant</span><span class="pwhere">neu, Ort folgt</span><span class="pdo">Je Thema ein Regal mit guten Seiten, Auffrischung per Pipeline.</span></li>
+      <li data-s="plan"><span class="pname">Lern-Sortierer</span><span class="pill s-plan">geplant</span><span class="pwhere">neu, Ort folgt</span><span class="pdo">Lernt aus der Nutzung, welche Seiten du übernimmst.</span></li>
+      <li data-s="plan"><span class="pname">Emil auf den Nachbau</span><span class="pill s-plan">geplant</span><span class="pwhere">VPS</span><span class="pdo">Emil nutzt noch Tavily, RAM auf dem VPS knapp.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Messwerte gegen die Originale</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Messung</th><th>Original</th><th>Nachbau</th><th>Ergebnis</th></tr></thead>
+      <tbody>
+        <tr><td>Faktenfragen, richtige Quelle auf Platz 1</td><td class="n">97 %</td><td class="n">100 %</td><td><span class="v v-b">besser</span></td></tr>
+        <tr><td>Blindtest Quellen-Vertrauen (1 bis 5), 14.10.</td><td class="n">3,33</td><td class="n">3,49</td><td><span class="v v-b">besser</span></td></tr>
+        <tr><td>SEO- und Werbeseiten in 90 Top-Treffern</td><td class="n">15</td><td class="n">15</td><td><span class="v v-s">gleich</span></td></tr>
+        <tr><td>Gute Quelle weit oben, Tavily-Format (MRR)</td><td class="n">0,28</td><td class="n">0,25</td><td><span class="v v-w">schlechter</span></td></tr>
+        <tr><td>Gold-Domains in den Top 30</td><td class="n">0,15</td><td class="n">0,12</td><td><span class="v v-w">schlechter</span></td></tr>
+        <tr><td>Gute Quelle weit oben, Serper-Format (MRR)</td><td class="n">0,27</td><td class="n">0,35</td><td><span class="v v-b">besser</span></td></tr>
+        <tr><td>Antwortzeit Tavily-Suche (Median)</td><td class="n">1,33 s</td><td class="n">0,93 s</td><td><span class="v v-b">besser</span></td></tr>
+        <tr><td>Antwortzeit Serper (Median)</td><td class="n">1,60 s</td><td class="n">0,91 s</td><td><span class="v v-b">besser</span></td></tr>
+        <tr><td>Antwortzeit Jina Reader (Median)</td><td class="n">3,79 s</td><td class="n">0,22 s</td><td><span class="v v-b">besser</span></td></tr>
+      </tbody></table></div>
+    <p class="note">Quellen: README und Messrunde 14.10. (eval/private/history-score-2026-10-14, blind-2026-10-14). Recherche-Werte schwanken je Lauf um etwa 0,03. Die Gold-Domains sind die größte Lücke und das Ziel der Themen-Bibliothek.</p>
+  </section>
+
+  <section>
+    <h2>Auftrag vom 14.10.</h2>
+    <ul class="todo">
+      <li><span class="k">1</span><span class="t">Bauplan<span>diese Seite</span></span><span class="pill s-live">fertig</span></li>
+      <li><span class="k">2</span><span class="t">Camoufox-Messung<span>33 blockierte Seiten vom 14.10. durchschicken und zählen</span></span><span class="pill s-plan">als Nächstes</span></li>
+      <li><span class="k">3</span><span class="t">Prüfsatz mit Zeit-Trennung<span>Bibliothek nur aus Funden bis 01.10., Prüfung an Runde 8, Runde 9 und Hackathon-Radar</span></span><span class="pill s-plan">offen</span></li>
+      <li><span class="k">4</span><span class="t">Themen-Bibliothek<span>Erkennung, Regale, Auffrischung, Einmischen vor dem Reranker</span></span><span class="pill s-plan">offen</span></li>
+      <li><span class="k">5</span><span class="t">Lernen aus Nutzung<span>Sortier-Modell, bleibt nur bei steigendem Testteil</span></span><span class="pill s-plan">offen</span></li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.filters button');
+  var items = document.querySelectorAll('#parts li');
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var f = b.getAttribute('data-f');
+      buttons.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      items.forEach(function (li) { li.hidden = f !== 'all' && li.getAttribute('data-s') !== f; });
+    });
+  });
+})();
+</script>

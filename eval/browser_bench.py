@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Browser-Vergleich fuer schwierige Seiten: normales Chrome, patchright (offener
-Tarn-Playwright) und ShardX (ShardBrowser, Anti-Detect-Chromium, Kern closed source).
+Tarn-Playwright), ShardX (ShardBrowser, Anti-Detect-Chromium, Kern closed source)
+und Camoufox (quelloffener getarnter Firefox, Messung 15.10.2026 auf dem Mac).
 
 Gleiche URLs, gleiche Reihenfolge, gleiche Wartezeit, alle headless, ohne Proxy.
 URL-Gruppen aus eval/browser_bench_urls.json (Messung 14.10.2026, 856 Trefferseiten):
@@ -115,7 +116,28 @@ async def run_shardx(urls):
         sdk.delete_profile(profile.id)
 
 
-BACKENDS = {"chrome": run_chrome, "patchright": run_patchright, "shardx": run_shardx}
+async def run_camoufox(urls):
+    """Camoufox (quelloffener getarnter Firefox). Eigenes venv, Version gepinnt,
+    GeoIP und Standard-Addons (uBlock) aus, damit beim Start nichts nachgeladen wird
+    (Security-Vetting 15.10.). Die Binary liegt per Hand geladen und Hash-geprueft im
+    Camoufox-Cache als aktive Version, darum braucht es kein `camoufox fetch`.
+    executable_path geht auf dem Mac nicht (sucht properties.json neben der Binary)."""
+    from camoufox.async_api import AsyncCamoufox
+    async with AsyncCamoufox(headless=True, geoip=False, exclude_addons=_camoufox_addons(),
+                             locale="de-DE") as browser:
+        async def open_ctx():
+            ctx = await browser.new_context()
+            return ctx, ctx.close
+        return await visit_all(open_ctx, urls)
+
+
+def _camoufox_addons():
+    from camoufox import DefaultAddons
+    return list(DefaultAddons)
+
+
+BACKENDS = {"chrome": run_chrome, "patchright": run_patchright, "shardx": run_shardx,
+            "camoufox": run_camoufox}
 
 
 def summary(groups: dict, res: dict) -> dict:
@@ -134,8 +156,11 @@ def main():
     ap.add_argument("--urls", default=str(HERE / "browser_bench_urls.json"))
     ap.add_argument("--out", default="browser_bench_result.json")
     ap.add_argument("--limit", type=int, default=0, help="nur die ersten N URLs je Gruppe (Rauchtest)")
+    ap.add_argument("--groups", default="", help="nur diese Gruppen, z. B. blockiert")
     a = ap.parse_args()
     groups = json.load(open(a.urls, encoding="utf-8"))
+    if a.groups:
+        groups = {g: v for g, v in groups.items() if g in a.groups.split(",")}
     if a.limit:
         groups = {g: v[:a.limit] for g, v in groups.items()}
     urls = [u for v in groups.values() for u in v]
