@@ -188,9 +188,9 @@ statische Text bleibt, falls alle Stufen scheitern). Der schnelle Weg bleibt unb
 (bleibt offen, nach 5 min Leerlauf zu; `RENDER_SLOTS`=3 gleichzeitig), 3. Chromium laedt
 die Seite selbst (gegen Bot-Schutz; `RENDER_DIRECT=0` schaltet nur diese Stufe ab).
 Hoechstens 2 Seiten je Anfrage (`app/compat/render.py`, `reader._render_failed`).
-`playwright` steht in `requirements.txt`, die Browser einmalig laden (~250 MB):
+`playwright` steht in `requirements.txt`, den Browser einmalig laden (~100 MB):
 ```
-.venv/bin/python -m playwright install chromium chromium-headless-shell
+.venv/bin/python -m playwright install chromium-headless-shell
 ```
 Ohne playwright oder mit `READER_RENDER=0` ist die Reserve aus (Rueckfall: Seite zaehlt
 als Fehlschlag wie bisher). SSRF-Schutz: Start-URL nur oeffentlich, jede Browser-Anfrage

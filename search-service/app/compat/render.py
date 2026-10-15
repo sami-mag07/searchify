@@ -17,9 +17,11 @@ bleibt unberuehrt. Zwei Stufen, die zweite nur, wenn die erste scheitert:
   fremder Hosts laufen wie in Stufe 2 ueber httpx.
 
 Braucht das optionale Paket `playwright` und dessen Chromium
-(`.venv/bin/python -m playwright install chromium chromium-headless-shell`); fehlt
-beides oder steht READER_RENDER=0, ist die Funktion aus. RENDER_DIRECT=0 schaltet
-nur Stufe 3 ab.
+(`.venv/bin/python -m playwright install chromium-headless-shell`); fehlt beides oder
+steht READER_RENDER=0, ist die Funktion aus. RENDER_DIRECT=0 schaltet nur Stufe 3 ab.
+Stufe 3 nimmt ebenfalls die headless-shell: gemessen 15.10. auf 30 Bot-Seiten ~760 MB
+weniger RAM als der volle Chromium und nicht weniger Treffer
+(RENDER_DIRECT_CHANNEL=chromium waehlt den vollen).
 
 Sicherheit (SSRF, gleiche Regeln wie app/extract._public_ips: nur is_global):
 - Start-URL nur http(s) mit oeffentlichem Host (file:, chrome:, data: & Co. nie).
@@ -364,9 +366,10 @@ def _direct_route(pins: Dict[str, str]):
 async def _render_direct(url: str, deadline: float, pins: Dict[str, str]) -> Optional[str]:
     pw = await _ENGINE.playwright()
     opts = _direct_launch(pins)
-    try:  # voller Chromium (neuer Headless-Modus) wirkt echter als chrome-headless-shell
-        browser = await pw.chromium.launch(headless=True, channel="chromium", **opts)
-    except Exception:  # noqa: BLE001 - nur headless-shell installiert
+    channel = os.environ.get("RENDER_DIRECT_CHANNEL", "").strip()  # "chromium": voller Browser
+    try:
+        browser = await pw.chromium.launch(headless=True, channel=channel or None, **opts)
+    except Exception:  # noqa: BLE001 - Kanal nicht installiert
         browser = await pw.chromium.launch(headless=True, **opts)
     try:
         ctx = await browser.new_context(
