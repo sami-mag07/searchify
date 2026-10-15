@@ -132,21 +132,50 @@ def test_kein_dienst_ohne_playwright(monkeypatch):
     assert render_mod.render_html("https://example.org/") is None
 
 
-def test_direkt_stufe_nur_gepinnte_hosts():
-    opts = render_mod._direct_launch({"stackoverflow.com": "198.252.206.1", "v6.test": "2001:db8::1"})
-    assert opts["proxy"]["server"] == "http://127.0.0.1:9"
-    assert opts["proxy"]["bypass"].split(",") == ["<-loopback>", "stackoverflow.com", "v6.test"]
-    rules = next(a for a in opts["args"] if a.startswith("--host-resolver-rules="))
-    assert rules.endswith("MAP * ~NOTFOUND") and "MAP v6.test [2001:db8::1]" in rules
+def test_direkt_stufe_start_url_nur_oeffentlich():
     for url in ("http://127.0.0.1/", "http://localhost/", "file:///etc/passwd", "http://10.0.0.1/"):
-        assert render_mod._pins(url) == {}, url
         assert render_mod.try_render_direct(url) == ("blocked", None), url
 
 
+def test_ausgangs_proxy_blockt_intern(internal_server):
+    """Der Ausgangs-Proxy (SSRF-Grenze der Stufe 3) laesst nichts Internes durch:
+    IP-Literale, localhost, IPv6-Loopback, Metadaten-Adresse, Dezimal-IP, fremde Ports."""
+    import asyncio
+
+    from app.compat import egress
+
+    port, hits = internal_server
+
+    async def ask(line: str) -> bytes:
+        server, pport = await egress.start()
+        try:
+            r, w = await asyncio.open_connection("127.0.0.1", pport)
+            w.write(line.encode() + b"\r\n\r\n")
+            await w.drain()
+            first = await asyncio.wait_for(r.readline(), 10)
+            w.close()
+            return first
+        finally:
+            server.close()
+
+    for line in (f"CONNECT 127.0.0.1:{port} HTTP/1.1", "CONNECT 127.0.0.1:443 HTTP/1.1",
+                 "CONNECT localhost:443 HTTP/1.1", "CONNECT [::1]:443 HTTP/1.1",
+                 "CONNECT 169.254.169.254:80 HTTP/1.1", "CONNECT 2130706433:443 HTTP/1.1",
+                 "CONNECT 10.0.0.1:443 HTTP/1.1", "CONNECT example.com:22 HTTP/1.1",
+                 f"GET http://127.0.0.1:{port}/x HTTP/1.1\r\nHost: 127.0.0.1",
+                 "GET http://localhost/x HTTP/1.1\r\nHost: localhost",
+                 "GET file:///etc/passwd HTTP/1.1"):
+        first = asyncio.run(ask(line))
+        assert b" 403 " in first or b" 400 " in first, (line, first)
+    assert hits == []
+
+
 def test_direkt_stufe_erreicht_nichts_internes(monkeypatch, internal_server):
-    """Stufe 3 laedt public.test selbst (fuer den Test auf einen lokalen Server
-    gepinnt). Alles andere (IP-Literal, localhost, fremde Namen, Worker, WebSocket,
-    Redirect nach intern) muss scheitern: der interne Server zaehlt null Treffer."""
+    """Stufe 3 laedt public.test selbst ueber den Ausgangs-Proxy (fuer den Test auf
+    einen lokalen Server aufgeloest). Alles andere (IP-Literal, localhost, fremde Namen,
+    Worker, WebSocket, Redirect nach intern) muss scheitern: null Treffer intern."""
+    from app.compat import egress
+
     _need_browser()
     port, hits = internal_server
     loc = f"http://127.0.0.1:{port}"
@@ -181,7 +210,10 @@ try {{ new WebSocket("ws://127.0.0.1:{port}/ws") }} catch(e) {{}}
         pport = srv.server_address[1]
         start = f"http://public.test:{pport}/"
         monkeypatch.setattr(render_mod, "url_allowed", lambda url: url.startswith(start))
-        monkeypatch.setattr(render_mod, "_pins", lambda url: {"public.test": "127.0.0.1"})
+        real_resolve = egress._resolve
+        monkeypatch.setattr(egress, "_resolve",
+                            lambda host: ["127.0.0.1"] if host == "public.test" else real_resolve(host))
+        monkeypatch.setattr(egress, "PORTS", egress.PORTS | {pport})
         monkeypatch.setenv("READER_RENDER", "1")
         status, html = render_mod.try_render_direct(start, timeout=8.0)
         assert status == "tried" and html and "Oeffentlicher Inhalt" in html

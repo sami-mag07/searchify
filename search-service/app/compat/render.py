@@ -7,21 +7,16 @@ bleibt unberuehrt. Zwei Stufen, die zweite nur, wenn die erste scheitert:
   nach IDLE_CLOSE_S ohne Render wieder zu), je Render ein frischer Kontext, SLOTS
   Renders gleichzeitig. Jede Anfrage des Browsers laeuft ueber den gepinnten
   httpx-Client (siehe unten), der Browser selbst geht nie ins Netz.
-- Stufe 3, `try_render_direct`: eigener Chromium je Aufruf, der das Hauptdokument
-  SELBST laedt (echter Chrome-TLS-Fingerabdruck, darum kommt er an Cloudflare &
-  Co. vorbei, wo httpx die Challenge bekommt; so macht es Crawl4AI). Der SSRF-
-  Schutz bleibt: nur vorab gepruefte Hosts (Start-Host, www-Variante, Challenge-
-  Hosts) duerfen direkt, ihre IP ist per --host-resolver-rules festgenagelt
-  (kein DNS-Rebinding), jeder andere Name loest zu nichts auf und jeder andere
-  Host (auch IP-Literale, Redirect-Ziele) geht an den toten Proxy. Unterressourcen
-  fremder Hosts laufen wie in Stufe 2 ueber httpx.
+- Stufe 3, `try_render_direct`: eigener Kontext im selben Browser, der SELBST laedt
+  (echter Chrome-TLS-Fingerabdruck, darum kommt er an Cloudflare & Co. vorbei, wo
+  httpx die Challenge bekommt; so macht es Crawl4AI). Sein ganzer Verkehr laeuft
+  ueber den Ausgangs-Proxy app/compat/egress.py: der laesst nur oeffentliche Ziele
+  durch, festgenagelt auf die gepruefte IP (kein DNS-Rebinding), und reicht die
+  verschluesselten Bytes unveraendert weiter. Kein eigener Browserstart.
 
 Braucht das optionale Paket `playwright` und dessen Chromium
 (`.venv/bin/python -m playwright install chromium-headless-shell`); fehlt beides oder
 steht READER_RENDER=0, ist die Funktion aus. RENDER_DIRECT=0 schaltet nur Stufe 3 ab.
-Stufe 3 nimmt ebenfalls die headless-shell: gemessen 15.10. auf 30 Bot-Seiten ~760 MB
-weniger RAM als der volle Chromium und nicht weniger Treffer
-(RENDER_DIRECT_CHANNEL=chromium waehlt den vollen).
 
 Sicherheit (SSRF, gleiche Regeln wie app/extract._public_ips: nur is_global):
 - Start-URL nur http(s) mit oeffentlichem Host (file:, chrome:, data: & Co. nie).
@@ -30,10 +25,11 @@ Sicherheit (SSRF, gleiche Regeln wie app/extract._public_ips: nur is_global):
   fuehrt sie ueber den gepinnten httpx-Client aus app/extract aus (Pruefung je
   Anfrage und je Verbindung, kein Redirect-Folgen im Client: der Browser stellt
   den naechsten Sprung neu, der wieder hier durchlaeuft). Interne Ziele -> abort.
-  Ausnahme Stufe 3: gepinnte Hosts (siehe oben).
+  Stufe 3 statt dessen: alles ueber den Ausgangs-Proxy (Kontext-Proxy, auch Loopback).
 - Was die Abfangschicht nicht sieht (Worker, WebSocket, Vorabladen), geht ueber
-  einen toten Proxy (127.0.0.1:9, auch fuer Loopback) und scheitert; WebRTC und
-  Service Worker sind aus, Bilder/Medien/Schriften werden gar nicht geladen.
+  den Proxy des Kontexts (Stufe 2: toter Proxy 127.0.0.1:9, scheitert; Stufe 3:
+  Ausgangs-Proxy, geprueft); WebRTC und Service Worker sind aus,
+  Bilder/Medien/Schriften werden gar nicht geladen.
 """
 
 from __future__ import annotations
@@ -50,7 +46,7 @@ from urllib.parse import urlparse
 from .. import extract as extract_mod
 
 SLOTS = max(1, int(os.environ.get("RENDER_SLOTS", "3")))  # Stufe 2 gleichzeitig (ein Browser)
-DIRECT_SLOTS = max(1, int(os.environ.get("RENDER_DIRECT_SLOTS", "1")))  # Stufe 3: je ein Browser
+DIRECT_SLOTS = max(1, int(os.environ.get("RENDER_DIRECT_SLOTS", "2")))  # Stufe 3 gleichzeitig
 IDLE_CLOSE_S = 300.0  # geteilten Browser nach so viel Leerlauf schliessen (RAM)
 _SEM = threading.Semaphore(SLOTS)
 _DIRECT_SEM = threading.Semaphore(DIRECT_SLOTS)
@@ -68,10 +64,9 @@ _ARGS = [
     "--webrtc-ip-handling-policy=disable_non_proxied_udp",
     "--dns-prefetch-disable",
     "--disable-background-networking",
+    "--disable-blink-features=AutomationControlled",
 ]
 _INIT_JS = "try{delete window.RTCPeerConnection;delete window.webkitRTCPeerConnection}catch(e){}"
-# Hosts, die Challenge-Seiten selbst nachladen; sie duerfen in Stufe 3 direkt (gepinnt).
-_CHALLENGE_HOSTS = ("challenges.cloudflare.com",)
 CHALLENGE_WAIT_S = 6.0  # Stufe 3: hoechstens so lange auf das Loesen einer Bot-Challenge warten
 _CHALLENGE_TITLE_RE = re.compile(
     r"just a moment|attention required|checking your browser|verifying|security check|un moment", re.IGNORECASE)
@@ -154,6 +149,7 @@ class _Engine:
         self.active = 0
         self.last_used = 0.0
         self._launch_lock: Optional[asyncio.Lock] = None
+        self._egress = None
 
     def _ensure_loop(self) -> asyncio.AbstractEventLoop:
         with self._lock:
@@ -199,6 +195,14 @@ class _Engine:
                 pw = await self.playwright()
                 self.browser = await pw.chromium.launch(headless=True, proxy=_DEAD_PROXY, args=_ARGS)
         return self.browser
+
+    async def egress_port(self) -> int:
+        """Port des Ausgangs-Proxys fuer Stufe 3 (laeuft in dieser Schleife, Start bei Bedarf)."""
+        if self._egress is None:
+            from . import egress  # noqa: PLC0415
+
+            self._egress = await egress.start()
+        return self._egress[1]
 
     async def _idle_closer(self) -> None:
         while True:
@@ -305,87 +309,48 @@ async def _render_shared(url: str, deadline: float) -> Optional[str]:
 # ---------------------------------------------------------------- Stufe 3
 
 
-def _pins(url: str) -> Dict[str, str]:
-    """Hosts, die der Browser in Stufe 3 selbst laden darf, je mit gepruefter
-    oeffentlicher IP (IPv4 bevorzugt). Leer, wenn der Start-Host nicht dabei ist."""
-    host = (urlparse(url).hostname or "").lower().rstrip(".")
-    if not host:
-        return {}
-    twin = host[4:] if host.startswith("www.") else "www." + host
-    pins: Dict[str, str] = {}
-    for name in (host, twin, *_CHALLENGE_HOSTS):
-        ips = extract_mod._public_ips(name)
-        if ips:
-            pins[name] = next((ip for ip in ips if ":" not in ip), ips[0])
-    return pins if host in pins else {}
-
-
-def _direct_launch(pins: Dict[str, str]) -> Dict:
-    """Start-Optionen fuer Stufe 3: nur die gepinnten Hosts umgehen den toten Proxy,
-    und nur sie loesen auf (zur geprueften IP); jeder andere Name -> NOTFOUND."""
-    rules = ", ".join(f"MAP {h} {f'[{ip}]' if ':' in ip else ip}" for h, ip in pins.items())
-    return {
-        "proxy": {"server": _DEAD_PROXY["server"], "bypass": ",".join(["<-loopback>", *pins])},
-        "args": _ARGS + [
-            f"--host-resolver-rules={rules}, MAP * ~NOTFOUND",
-            "--disable-blink-features=AutomationControlled",
-        ],
-    }
-
-
 def try_render_direct(url: str, timeout: float = 15.0, wait: Optional[float] = None
                       ) -> Tuple[str, Optional[str]]:
-    """Stufe 3, Status wie try_render. Nur aufrufen, wenn Stufe 2 gescheitert ist
-    (eigener Browserstart, ~1 s mehr)."""
+    """Stufe 3, Status wie try_render. Nur aufrufen, wenn Stufe 2 gescheitert ist."""
     if timeout <= 0 or not direct_enabled():
         return "off", None
     if not url_allowed(url):
         return "blocked", None
-    pins = _pins(url)
-    if not pins:
-        return "blocked", None
     if not _DIRECT_SEM.acquire(timeout=max(0.0, min(SEM_WAIT_S if wait is None else wait, timeout))):
         return "busy", None
     try:
-        return "tried", _ENGINE.run(lambda: _render_direct(url, time.monotonic() + timeout, pins), timeout)
+        return "tried", _ENGINE.run(lambda: _render_direct(url, time.monotonic() + timeout), timeout)
     finally:
         _DIRECT_SEM.release()
 
 
-def _direct_route(pins: Dict[str, str]):
-    async def handler(route) -> None:
-        try:
-            req = route.request
-            parts = urlparse(req.url)
-            if req.resource_type not in _SKIP_TYPES and parts.scheme in ("http", "https") \
-                    and (parts.hostname or "").lower() in pins:
-                await route.continue_()  # Browser laedt selbst, Proxy-Bypass + Resolver-Pin
-                return
-        except Exception:  # noqa: BLE001 - Kontext schon zu
-            return
-        await _proxy(route)
-    return handler
+async def _skip_heavy(route) -> None:
+    try:
+        if route.request.resource_type in _SKIP_TYPES:
+            await route.abort("blockedbyclient")
+        else:
+            await route.continue_()  # Browser laedt selbst, ueber den Ausgangs-Proxy
+    except Exception:  # noqa: BLE001 - Kontext schon zu
+        pass
 
 
-async def _render_direct(url: str, deadline: float, pins: Dict[str, str]) -> Optional[str]:
-    pw = await _ENGINE.playwright()
-    opts = _direct_launch(pins)
-    channel = os.environ.get("RENDER_DIRECT_CHANNEL", "").strip()  # "chromium": voller Browser
+async def _render_direct(url: str, deadline: float) -> Optional[str]:
+    """Eigener Kontext im geteilten Browser, dessen gesamter Verkehr ueber den
+    Ausgangs-Proxy laeuft (app/compat/egress.py: nur oeffentliche, gepinnte Ziele)."""
+    browser = await _ENGINE.shared_browser()
+    port = await _ENGINE.egress_port()
+    ctx = await browser.new_context(
+        proxy={"server": f"http://127.0.0.1:{port}", "bypass": "<-loopback>"},
+        user_agent=_UA_DIRECT.format(ver=browser.version), locale="en-US",
+        service_workers="block", viewport={"width": 1366, "height": 768},
+    )
     try:
-        browser = await pw.chromium.launch(headless=True, channel=channel or None, **opts)
-    except Exception:  # noqa: BLE001 - Kanal nicht installiert
-        browser = await pw.chromium.launch(headless=True, **opts)
-    try:
-        ctx = await browser.new_context(
-            user_agent=_UA_DIRECT.format(ver=browser.version), locale="en-US",
-            service_workers="block", viewport={"width": 1366, "height": 768},
-        )
         await ctx.add_init_script(_INIT_JS)
-        await ctx.route("**/*", _direct_route(pins))
+        await ctx.route("**/*", _skip_heavy)
         page = await ctx.new_page()
         return await _load(page, url, deadline, challenge=True)
     finally:
         try:
-            await browser.close()
+            await ctx.close()
         except Exception:  # noqa: BLE001
             pass

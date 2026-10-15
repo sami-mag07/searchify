@@ -510,7 +510,7 @@ DIRECT_MIN_REST_S = 3.0
 RENDER_MIN_WORDS = 40
 _CHALLENGE_RE = re.compile(
     r"verifying (?:you are|your browser)|just a moment|enable javascript and cookies"
-    r"|you need to enable javascript|captcha|access denied|couldn.t load", re.IGNORECASE)
+    r"|captcha|access denied|couldn.t load", re.IGNORECASE)
 
 
 def _poor(content: str) -> bool:
