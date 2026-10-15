@@ -47,3 +47,10 @@ Eine Seite, am Handy lesbar, die den ganzen Scraper zeigt:
 - Erst messen: die ~33 Seiten, die am 14.10. blockiert blieben (3,9 % von 856, siehe loop-log 14.10. 01:18), durch Camoufox schicken und zählen, wie viele gerettet werden. Nur einbauen, wenn es spürbar rettet.
 - Einbau als eigene Stufe hinter dem Headless-Browser, mit festem Zeitlimit; SSRF-Schutz wie in render.py (nur öffentliche Ziele, jede Weiterleitung prüfen). Version pinnen, vorher vom security-Agent vetten lassen.
 - ShardBrowser NICHT einbauen (Chromium-Kern closed source vom Hersteller-CDN).
+
+## Zusatz 15.10.2026 nachmittags (Samis Entscheidungen, Board https://claude.ai/artifact/7EtKvb8UvpbzQ9VmjVHBhs)
+
+- Nur Open Source und kostenlos (Mojeek und andere Bezahl-APIs raus).
+- Themen-Bibliothek: jedes Regal bekommt ein eigenes Nutzerprofil (Rocchio) als "Eröffnungsseite" mit Notizen: was Sami in diesem Thema übernimmt, Seitentypen, Sprache. Ältere Beispiele zählen weniger, max. ~50 je Profil.
+- Freigegeben: Engine-Messung (Gold-Domains je Engine aus der Kassette), Bandit (fragt immer alle Engines, je Thema eine primär, lernt live), LambdaMART aus Klicks, Verweildauer, Camoufox live schalten. IPS geparkt bis Klick-Lernen läuft.
+- README nach dem Live-Schalten von Camoufox: Satz wie "Von 856 Trefferseiten aus echten Suchen bleiben mit allen Lade-Stufen 13 gesperrt (1,5 %); Seiten hinter Login oder Bezahlschranke zählen nicht dazu." Erst eintragen, wenn Camoufox wirklich live ist, Zahlen vorher am Live-Stand nachmessen.
