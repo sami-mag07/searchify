@@ -181,16 +181,24 @@ python -c "from transformers import AutoModelForSequenceClassification as M; M.f
 Andere Wahl ueber `RERANKER_MODEL`, z. B. `BAAI/bge-reranker-base` (genauer, ~3x langsamer).
 
 ### 3b. Optional: Browser-Rendering fuer den Reader (JS-Seiten)
-`/jina/r` und `/extract` rendern Seiten ohne lesbaren Text (SPAs) im Headless-Chromium
-nach (`app/compat/render.py`, hoechstens 2 je Anfrage, einer gleichzeitig). `playwright`
-steht in `requirements.txt`, den Browser einmalig laden (~100 MB):
+`/jina/r` und `/extract` laden in Stufen, jede nur, wenn die vorige scheitert (fehlt der
+Text, ist er unter 40 Woertern oder eine Challenge-/"enable JavaScript"-Seite; der
+statische Text bleibt, falls alle Stufen scheitern). Der schnelle Weg bleibt unberuehrt.
+1. statisch (httpx, bei 403/429/503 curl_cffi), 2. Render im geteilten Headless-Chromium
+(bleibt offen, nach 5 min Leerlauf zu; `RENDER_SLOTS`=3 gleichzeitig), 3. Chromium laedt
+die Seite selbst (gegen Bot-Schutz; `RENDER_DIRECT=0` schaltet nur diese Stufe ab).
+Hoechstens 2 Seiten je Anfrage (`app/compat/render.py`, `reader._render_failed`).
+`playwright` steht in `requirements.txt`, die Browser einmalig laden (~250 MB):
 ```
-.venv/bin/python -m playwright install chromium-headless-shell
+.venv/bin/python -m playwright install chromium chromium-headless-shell
 ```
 Ohne playwright oder mit `READER_RENDER=0` ist die Reserve aus (Rueckfall: Seite zaehlt
 als Fehlschlag wie bisher). SSRF-Schutz: Start-URL nur oeffentlich, jede Browser-Anfrage
 (Unterressourcen, Redirects, JS-Weiterleitungen, Popups) laeuft ueber den gepinnten Client
-aus `app/extract.py`, alles andere ueber einen toten Proxy; Test `tests/test_render_ssrf.py`.
+aus `app/extract.py`, alles andere ueber einen toten Proxy. Stufe 3: nur Start-Host,
+www-Variante und challenges.cloudflare.com duerfen direkt, je auf die vorab gepruefte IP
+festgenagelt (`--host-resolver-rules`, jeder andere Name -> NOTFOUND, jeder andere Host ->
+toter Proxy); Test `tests/test_render_ssrf.py`.
 
 ### 4. Antwort-LLM (Claude ueber claude-code-api)
 `claude-code-api` als OpenAI-kompatiblen Wrapper starten (eigener Login) und in

@@ -132,6 +132,65 @@ def test_kein_dienst_ohne_playwright(monkeypatch):
     assert render_mod.render_html("https://example.org/") is None
 
 
+def test_direkt_stufe_nur_gepinnte_hosts():
+    opts = render_mod._direct_launch({"stackoverflow.com": "198.252.206.1", "v6.test": "2001:db8::1"})
+    assert opts["proxy"]["server"] == "http://127.0.0.1:9"
+    assert opts["proxy"]["bypass"].split(",") == ["<-loopback>", "stackoverflow.com", "v6.test"]
+    rules = next(a for a in opts["args"] if a.startswith("--host-resolver-rules="))
+    assert rules.endswith("MAP * ~NOTFOUND") and "MAP v6.test [2001:db8::1]" in rules
+    for url in ("http://127.0.0.1/", "http://localhost/", "file:///etc/passwd", "http://10.0.0.1/"):
+        assert render_mod._pins(url) == {}, url
+        assert render_mod.try_render_direct(url) == ("blocked", None), url
+
+
+def test_direkt_stufe_erreicht_nichts_internes(monkeypatch, internal_server):
+    """Stufe 3 laedt public.test selbst (fuer den Test auf einen lokalen Server
+    gepinnt). Alles andere (IP-Literal, localhost, fremde Namen, Worker, WebSocket,
+    Redirect nach intern) muss scheitern: der interne Server zaehlt null Treffer."""
+    _need_browser()
+    port, hits = internal_server
+    loc = f"http://127.0.0.1:{port}"
+    body = f"""<html><head><title>Oeffentlich</title></head><body><p>Oeffentlicher Inhalt fuer den Test.</p>
+<img src="{loc}/img"><iframe src="http://localhost:{port}/iframe"></iframe>
+<script>
+fetch("{loc}/fetch").catch(()=>{{}});
+fetch("http://localhost:{port}/fetch2").catch(()=>{{}});
+fetch("http://intern.test:{port}/fetch3").catch(()=>{{}});
+try {{ new Worker(URL.createObjectURL(new Blob(['fetch("{loc}/worker").catch(()=>{{}})']))) }} catch(e) {{}}
+try {{ new WebSocket("ws://127.0.0.1:{port}/ws") }} catch(e) {{}}
+</script></body></html>""".encode()
+
+    class Public(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/":
+                self.send_response(200)
+                self.send_header("content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(body)
+            else:  # Weiterleitung ins interne Netz
+                self.send_response(302)
+                self.send_header("location", f"{loc}/redirect")
+                self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Public)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        pport = srv.server_address[1]
+        start = f"http://public.test:{pport}/"
+        monkeypatch.setattr(render_mod, "url_allowed", lambda url: url.startswith(start))
+        monkeypatch.setattr(render_mod, "_pins", lambda url: {"public.test": "127.0.0.1"})
+        monkeypatch.setenv("READER_RENDER", "1")
+        status, html = render_mod.try_render_direct(start, timeout=8.0)
+        assert status == "tried" and html and "Oeffentlicher Inhalt" in html
+        assert render_mod.try_render_direct(start + "weiter", timeout=6.0)[1] is None
+    finally:
+        srv.shutdown()
+    assert hits == []
+
+
 def test_lokaler_port_frei():
     # Plausibilitaet: der tote Proxy-Port 9 nimmt nichts an (sonst waere die Reserve offen).
     s = socket.socket()

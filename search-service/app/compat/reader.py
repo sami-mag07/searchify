@@ -111,9 +111,36 @@ def _wiki_text(html: str, fmt: str = "markdown") -> str:
             el.drop_tree()
     _tables_as_rows(tree)
     if fmt == "markdown":
-        for head in tree.xpath("//h1|//h2|//h3|//h4|//h5|//h6"):
-            head.text = "#" * int(head.tag[1]) + " " + (head.text or "").lstrip()
+        _mark_headings(tree)
     return _full_page_text(HTMLTree.parse(lxml_html.tostring(tree, encoding="unicode")))
+
+
+def _mark_headings(tree) -> None:
+    for head in tree.xpath(".//h1|.//h2|.//h3|.//h4|.//h5|.//h6"):
+        head.text = "#" * int(head.tag[1]) + " " + (head.text or "").lstrip()
+
+
+# GitHub: die README steckt in article.markdown-body. Neben Dateiliste, Menues und
+# Seitenleiste ist sie oft unter FULL_PAGE_RATIO der Seite, dann kaeme die ganze Seite.
+_README = "//article[contains(concat(' ',normalize-space(@class),' '),' markdown-body ')]"
+README_MIN_WORDS = 50
+
+
+def _readme_text(html: str, fmt: str = "markdown") -> str:
+    from lxml import html as lxml_html  # noqa: PLC0415
+    from resiliparse.parse.html import HTMLTree  # noqa: PLC0415
+
+    found = lxml_html.fromstring(html).xpath(_README)
+    if not found:
+        return ""
+    box = found[0]
+    for el in box.xpath(".//svg|.//script|.//style|.//*[contains(@class,'anchor')]"):
+        if el.getparent() is not None:
+            el.drop_tree()
+    _tables_as_rows(box)
+    if fmt == "markdown":
+        _mark_headings(box)
+    return _full_page_text(HTMLTree.parse(lxml_html.tostring(box, encoding="unicode")))
 
 
 def _unwrap_forms(html: str) -> str:
@@ -158,6 +185,13 @@ def reader_content(html: str, url: str = "", fmt: str = "markdown") -> Optional[
             wiki = ""
         if _words(wiki) >= WIKI_MIN_WORDS:
             return wiki
+    if "markdown-body" in html:
+        try:
+            readme = _readme_text(html, fmt)
+        except Exception:  # noqa: BLE001 - kaputtes HTML: wie gehabt
+            readme = ""
+        if _words(readme) >= README_MIN_WORDS:
+            return readme
     try:
         main = trafilatura.extract(
             html, url=url or None, favor_recall=True, include_tables=True,
@@ -452,49 +486,81 @@ def read_pages(
         urls, fmt, timeout, extractor=reader_document, cache_prefix=_PREFIX,
         max_bytes=READER_MAX_BYTES,
     )
-    if failed and render_mod.enabled():
-        docs, failed = _render_failed(docs, failed, fmt, urls, deadline)
+    if render_mod.enabled():
+        # Duenne Ergebnisse (JS-Huelle, "Skip to main content", Challenge-Seite) zaehlen
+        # fuer die Stufen wie Fehler; scheitern alle, bleibt der statische Text.
+        thin = [d for d in docs if _poor(d.get("content") or "")]
+        if thin:
+            docs = [d for d in docs if d not in thin]
+            failed = failed + [{"url": d.get("url"), "error": "Zu wenig Text", "static": d} for d in thin]
+        if failed:
+            docs, failed = _render_failed(docs, failed, fmt, urls, deadline)
     return docs, failed
 
 
 RENDER_MAX = 2  # hoechstens so viele Seiten je Anfrage nachrendern (je 2-10 s)
 RENDER_TIMEOUT_S = 12.0  # ohne Frist des Aufrufers (x-timeout)
+DIRECT_TIMEOUT_S = 15.0  # Stufe 3: Challenge-Seiten brauchen ein paar Sekunden
 RENDER_MIN_REST_S = 1.0  # weniger Restzeit lohnt keinen Browserstart
+DIRECT_MIN_REST_S = 3.0
 RENDER_MIN_WORDS = 40
 _CHALLENGE_RE = re.compile(
     r"verifying (?:you are|your browser)|just a moment|enable javascript and cookies"
-    r"|captcha|access denied|couldn.t load", re.IGNORECASE)
+    r"|you need to enable javascript|captcha|access denied|couldn.t load", re.IGNORECASE)
+
+
+def _poor(content: str) -> bool:
+    """Kein brauchbarer Text: zu kurz oder (kurz und) Challenge-/JS-Hinweis."""
+    n = _words(content)
+    return n < RENDER_MIN_WORDS or (n < 300 and bool(_CHALLENGE_RE.search(content)))
 
 
 def _render_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
     deadline: Optional[float] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
-    """Reserve fuer JS-Seiten: fehlgeschlagene URLs im Headless-Browser rendern.
+    """Reserve-Stufen fuer Fehlschlaege, jede nur, wenn die vorige scheitert:
+    Stufe 2 rendert im geteilten Browser (alle Anfragen ueber httpx), Stufe 3 laesst
+    den Browser die Seite selbst laden (gegen Bot-Schutz, render.try_render_direct).
     Bot-Schutz-Seiten (Challenge-Text, kaum Woerter) zaehlen weiter als Fehler.
-    Mit `deadline` (monotonic, aus x-timeout) bekommt jeder Render nur die Restzeit;
-    ist der Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen."""
+    Mit `deadline` (monotonic, aus x-timeout) bekommt jede Stufe nur die Restzeit;
+    ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen."""
     still: List[Dict] = []
     tried = 0  # echte Render-Versuche (Zeitlimit-Fehler und belegter Platz zaehlen nicht)
     busy = False
-    for fail in failed:
-        rest = RENDER_TIMEOUT_S if deadline is None else deadline - time.monotonic()
-        if (busy or tried >= RENDER_MAX or fail.get("error") == "Zeitlimit"
-                or rest < RENDER_MIN_REST_S):
+
+    def rest(cap: float) -> float:
+        return cap if deadline is None else min(cap, deadline - time.monotonic())
+
+    def give_up(fail: Dict) -> None:
+        static = fail.pop("static", None)
+        if static and (static.get("content") or "").strip():
+            docs.append(static)  # duenner Text ist besser als nichts
+        else:
             still.append(fail)
+
+    def good(html: Optional[str], url: str) -> Optional[Dict]:
+        doc = reader_document(html, url, fmt) if html else None
+        return doc if doc and not _poor(doc.get("content") or "") else None
+
+    for fail in failed:
+        if (busy or tried >= RENDER_MAX or fail.get("error") == "Zeitlimit"
+                or rest(RENDER_TIMEOUT_S) < RENDER_MIN_REST_S):
+            give_up(fail)
             continue
-        status, html = render_mod.try_render(fail["url"], timeout=min(rest, RENDER_TIMEOUT_S))
+        status, html = render_mod.try_render(fail["url"], timeout=rest(RENDER_TIMEOUT_S))
         if status != "tried":
             # Platz belegt: die uebrigen nicht auch noch je 1 s warten lassen.
             busy = busy or status in ("busy", "off")
-            still.append(fail)
+            give_up(fail)
             continue
         tried += 1
-        doc = reader_document(html, fail["url"], fmt) if html else None
-        content = (doc or {}).get("content") or ""
-        if _words(content) < RENDER_MIN_WORDS or (
-                _words(content) < 300 and _CHALLENGE_RE.search(content)):
-            still.append(fail)
+        doc = good(html, fail["url"])
+        if doc is None and rest(DIRECT_TIMEOUT_S) >= DIRECT_MIN_REST_S:
+            status, html = render_mod.try_render_direct(fail["url"], timeout=rest(DIRECT_TIMEOUT_S))
+            doc = good(html, fail["url"]) if status == "tried" else None
+        if doc is None:
+            give_up(fail)
             continue
         pages_mod._docs().put(f"{_PREFIX}{fmt}|{fail['url']}", doc)
         docs.append(doc)
