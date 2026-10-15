@@ -72,6 +72,7 @@ _ARGS = [
 _INIT_JS = "try{delete window.RTCPeerConnection;delete window.webkitRTCPeerConnection}catch(e){}"
 # Hosts, die Challenge-Seiten selbst nachladen; sie duerfen in Stufe 3 direkt (gepinnt).
 _CHALLENGE_HOSTS = ("challenges.cloudflare.com",)
+CHALLENGE_WAIT_S = 6.0  # Stufe 3: hoechstens so lange auf das Loesen einer Bot-Challenge warten
 _CHALLENGE_TITLE_RE = re.compile(
     r"just a moment|attention required|checking your browser|verifying|security check|un moment", re.IGNORECASE)
 
@@ -232,7 +233,10 @@ async def _load(page, url: str, deadline: float, challenge: bool = False) -> Opt
     resp = await page.goto(url, wait_until="domcontentloaded", timeout=_ms(deadline))
     status = resp.status if resp is not None else 200
     if challenge and _CHALLENGE_TITLE_RE.search(await _title(page)):
-        while time.monotonic() < deadline - 0.5:
+        # Geloeste Challenges brauchten am 15.10. wenige Sekunden (Stack Overflow ganz
+        # <= 7,5 s), haengende sonst das ganze Budget und blockieren den Platz.
+        give_up = min(deadline - 0.5, time.monotonic() + CHALLENGE_WAIT_S)
+        while time.monotonic() < give_up:
             await asyncio.sleep(0.5)
             if not _CHALLENGE_TITLE_RE.search(await _title(page)):
                 status = 200
