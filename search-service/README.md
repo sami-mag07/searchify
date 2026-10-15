@@ -193,8 +193,11 @@ run with the search engine switched off.
 ## Limits
 
 - No own web index. Breadth depends on the public engines behind SearXNG.
-- Pages behind bot protection or heavy JavaScript can fail (an optional headless
-  browser helps with the second).
+- Of 856 result pages from real searches, 19 still cannot be loaded with all fetch
+  stages (2.2 %, measured live on Oct 15, 2026; before the Camoufox stage it was 33).
+  Pages behind a login or paywall are not counted. The reader tries, in order: plain
+  HTTP, a Chrome TLS profile, headless Chromium, and Camoufox (open source Firefox,
+  see `docs/camoufox.md`).
 - Research ranking for the Tavily format is still behind the original (0.25 vs 0.28).
 
 ## Legal

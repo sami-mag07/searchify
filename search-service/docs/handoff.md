@@ -143,3 +143,20 @@ Zuverlaessigkeits-Lauf: Run wf_0944d022-74e, Ablage eval/private/zuverl-2026-10-
   Training (prepare_data.py, train_reranker.py, run_night.ps1/.sh) und ein Auftrag fuer Claude Code.
 - Messdaten: train/make_bundle.sh <ziel.zip> auf dem Mac (nur USB/AirDrop/lokales Netz), train/unpack_bundle.py auf dem Laptop.
 - Ergebnis kommt als models/reranker-mminilm-<datum>/ zurueck, gemessen wird nur auf dem Mac.
+
+## Stand 15.10.2026 abends (Auftrag Themen-Bibliothek, docs/auftrag-bibliothek.md)
+
+- Camoufox LIVE als letzte Lade-Stufe im Reader/Extract (app/compat/stealth.py, stealth_proxy.py,
+  camoufox_worker.py; Einrichtung docs/camoufox.md, eigenes venv ~/tools/camoufox, CAMOUFOX_PYTHON in .env).
+  Live-Stand 856 Trefferseiten: 809 lesbar, 19 nicht ladbar ohne Bezahlschranke (2,2 %, vorher 33),
+  15 laden mit zu wenig Text. Security-Vetting und SSRF-Review freigegeben (4 Low behoben).
+- Pruefsatz mit Zeit-Trennung: eval/bibliothek/pruefsatz.json (29 Testfragen, spaetere Funde aus Runde 8,
+  Radar, Runde 9), Messung eval/bibliothek/bench.py gegen eigene Instanz ohne Caches. Basis site@20 0.39, mrr 0.41.
+- Themen-Bibliothek eingebaut, aber Standard AUS (LIBRARY_K=0): Bau python -m app.library_build
+  (data/bibliothek/regale.json), A/B site@20 +0.012/+0.015, mrr -0.02/-0.03, p95 +0.3-0.4 s.
+  Grenze: nur 18 von 119 Fund-Domains stehen ueberhaupt in Quellen bis 01.10.
+- Sortier-Modell aus uebernommenen Links verworfen (eval/bibliothek/lernen.py, Kreuzvalidierung negativ).
+- Engine-Messung je Regal: eval/bibliothek/engines.py (Bing fast 0 Gold-Domains, Yahoo vorn in 6 von 9 Regalen).
+- Falle: objective.py hist_* ist mit Bibliothek zirkulaer (Bibliothek kennt die Gold-Links), nur Fakten zaehlen.
+- Offen (Sami 15.10. nachmittags freigegeben): Rocchio-Profil je Regal, Bandit fuer die primaere Engine,
+  LambdaMART aus Klicks, Verweildauer. Alles braucht ein Klick-/Uebernahme-Signal, das es noch nicht gibt.

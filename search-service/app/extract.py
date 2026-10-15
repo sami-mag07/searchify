@@ -362,6 +362,32 @@ def _cache() -> PageCache:
     return _CACHE
 
 
+# is_global laesst IPv6-Formen durch, die eine IPv4 einbetten oder veraltet sind
+# (Security-Review 15.10.2026): NAT64 64:ff9b::/96 fuehrt in NAT64-Netzen (Hotspot)
+# zu 192.168.x.x, dazu 6to4, IPv4-kompatibel ::a.b.c.d und Site-Local fec0::/10.
+_V6_EMBED = (ipaddress.ip_network("64:ff9b::/96"), ipaddress.ip_network("64:ff9b:1::/48"))
+_V6_BLOCK = (ipaddress.ip_network("fec0::/10"), ipaddress.ip_network("::/96"))
+
+
+def ip_is_public(raw: str) -> bool:
+    """Oeffentliche Adresse (is_global), eingebettete IPv4 wird mitgeprueft."""
+    try:
+        ip = ipaddress.ip_address(raw)
+    except ValueError:
+        return False
+    if not ip.is_global:
+        return False
+    if ip.version == 6:
+        if any(ip in net for net in _V6_BLOCK):
+            return False
+        inner = ip.ipv4_mapped or ip.sixtofour
+        if inner is None and any(ip in net for net in _V6_EMBED):
+            inner = ipaddress.ip_address(int(ip) & 0xFFFFFFFF)
+        if inner is not None and not inner.is_global:
+            return False
+    return True
+
+
 def _public_ips(host: str) -> List[str]:
     """Aufgeloeste IPs des Hosts, aber nur wenn ALLE oeffentlich sind, sonst [].
     Loopback, private Netze, Link-Local & Co. fuehren zu []."""
@@ -372,7 +398,7 @@ def _public_ips(host: str) -> List[str]:
     ips: List[str] = []
     for info in infos:
         raw = info[4][0].split("%")[0]
-        if not ipaddress.ip_address(raw).is_global:
+        if not ip_is_public(raw):
             return []
         if raw not in ips:
             ips.append(raw)

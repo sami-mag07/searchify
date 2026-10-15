@@ -21,6 +21,7 @@ from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from typing import Dict, List, Optional, Tuple
 
 from . import extract as extract_mod
+from . import library as library_mod
 from . import rerank as rerank_mod
 from . import search as search_mod
 from .config import get_settings
@@ -112,6 +113,19 @@ def gather(
     extracted = 0
     first_hit: Optional[float] = None
 
+    # Themen-Bibliothek: passende Regal-Seiten gleich zu Beginn laden lassen, sie laufen
+    # danach wie Engine-Treffer durch Reranker und Fusion (app/library.py).
+    lib = library_mod.seed_hits(req, settings.library_k) if settings.library_k > 0 else []
+    for hit in lib:
+        key = rerank_mod.canonical_url(hit["url"])
+        if key and key not in seen:
+            seen[key] = len(candidates)
+            fetcher.add(len(candidates), hit["url"])
+            candidates.append(hit)
+    delivered = [0]  # Engine-Treffer insgesamt (auch Dubletten von Regal-Seiten)
+    if lib:
+        ranked.extend(rerank_mod.rerank(req.query, [ch for c in candidates for ch in extract_mod.page_chunks(c, None)]))
+
     def take_pages(timeout: float) -> None:
         nonlocal extracted
         batch = fetcher.poll(timeout)
@@ -140,6 +154,7 @@ def gather(
             answered.add(name)
             if not hits:
                 empty.add(name)
+            delivered[0] += len(hits)
             engine = name.split("#")[0]
             for hit in hits:
                 key = rerank_mod.canonical_url(hit.get("url", ""))
@@ -194,8 +209,8 @@ def gather(
     t_search = time.monotonic()
     _LAST.complete = len(answered) >= len(slots) and not empty
 
-    if not candidates:
-        return None
+    if not delivered[0]:
+        return None  # keine Engine hat geliefert: Ersatz-Backend (die Bibliothek kommt dort wieder dazu)
 
     # Seiten: mindestens `budget_s` ab dem ersten Treffer, nach der letzten Engine
     # aber hoechstens noch einen kurzen Rest (SPLIT_TAIL_MS) warten.

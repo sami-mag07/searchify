@@ -1,0 +1,1073 @@
+{
+ "stand": "2026-10-15",
+ "bau_bis": "2026-10-01",
+ "pruefung": [
+  "runde8 04.10.",
+  "radar 13.10.",
+  "runde9 14.10."
+ ],
+ "hinweis": "Funde nicht von Sami bestaetigt, schwaecher als Gold",
+ "themen": {
+  "hackathon": {
+   "fragen": [
+    "Hackathon Deutschland November 2026 Preisgeld Anmeldung",
+    "KI Hackathon Berlin Wochenende kostenlos teilnehmen",
+    "hackathon Munich December 2026 prize money register",
+    "Hackathons Januar Februar 2027 online Preisgeld",
+    "Robotik Hackathon 2026 Deutschland Bewerbung"
+   ],
+   "funde": [
+    {
+     "url": "https://eveeno.com/hackathon26",
+     "name": "Hackathon Fulda 2026 (Future Education: KI und Serious Games)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://germanhackathons.com/en/events/berlin-robotics-ai-hackathon-hacklab-x-brisa",
+     "name": "HackLab #2 Berlin Robotics & AI Hackathon (Physical AI)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/2zl1ik82",
+     "name": "Lovable Winter Hackathon (Ugly-Sweater-Edition)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://www.ctrl-rwth.de/events/ctrl-hackathon-2026",
+     "name": "Construction Robotics Hackathon Aachen",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://germanhackathons.com/en/events/civil-resilience-technology-hackathon",
+     "name": "Civil Resilience Technology Hackathon (EUCIV)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.hackahealth.ch/home-de",
+     "name": "HackaHealth Stuttgart (Inklusions-Hackathon)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.biwe.de/kickathon",
+     "name": "KI.ckAthon (Tages-Hackathon für Azubis, Studierende und Schüler*innen)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://assistive-innovation-challenge.devpost.com/",
+     "name": "Assistive Innovation Challenge 2026 (Devpost, online)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/9j6zoc6n",
+     "name": "Hack-Nation 8th Global AI Hackathon",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://www.barcelonahackathon.com/#join",
+     "name": "barcelonahackathon",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://developerweek-2027-hackathon.devpost.com/",
+     "name": "DeveloperWeek 2027 Hackathon (online)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://events.eurodefense.tech/munich-2027",
+     "name": "EDTH MSC 2027 (European Defense Tech Hackathon, Münchner Sicherheitskonferenz)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://hackathonhub.eu/events/european-defense-tech-hackathon-hannover-hanover-2027",
+     "name": "European Defense Tech Hackathon Hannover",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/q05b1qea",
+     "name": "European Defense Tech Hackathon Bratislava",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://hackathon.cloudfest.com/",
+     "name": "CloudFest Hackathon 2027 (10. Jubiläum)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://unitedhacksv8.devpost.com/",
+     "name": "united hacks v8",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.genaiberlin.com/hackathon/genai-berlin-hackathon-2026.pdf",
+     "name": "GenAI Berlin Hackathon 2026 (Build it. Break it.)",
+     "quelle": "radar",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://brainberg.eu/events/ai-and-innovation-hackathon-future-career-festival-program-2026-10-15-dusseldorf",
+     "name": "AI & Innovation Hackathon, Future Career Festival",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.com/e/climathon-2026-potsdam-tickets-2002566716958",
+     "name": "Climathon 2026 Potsdam",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://pages.fachmedien.de/hackathon/",
+     "name": "Tax Tech Hackathon 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://hackathonhub.eu/hackathons/germany",
+     "name": "DO-DATA-HACKATHON",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://hrojam.de/",
+     "name": "1. Rostocker GameJam (HRO Jam, erste Iteration)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/big-gtc-hack",
+     "name": "Nebius Build Week Hackathon (mit NVIDIA, vor GTC Berlin)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/research-to-commerce",
+     "name": "Agentic Hackathon: From Research to Commerce",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/1ykmpq40",
+     "name": "OSI Hackathon, Berlin Site (Open Scientific Intelligence)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/lusi0xff",
+     "name": "Climate Innovation Challenge (Halbtages-Ideation-Workshop, kein Coding)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://baiosphere.org/events/2026/munich-hackathon-2026",
+     "name": "Munich Hackathon 2026 (Agentic Coding)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://berlincollege.de/hackathon#apply",
+     "name": "Berlin College Hackathon: AI Entrepreneurship (What if you built it?)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/070qezlj",
+     "name": "Industrial Agents Hackathon (MM x UVC x Anthropic)",
+     "quelle": "radar",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://lu.ma/mcw2026-foj2",
+     "name": "WATT THE HACK: Energy & AI Hackathon",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://germanhackathons.com/en/hackathons/dusseldorf",
+     "name": "Ideaton Aufblühen - Stadtteile neu denken (Düsseldorf)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://hackathon-fulda.de/#anmeldung",
+     "name": "Hackathon Fulda (8. Runde)",
+     "quelle": "radar",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://hackation.de/de/events/hackathon-2026-q3-berlin/",
+     "name": "AI Vibe Hackathon Berlin",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/g6kvvori",
+     "name": "LangChain x Data Reply Hackathon (Agent Harnesses)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/ru3aaj72",
+     "name": "Traffic Wars Coding Challenge x CHECK24 Hamburg",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.com/e/brain-1-hackathon-build-the-future-of-cognitive-performance-tickets-2002705039685",
+     "name": "Brain 1 Hackathon Build the Future of Cognitive Performance",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://tum.devfolio.co/",
+     "name": "TUM Blockchain & AI Hackathon 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://lu.ma/55d7qwvn",
+     "name": "Halloween Hackathon (supported by Lovable)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.mlh.com/events/hacktoberfest-2026-in-frankfurt",
+     "name": "Hacktoberfest Hack Day Frankfurt (MLH)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://bot.biwe.eu/kickathon-1?qugo=fre26",
+     "name": "KI.ckAthon Freiburg",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.ml6.eu/en/events/ml6-hackathon-munich-build-your-own-ai-co-worker-with-claude",
+     "name": "ML6 Hackathon: Build your own AI Coworker with Claude (Munich)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://eveeno.com/leuphana-ai-hackathon",
+     "name": "Leuphana AI Hackathon",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/euciv-2026-berlin",
+     "name": "Civil Resilience Technology Hackathon (EUCIV)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/n86qlmfn",
+     "name": "European Defense Tech Hackathon UniBw München",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://eveeno.com/healthhacksaar2026",
+     "name": "Health Hack Saar 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.denkmal-leipzig.de/program/denkmal/32195",
+     "name": "Heritage Hackathon 2026: Saving Buildings Together",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.com/e/game-jam-finkenau-17-tickets-2002935438815",
+     "name": "Game-Jam Finkenau 17",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.lndc.de/anmeldung/",
+     "name": "LNDC - Lange Nacht des Coding 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://hackathonhub.eu/events/cursor-x-sandbox-hackathon-stuttgart-stuttgart-2026",
+     "name": "Cursor x Sandbox Hackathon Stuttgart",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://pretix.eu/saarhackathon/wth09/",
+     "name": "Saar Hackathon #09 Machen statt Meckern",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/jszbui71",
+     "name": "Miro Meetup Berlin: AI Buildathon",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.de/e/healthcare-hackathon-bayern-erlangen-2026-tickets-1975590123240",
+     "name": "Healthcare Hackathon Bayern Erlangen",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.wiesbaden.de/en/wirtschaft/netzwerke-kooperationen/hackathon-2026",
+     "name": "Hackathon 2026 Wiesbaden (soziale und ökologische Geschäftsideen)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://germanhackathons.com/en/events/enactus-aachen-x-collective-incubator-ideathon",
+     "name": "Enactus Aachen x Collective Incubator Ideathon",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://ideen-fuer-unternehmen.de/hackathon",
+     "name": "KUESTENMATCH Hackathon an der HOST",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/etoyylwe",
+     "name": "MagdeHack (erster Hackathon)",
+     "quelle": "radar",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://hanse-innovation-campus.de/de/hanseatic-hackathon-2026-teilnehmen",
+     "name": "Hanseatic Hackathon 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.spaceappschallenge.org/2026/local-events/berlin/",
+     "name": "NASA Space Apps Challenge Berlin 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.com/e/robotics-x-ai-hackathon-hacklab-tickets-1996433093124",
+     "name": "ROBOTICS X AI Hackathon (HackLab)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/or3d9qtg",
+     "name": "Entropy AI Security Hackathon",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lu.ma/8m3nujc6",
+     "name": "Game Jam Stuttgart (Chroma Awards)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.spaceappschallenge.org/2026/local-events/hamburg/",
+     "name": "NASA Space Apps Challenge Hamburg 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.spaceappschallenge.org/2026/local-events/cottbus/",
+     "name": "NASA Space Apps Challenge Cottbus 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.de/e/green-bonn-hackathon-2026-tickets-2001168199956",
+     "name": "GreenBonn Hackathon 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.interact.network/events/hackathon-koeln-2026",
+     "name": "InterACT Hackathon Köln (#interact.now Immobilien-Assets)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://bot.biwe.eu/kickathon-1?qugo=ulm26",
+     "name": "KI.ckAthon Ulm",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.startplatz.de/event-series/ai-coding-hackathon?lang=de",
+     "name": "AI Coding Hackathon November 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://zedita.de/event/hackathon-hamelnhack-3",
+     "name": "HamelnHack 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://eveeno.com/hackathon-hildesheim",
+     "name": "Smart City Future Hackathon Hildesheim",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.com/e/berlin-robotics-ai-hackathon-hacklab-x-brisa-tickets-2001277673394",
+     "name": "Berlin Robotics & AI Hackathon, HackLab x BRISA (HackLab #2)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.startmunich.de/eventpage/rtsh",
+     "name": "START Hack Munich 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://devfest-ai-hackathon.devpost.com/",
+     "name": "DevFest Münster 2026: Agentic AI Hackathon",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://makeathon.info/project/fuer-studierende/",
+     "name": "Makeathon.RUHR 2026",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://hackathon-pmrexpo.eventbrite.de/?aff=Website",
+     "name": "Hackathon@PMRExpo 2026 What's NEXT",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://disruptive-muenchen.de/hackathon/#bewerbung-muenchen",
+     "name": "Hack the Mittelstand Vol. 3 (Agentic AI in Action)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://events.eurodefense.tech/european-defense-tech-hackathon-berlin-2",
+     "name": "European Defense Tech Hackathon, Berlin (Nov-Edition)",
+     "quelle": "radar",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://www.cassini.eu/hackathons/germany",
+     "name": "Cassini Hackathon Darmstadt (12th, EU Space for Peace and Resilience)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.cgi.com/de/de/event/karriere/ai-thon-2026",
+     "name": "CGI AI-Thon 2.0",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.42kaiserslautern.de/42-hackathon/",
+     "name": "42 Hackathon Mobilität Kaiserslautern",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://bot.biwe.eu/kickathon-1",
+     "name": "KI.ckAthon Tübingen",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://stimulate.ovgu.de/Hackathon.html",
+     "name": "MedTech & More Hackathon Magdeburg 2026 (STIMULATE)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.bf-innovation.de/events/black-forest-hackathon-health/",
+     "name": "Black Forest Hackathon: Health",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eventbrite.de/e/aufbluhen-stadtteile-neu-denken-i-ideaton-tickets-1991822172737",
+     "name": "Ideaton Aufblühen - Stadtteile neu denken (Essen)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://impuls-hamm.de/termine/2-makeathon-mach-mal-hamm-morgen-liefern-wir-anders/",
+     "name": "2. Makeathon Mach mal! Hamm",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://deutschland-was-geht.org",
+     "name": "SPRIND Citizen Hackathon (Deutschland-was-geht)",
+     "quelle": "radar",
+     "domain_schon_bekannt": false
+    }
+   ]
+  },
+  "planspiel": {
+   "fragen": [
+    "Jugendforum Landtag Brandenburg Bewerbung",
+    "Model Congress Europe 2027 Berlin Anmeldung",
+    "Model United Nations Europe 2027 financial aid"
+   ],
+   "funde": [
+    {
+     "url": "https://www.landtag.brandenburg.de/de/landtag_kennenlernen/jugend_und_politik/wiederkehrende_veranstaltungen/parlamentarisches_jugendforum/46966",
+     "name": "Parlamentarisches Jugendforum im Landtag Brandenburg (2. Ausgabe 2027)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://ofajgenerationeurope-demo.teamtailor.com/de/jobs/8278363-generation-europa-2027",
+     "name": "DFJW Generation Europa 2027 (Paris, Berlin, Tirana)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.hmceurope.org/registration",
+     "name": "Harvard Model Congress Europe (HMCE) 2027, 40. Ausgabe",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://ymuneurope.org/financialaid",
+     "name": "Yale Model United Nations Europe XVI (YMUNE), Prag",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    }
+   ]
+  },
+  "gruender": {
+   "fragen": [
+    "Social Impact Wettbewerb junge Gründer Preisgeld 2027",
+    "EdTech Wettbewerb 2027 Einreichung Preisgeld",
+    "Förderung Open Source Einzelpersonen 2027 Bewerbung",
+    "youth startup competition under 25 Europe 2027",
+    "Jugendpreis Engagement 2027 bewerben"
+   ],
+   "funde": [
+    {
+     "url": "https://tools-competition.org/27-overview",
+     "name": "Tools Competition 2027 (Learning Agency, Google.org u.a.)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://sxswedu.com/student-impact-application/",
+     "name": "SXSW EDU Student Impact Challenge 2027",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.dkhw.de/informieren/unsere-angebote/fuer-kinder-und-jugendliche/bewerbungsformular-2027-fuer-kinder-und-jugendliche/",
+     "name": "Deutscher Kinder- und Jugendpreis 2027 (Deutsches Kinderhilfswerk)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://worldwide-edtech.org/awards",
+     "name": "WorldWiDE EdTech Awards 2027",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.cbp.caritas.de/digital-preis/digital-preis",
+     "name": "CBP-Digitalpreis 2027 (Caritas Behindertenhilfe)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://aiforgood.itu.int/ai-for-good-impact-awards",
+     "name": "AI for Good Impact Awards 2027 (ITU/UN, Genf)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.bvl-legasthenie.de/bundeskongress.html",
+     "name": "BVL-Bundeskongress 2027 (Legasthenie und Dyskalkulie)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://developer.apple.com/swift-student-challenge/",
+     "name": "Swift Student Challenge 2027 (Apple)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://solve.mit.edu/challenges/2027-global-learning-challenge",
+     "name": "MIT Solve 2027 Global Learning Challenge",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://entrepreneurshipworldcup.com/apply-form/",
+     "name": "Entrepreneurship World Cup 2026/27 (Global Finals Riyadh)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://apply.socialimpactaward.net/germany/",
+     "name": "Social Impact Award Germany (Discovery Journey + Inkubation)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://foundersfoundation.de/edtech-academy/",
+     "name": "Founders Foundation EdTech Academy",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://en.wemakefuture.it/call/startup-competition-young/#form",
+     "name": "Startup Competition Young (We Make Future 2027)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.erasmus-entrepreneurs.eu/page.php?cid=4",
+     "name": "Erasmus for Young Entrepreneurs",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://entrepreneurship.de/en/competition",
+     "name": "Citizen Entrepreneurship Competition 2027",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://eitjumpstarter.eu/",
+     "name": "EIT Jumpstarter 2027",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://startsocial.de/foerderung/bewerbung",
+     "name": "startsocial Wettbewerb (Beratungsstipendium)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.wise-qatar.org/innovation/edtech-accelerator",
+     "name": "WISE EdTech Accelerator 2026/27",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.oberhavel.de/index.php?object=tx,2244.1&ModID=7&FID=2244.106469.1",
+     "name": "Ehrenpreis des Landkreises Oberhavel (mit Foerderpreis fuer junge Menschen)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.forbes.at/30-under-30/bewerbung",
+     "name": "Forbes Under 30 DACH 2027",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://youth.europarl.europa.eu/de/more-information/charlemagne-prize/apply-now.html",
+     "name": "Europaeischer Jugendkarlspreis 2027 (nationale Runde Deutschland)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://gruendungspreis-brandenburg.de",
+     "name": "Gruendungspreis Brandenburg 2027",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.asg-goe.de/",
+     "name": "Tassilo-Troescher-Jugendpreis (Ehrenamt im laendlichen Raum, bis 25)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://yodunesco.org/d-prize-challenge-2026-2027-for-social-entrepreneurs-to-fight-poverty-usd-20000/",
+     "name": "D-Prize Challenge 2026/27",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    }
+   ]
+  },
+  "konferenz": {
+   "fragen": [
+    "KI Events Berlin Oktober 2026 kostenlos",
+    "Gründerkonferenz Berlin November 2026 Tickets",
+    "ambassador program AI company community apply",
+    "Claude Code Workshop Berlin"
+   ],
+   "funde": [
+    {
+     "url": "https://events.openai.com/devdayexchange2026",
+     "name": "OpenAI DevDay Exchange Berlin",
+     "quelle": "runde8",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://claude.com/community/ambassadors",
+     "name": "Claude Community Ambassadors (Anthropic)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://community-hub.replit.app/ambassadors/apply",
+     "name": "Replit Ambassador Program",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://createwith.com/cities/berlin",
+     "name": "GitHub Copilot Dev Days Berlin",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://shop.snapticket.de/event/young-founders-conference-2026-m0e66y",
+     "name": "Young Founders Conference 2026",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/mkrpn9oh",
+     "name": "YFC Community Night (FOMO x CODE x Startup Berlin)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/big-gtc-hack",
+     "name": "Nebius Build Week Hackathon mit NVIDIA",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/jamie-hack",
+     "name": "Jamie Agentic AI Hack (Partner Anthropic, Reson8)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/claude-fxrb",
+     "name": "Claude Code Berlin Workshop: Agents that Debug and Review",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/unconference_11",
+     "name": "UNCONFERENCE: Engineering AI Together #11",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/Building-at-the-frontier-of-AI-NVIDIA",
+     "name": "Building At the Frontier of AI (GTC-Woche, Keynote-Watchparty)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/hep-hack-night",
+     "name": "Hack Night: Haystack Enterprise Platform",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/replit-gtc-berlin",
+     "name": "Replit x Black Forest Labs Pre-GTC Breakfast",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/04wd1rzw",
+     "name": "Berlin Deep Tech Nexus Meetup #13 (TU Berlin)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://unicon.berlin/#apply",
+     "name": "Unicon 2026 (CODE Startup & AI Conference)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://effectivealtruism.my.site.com/EAGlobal/s/eagxberlinapplication",
+     "name": "EAGxBerlin 2026",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://luma.com/research-to-commerce",
+     "name": "Agentic Hackathon: From Research to Commerce",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://luma.com/ai-builders",
+     "name": "AI Builders Berlin",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    }
+   ]
+  },
+  "uni": {
+   "fragen": [
+    "Begabtenförderung Studienanfänger Bewerbung vor dem Abitur",
+    "Stipendium Studienwerk Bewerbung 2027 Frist",
+    "university full scholarship international students 2027 early action",
+    "Liberal Arts College Berlin Stipendium Financial Aid"
+   ],
+   "funde": [
+    {
+     "url": "https://berlin.bard.edu/admissions/finances/financial-aid/",
+     "name": "Bard College Berlin, Early/Regular Action mit Stipendium",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.minerva.edu/undergraduate/admissions",
+     "name": "Minerva University, Early Action (Aid)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://nyuad.nyu.edu/en/apply/undergraduate/apply/key-dates-and-deadlines.html",
+     "name": "NYU Abu Dhabi, Early Decision I/II und Regular",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://admissions.dukekunshan.edu.cn/en/duke-kunshan-university-full-scholarship",
+     "name": "Duke Kunshan University, Global Leaders Full Scholarship",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.hss.de/stipendium/bewerbung",
+     "name": "Hanns-Seidel-Stiftung, Studienstipendium (Studienanfaenger)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.evstudienwerk.de/stipendium/studium/bewerbung",
+     "name": "Evangelisches Studienwerk Villigst, Studienstipendium",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.avicenna-studienwerk.de/stipendium/",
+     "name": "Avicenna-Studienwerk, Studienstipendium",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.cusanuswerk.de/bewerbung/studienanfaenger/universitaeten",
+     "name": "Cusanuswerk, Auswahlverfahren fuer Studienanfaenger",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.fes.de/studienfoerderung/bewerbung",
+     "name": "Friedrich-Ebert-Stiftung, Grundfoerderung Studienanfaenger",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://constructor.university/scholarships",
+     "name": "Constructor University Bremen, Talent Scholarship",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://hpi.de/studium/dein-studium-am-hpi/studieren-mit-stipendium/",
+     "name": "HPI Bachelor Starting Fund (IT-Systems Engineering)",
+     "quelle": "runde8",
+     "domain_schon_bekannt": false
+    }
+   ]
+  },
+  "ausland_bezahlt": {
+   "fragen": [
+    "AI safety research fellowship summer 2027 stipend",
+    "paid summer program 2027 London research stipend",
+    "open source mentorship paid remote summer 2027"
+   ],
+   "funde": [
+    {
+     "url": "https://www.prototypefund.de/bewerbung",
+     "name": "Prototype Fund Jahrgang 3 (Open-Source-Förderung, bis 79.000 EUR für Einzelpersonen)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.lasrlabs.org/",
+     "name": "LASR Labs Sommer 2027 (London, KI-Sicherheitsforschung)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.matsprogram.org/apply",
+     "name": "MATS Sommer 2027 (AI-Safety-Forschung, Berkeley oder London)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://erafellowship.org/fellowship",
+     "name": "Cambridge ERA:AI Fellowship Sommer 2027",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://stripe.com/careers/apply/high-school-internship-software-engineering-summer-2027/8241260",
+     "name": "Stripe High School Internship Software Engineering Sommer 2027",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lfx.linuxfoundation.org/tools/mentorship/",
+     "name": "LFX Mentorship Sommerrunde 2027 (Linux Foundation, CNCF)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    }
+   ]
+  },
+  "politik": {
+   "fragen": [
+    "UN Jugenddelegierte Deutschland Bewerbung 2027",
+    "youth delegate United Nations Germany application 2027",
+    "Jugenddelegation G20 G7 Y20 Ausschreibung",
+    "Young Trade Leaders WTO youth programme apply",
+    "Sicherheitskonferenz Jugend Berlin 2027 Bewerbung"
+   ],
+   "funde": [
+    {
+     "url": "https://www.jugenddelegierte.de/was-du-tun-kannst/bewerbungsprozess/",
+     "name": "UN-Jugenddelegierte zur Generalversammlung 2027 bis 2029 (DGVN/DNK)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://go.dbjr.de/ausschreibung-jugenddelegierte-r-nachhaltigkeit",
+     "name": "Jugenddelegierte Nachhaltige Entwicklung 2028/29 (HLPF New York, DBJR)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.eeas.europa.eu/delegations/un-new-york/call-applications-eu-%E2%80%93-un-youth-delegates-2026-2027_en",
+     "name": "EU-UN Youth Delegates 2027/28",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.unmgcy.org/get-involved",
+     "name": "Major Group for Children and Youth (UNMGCY), Einzelmitgliedschaft",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://www.internetsociety.org/fellowship/",
+     "name": "Internet Society Fellowship 2027 (Internet Policy and Mobilization)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://rm.coe.int/call-applications-ccj-2026-27-final/1680b527f8",
+     "name": "Council of Europe Advisory Council on Youth (CCJ) 2027/28",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://dgvn.de/meldung/ausschreibung-csw71",
+     "name": "Jugenddelegierte zur UN-Frauenrechtskommission CSW72 (DGVN)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.globalhealthhub.de/de/news/detail/ausschreibung-jugenddelegierte-r-m-w-d-im-rahmen-der-deutschen-delegation-zur-wha-2027",
+     "name": "Jugenddelegierte*r Weltgesundheitsversammlung WHA 2028 (BMG)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://d-n-k.org/fileadmin/DNK-website/Ausschreibung_Y20_2026_USA.pdf",
+     "name": "Y20 und Y7 Gipfel, deutsche Jugenddelegation (DNK)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.wto.org/english/forums_e/young_trade_leader_e/call_for_proposals_e.htm",
+     "name": "WTO Young Trade Leaders Programme (Genf)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://www.youth4disarmament.org/apply-now-become-youth4disarmament-champion",
+     "name": "Youth4Disarmament Champions (UNODA, Genf und New York)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://lcoy.de/lcoy26/anmeldung",
+     "name": "LCOY 2026, Junge Klimakonferenz Deutschland (München)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": true
+    },
+    {
+     "url": "https://youngoclimate.org/",
+     "name": "YOUNGO COP32 Badge Pool und Mitgliedschaft (UN-Klimakonferenz)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.cymgenv.net/join",
+     "name": "Children and Youth Major Group to UNEP (UNEA, Plastikabkommen)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://www.munichyoungforum.de/",
+     "name": "Munich Young Forum, MSC-Nebenveranstaltung (München)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://dgvn.de/ueber-uns/arbeitskreise/ak-junge-dgvn",
+     "name": "Junge DGVN (Mitgliedschaft unter 35)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    },
+    {
+     "url": "https://yps-ger.org/mitmachen/",
+     "name": "Deutsche Koalition Jugend, Frieden und Sicherheit (Einzelmitglied)",
+     "quelle": "runde9",
+     "domain_schon_bekannt": false
+    }
+   ]
+  }
+ }
+}
