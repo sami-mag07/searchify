@@ -1,0 +1,7 @@
+# Falls dieses Skill in ein Git-Repo gespiegelt wird: echte Secrets nie mit.
+.env
+.env.*
+!.env.example
+# Recherche-Ablagen und Ledger sind Arbeitsdaten, nicht ins Skill-Repo.
+sources.json
+research/
