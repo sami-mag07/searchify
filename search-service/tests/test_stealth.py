@@ -256,3 +256,19 @@ def test_proxy_lehnt_chunked_body_ab(internal, monkeypatch):
         out = _ask(proxy.port, f"POST http://public.test:{port}/x HTTP/1.1\r\nHost: public.test\r\n"
                                "Transfer-Encoding: chunked\r\n\r\n0\r\n\r\n".encode())
     assert out.startswith(b"HTTP/1.1 400") and hits == []
+
+
+def test_reader_duenne_seite_nur_camoufox(monkeypatch):
+    """Ist nur Camoufox an, eskaliert eine duenne Seite trotzdem, genau einmal;
+    scheitert Camoufox, kommt der statische Text zurueck."""
+    calls = []
+    thin = {"url": "https://www.reddit.example/r/x", "content": "Skip to main content"}
+    monkeypatch.setattr(reader_mod.render_mod, "enabled", lambda: False)
+    monkeypatch.setattr(reader_mod.stealth_mod, "enabled", lambda: True)
+    monkeypatch.setattr(reader_mod.render_mod, "try_render", lambda *a, **k: pytest.fail("Chromium ist aus"))
+    monkeypatch.setattr(reader_mod.stealth_mod, "try_stealth",
+                        lambda url, timeout=0: calls.append(url) or ("tried", "<p>Just a moment</p>"))
+    monkeypatch.setattr(reader_mod.pages_mod, "read_pages", lambda *a, **k: ([dict(thin)], []))
+    docs, failed = reader_mod.read_pages([thin["url"]], "markdown")
+    assert calls == [thin["url"]]
+    assert docs == [thin] and not failed
