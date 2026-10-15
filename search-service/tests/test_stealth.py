@@ -123,14 +123,17 @@ def test_reader_nimmt_camoufox_nach_chromium(monkeypatch):
     monkeypatch.setattr(reader_mod.stealth_mod, "enabled", lambda: True)
     monkeypatch.setattr(reader_mod.render_mod, "try_render",
                         lambda url, timeout=0: calls.append(("chromium", url)) or ("tried", "<p>Just a moment</p>"))
+    monkeypatch.setattr(reader_mod.render_mod, "try_render_direct",
+                        lambda url, timeout=0: calls.append(("direkt", url)) or ("tried", "<p>Just a moment</p>"))
     monkeypatch.setattr(reader_mod.stealth_mod, "try_stealth",
                         lambda url, timeout=0: calls.append(("camoufox", url)) or ("tried", text))
     docs, still = reader_mod._render_failed([], _fails("https://a.example/", "https://b.example/"),
                                             "markdown", ["https://a.example/", "https://b.example/"])
     assert [d["url"] for d in docs] == ["https://a.example/"]
     assert [f["url"] for f in still] == ["https://b.example/"]  # Camoufox nur einmal je Anfrage
-    assert calls == [("chromium", "https://a.example/"), ("camoufox", "https://a.example/"),
-                     ("chromium", "https://b.example/")]
+    assert calls == [("chromium", "https://a.example/"), ("direkt", "https://a.example/"),
+                     ("camoufox", "https://a.example/"),
+                     ("chromium", "https://b.example/"), ("direkt", "https://b.example/")]
 
 
 def test_reader_ohne_restzeit_kein_camoufox(monkeypatch):

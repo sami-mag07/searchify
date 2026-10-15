@@ -181,16 +181,26 @@ python -c "from transformers import AutoModelForSequenceClassification as M; M.f
 Andere Wahl ueber `RERANKER_MODEL`, z. B. `BAAI/bge-reranker-base` (genauer, ~3x langsamer).
 
 ### 3b. Optional: Browser-Rendering fuer den Reader (JS-Seiten)
-`/jina/r` und `/extract` rendern Seiten ohne lesbaren Text (SPAs) im Headless-Chromium
-nach (`app/compat/render.py`, hoechstens 2 je Anfrage, einer gleichzeitig). `playwright`
-steht in `requirements.txt`, den Browser einmalig laden (~100 MB):
+`/jina/r` und `/extract` laden in Stufen, jede nur, wenn die vorige scheitert (fehlt der
+Text, ist er unter 40 Woertern oder eine Challenge-Seite; der statische Text bleibt,
+falls alle Stufen scheitern). Der schnelle Weg bleibt unberuehrt.
+1. statisch (httpx, bei 403/429/503 curl_cffi), 2. Render im geteilten Headless-Chromium,
+alle Anfragen ueber httpx (bleibt offen, nach 5 min Leerlauf zu; `RENDER_SLOTS`=3
+gleichzeitig; Reddit klappt nur hier), 3. eigener Kontext im selben Browser, der selbst
+laedt (echter Chrome-TLS gegen Cloudflare & Co.; `RENDER_DIRECT_SLOTS`=2, wartet
+hoechstens 6 s auf eine Challenge; `RENDER_DIRECT=0` schaltet nur diese Stufe ab).
+Hoechstens 2 Seiten je Anfrage (`app/compat/render.py`, `reader._render_failed`).
+`playwright` steht in `requirements.txt`, den Browser einmalig laden (~100 MB):
 ```
 .venv/bin/python -m playwright install chromium-headless-shell
 ```
 Ohne playwright oder mit `READER_RENDER=0` ist die Reserve aus (Rueckfall: Seite zaehlt
 als Fehlschlag wie bisher). SSRF-Schutz: Start-URL nur oeffentlich, jede Browser-Anfrage
 (Unterressourcen, Redirects, JS-Weiterleitungen, Popups) laeuft ueber den gepinnten Client
-aus `app/extract.py`, alles andere ueber einen toten Proxy; Test `tests/test_render_ssrf.py`.
+aus `app/extract.py`, alles andere ueber einen toten Proxy. Stufe 3: der ganze Verkehr
+des Kontexts laeuft ueber den Ausgangs-Proxy `app/compat/egress.py` auf 127.0.0.1 (nur
+oeffentliche Ziele, auf die gepruefte IP festgenagelt, nur Web-Ports, verschluesselte
+Bytes unveraendert durchgereicht); Tests `tests/test_render_ssrf.py`.
 
 ### 4. Antwort-LLM (Claude ueber claude-code-api)
 `claude-code-api` als OpenAI-kompatiblen Wrapper starten (eigener Login) und in

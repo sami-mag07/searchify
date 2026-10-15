@@ -102,11 +102,73 @@ def test_try_render_waits_briefly_for_busy_slot(monkeypatch):
     monkeypatch.setattr(r, "enabled", lambda: True)
     monkeypatch.setattr(r, "url_allowed", lambda url: True)
     monkeypatch.setattr(r, "SEM_WAIT_S", 0.05)
-    assert r._SEM.acquire(timeout=1)
+    for _ in range(r.SLOTS):
+        assert r._SEM.acquire(timeout=1)
     try:
         t0 = _time.monotonic()
         assert r.try_render("https://a.example/", timeout=10.0) == ("busy", None)
         assert _time.monotonic() - t0 < 1.0
     finally:
-        r._SEM.release()
+        for _ in range(r.SLOTS):
+            r._SEM.release()
     assert r.try_render("https://a.example/", timeout=0) == ("off", None)
+
+
+_GOOD = "<html><body><main><p>" + " ".join(["Programm Anmeldung Hackathon"] * 30) + "</p></main></body></html>"
+
+
+def _stages(monkeypatch, stage2, stage3, calls):
+    monkeypatch.setattr(reader_mod.render_mod, "enabled", lambda: True)
+    monkeypatch.setattr(reader_mod.render_mod, "try_render",
+                        lambda url, timeout=12.0, wait=None: (calls.append(("2", url)) or ("tried", stage2)))
+    monkeypatch.setattr(reader_mod.render_mod, "try_render_direct",
+                        lambda url, timeout=15.0, wait=None: (calls.append(("3", url)) or ("tried", stage3)))
+
+
+def test_fast_path_untouched(monkeypatch):
+    """Gute statische Seiten loesen keine Stufe aus."""
+    calls = []
+    _stages(monkeypatch, _GOOD, _GOOD, calls)
+    doc = reader_mod.reader_document(_GOOD, "https://ok.example/", "markdown")
+    monkeypatch.setattr(reader_mod.pages_mod, "read_pages", lambda *a, **k: ([doc], []))
+    docs, failed = reader_mod.read_pages(["https://ok.example/"], "markdown")
+    assert calls == [] and docs == [doc] and not failed
+
+
+def test_thin_static_page_escalates_and_keeps_text(monkeypatch):
+    """"Skip to main content" zaehlt fuer die Stufen als Fehlschlag; scheitern alle,
+    kommt der statische Text trotzdem zurueck."""
+    calls = []
+    _stages(monkeypatch, None, None, calls)
+    thin = {"url": "https://www.reddit.example/r/x", "content": "Skip to main content"}
+    monkeypatch.setattr(reader_mod.pages_mod, "read_pages", lambda *a, **k: ([dict(thin)], []))
+    docs, failed = reader_mod.read_pages([thin["url"]], "markdown")
+    assert calls == [("2", thin["url"]), ("3", thin["url"])]
+    assert docs == [thin] and not failed
+
+
+def test_stage3_only_when_stage2_fails(monkeypatch):
+    calls = []
+    _stages(monkeypatch, _GOOD, _GOOD, calls)
+    monkeypatch.setattr(reader_mod.pages_mod, "read_pages", lambda *a, **k: ([], _fails("https://a.example/")))
+    docs, _ = reader_mod.read_pages(["https://a.example/"], "markdown")
+    assert calls == [("2", "https://a.example/")] and "Hackathon" in docs[0]["content"]
+    reader_mod.forget(["https://a.example/"], "markdown")
+    calls.clear()
+    challenge = "<html><body><p>Just a moment... verifying your browser</p></body></html>"
+    _stages(monkeypatch, challenge, _GOOD, calls)
+    docs, failed = reader_mod.read_pages(["https://a.example/"], "markdown")
+    assert [c[0] for c in calls] == ["2", "3"] and docs and not failed
+    reader_mod.forget(["https://a.example/"], "markdown")
+
+
+def test_github_takes_readme_not_whole_page():
+    readme = " ".join(["Grafana visualisiert Metriken aus vielen Datenquellen"] * 12)
+    html = ("<html><body><nav>" + " ".join(["Navigation Produkt Loesungen Preise"] * 60) + "</nav>"
+            "<table><tr><td>" + " ".join(["dateiname commitnachricht"] * 80) + "</td></tr></table>"
+            '<article class="markdown-body entry-content"><div class="markdown-heading">'
+            '<h1 class="heading-element">Grafana</h1><a class="anchor" href="#g"><svg></svg></a></div>'
+            f"<p>{readme}</p></article></body></html>")
+    text = reader_mod.reader_content(html, "https://github.com/grafana/grafana")
+    assert text.startswith("# Grafana") and "Datenquellen" in text
+    assert "Navigation" not in text and "commitnachricht" not in text

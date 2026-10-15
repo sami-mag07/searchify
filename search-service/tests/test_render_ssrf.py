@@ -132,6 +132,97 @@ def test_kein_dienst_ohne_playwright(monkeypatch):
     assert render_mod.render_html("https://example.org/") is None
 
 
+def test_direkt_stufe_start_url_nur_oeffentlich():
+    for url in ("http://127.0.0.1/", "http://localhost/", "file:///etc/passwd", "http://10.0.0.1/"):
+        assert render_mod.try_render_direct(url) == ("blocked", None), url
+
+
+def test_ausgangs_proxy_blockt_intern(internal_server):
+    """Der Ausgangs-Proxy (SSRF-Grenze der Stufe 3) laesst nichts Internes durch:
+    IP-Literale, localhost, IPv6-Loopback, Metadaten-Adresse, Dezimal-IP, fremde Ports."""
+    import asyncio
+
+    from app.compat import egress
+
+    port, hits = internal_server
+
+    async def ask(line: str) -> bytes:
+        server, pport = await egress.start()
+        try:
+            r, w = await asyncio.open_connection("127.0.0.1", pport)
+            w.write(line.encode() + b"\r\n\r\n")
+            await w.drain()
+            first = await asyncio.wait_for(r.readline(), 10)
+            w.close()
+            return first
+        finally:
+            server.close()
+
+    for line in (f"CONNECT 127.0.0.1:{port} HTTP/1.1", "CONNECT 127.0.0.1:443 HTTP/1.1",
+                 "CONNECT localhost:443 HTTP/1.1", "CONNECT [::1]:443 HTTP/1.1",
+                 "CONNECT 169.254.169.254:80 HTTP/1.1", "CONNECT 2130706433:443 HTTP/1.1",
+                 "CONNECT 10.0.0.1:443 HTTP/1.1", "CONNECT example.com:22 HTTP/1.1",
+                 f"GET http://127.0.0.1:{port}/x HTTP/1.1\r\nHost: 127.0.0.1",
+                 "GET http://localhost/x HTTP/1.1\r\nHost: localhost",
+                 "GET file:///etc/passwd HTTP/1.1"):
+        first = asyncio.run(ask(line))
+        assert b" 403 " in first or b" 400 " in first, (line, first)
+    assert hits == []
+
+
+def test_direkt_stufe_erreicht_nichts_internes(monkeypatch, internal_server):
+    """Stufe 3 laedt public.test selbst ueber den Ausgangs-Proxy (fuer den Test auf
+    einen lokalen Server aufgeloest). Alles andere (IP-Literal, localhost, fremde Namen,
+    Worker, WebSocket, Redirect nach intern) muss scheitern: null Treffer intern."""
+    from app.compat import egress
+
+    _need_browser()
+    port, hits = internal_server
+    loc = f"http://127.0.0.1:{port}"
+    body = f"""<html><head><title>Oeffentlich</title></head><body><p>Oeffentlicher Inhalt fuer den Test.</p>
+<img src="{loc}/img"><iframe src="http://localhost:{port}/iframe"></iframe>
+<script>
+fetch("{loc}/fetch").catch(()=>{{}});
+fetch("http://localhost:{port}/fetch2").catch(()=>{{}});
+fetch("http://intern.test:{port}/fetch3").catch(()=>{{}});
+try {{ new Worker(URL.createObjectURL(new Blob(['fetch("{loc}/worker").catch(()=>{{}})']))) }} catch(e) {{}}
+try {{ new WebSocket("ws://127.0.0.1:{port}/ws") }} catch(e) {{}}
+</script></body></html>""".encode()
+
+    class Public(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/":
+                self.send_response(200)
+                self.send_header("content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(body)
+            else:  # Weiterleitung ins interne Netz
+                self.send_response(302)
+                self.send_header("location", f"{loc}/redirect")
+                self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Public)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        pport = srv.server_address[1]
+        start = f"http://public.test:{pport}/"
+        monkeypatch.setattr(render_mod, "url_allowed", lambda url: url.startswith(start))
+        real_resolve = egress._resolve
+        monkeypatch.setattr(egress, "_resolve",
+                            lambda host: ["127.0.0.1"] if host == "public.test" else real_resolve(host))
+        monkeypatch.setattr(egress, "PORTS", egress.PORTS | {pport})
+        monkeypatch.setenv("READER_RENDER", "1")
+        status, html = render_mod.try_render_direct(start, timeout=8.0)
+        assert status == "tried" and html and "Oeffentlicher Inhalt" in html
+        assert render_mod.try_render_direct(start + "weiter", timeout=6.0)[1] is None
+    finally:
+        srv.shutdown()
+    assert hits == []
+
+
 def test_lokaler_port_frei():
     # Plausibilitaet: der tote Proxy-Port 9 nimmt nichts an (sonst waere die Reserve offen).
     s = socket.socket()
