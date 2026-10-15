@@ -36,7 +36,8 @@ die neueste Version, auch aus Fremd-Forks):
     touch ~/Library/Caches/camoufox/.0.5_FLAG
     printf '{"active_version":"browsers/official/152.0.4-beta.30"}' > ~/Library/Caches/camoufox/config.json
 
-In .env: `CAMOUFOX_PYTHON=/Users/<du>/tools/camoufox/.venv/bin/python`. `READER_STEALTH=0` schaltet aus.
+In .env: `CAMOUFOX_PYTHON=/Users/<du>/tools/camoufox/.venv/bin/python`. Standard ist aus, `READER_STEALTH=1` schaltet ein. Grund: im gemischten Lauf vom 16.10.
+(150 Seiten, 30 mit Bot-Schutz) kaum mehr Seiten, aber p95 4,5 -> 7,5 s und RAM +0,9 bis 1,8 GB.
 
 ## Sicherheit
 

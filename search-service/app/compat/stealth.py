@@ -5,8 +5,9 @@ Headless-Chromium (render.py) nichts Lesbares geliefert haben. Messung 15.10.202
 an den 33 Seiten, die am 14.10. auf allen Stufen blockiert blieben: Camoufox 20,
 Chromium 9, davon 11 nur mit Camoufox (eval/private/camoufox-2026-10-15).
 
-Aus, solange CAMOUFOX_PYTHON nicht auf den Python des eigenen Camoufox-venv zeigt
-(Einrichtung und gepinnte Versionen: docs/camoufox.md) oder READER_STEALTH=0 steht.
+Standard aus (Mac-Lauf 16.10.: im Mix kaum mehr Seiten, p95 +3 s, RAM +0,9 GB). An mit
+READER_STEALTH=1 und CAMOUFOX_PYTHON auf dem Python des eigenen Camoufox-venv
+(Einrichtung und gepinnte Versionen: docs/camoufox.md).
 Der Browser laeuft als eigener Prozess (camoufox_worker.py) mit hartem Zeitlimit,
 alles Netz geht ueber den SSRF-Proxy (stealth_proxy.py). Hoechstens ein Aufruf
 gleichzeitig.
@@ -37,7 +38,7 @@ def _python() -> str:
 
 
 def enabled() -> bool:
-    if os.environ.get("READER_STEALTH", "1").strip() in ("0", "false", "no", ""):
+    if os.environ.get("READER_STEALTH", "0").strip() in ("0", "false", "no", ""):
         return False
     py = _python()
     return bool(py) and os.path.isfile(py) and os.access(py, os.X_OK)
