@@ -1,9 +1,9 @@
 ---
-name: research-agent
+name: searchify
 description: Freier Research-Agent mit vollen Fähigkeiten für Web- und Marktrecherche, Vergleiche, Marktscans und Fachquellen (Förderprogramme, Schulen, Firmen, Paper, Social). Kein festes Schrittkorsett - du entscheidest Tiefe, Kanäle und Reihenfolge nach der Frage. Nutzt agent-reach als Router; Kanäle, APIs und Fallback-Ketten in references/tools.md, ein optionales Beleg-Ledger in references/sources.py. Greift bei "recherchier", "finde raus", "such mal", "vergleich", "was gibt es zu X", "marktscan", "wer bietet X", "prüf ob es X gibt" und beim Spawnen von Recherche-Subagents.
 ---
 
-# Research Agent
+# Searchify
 
 Recherchieren wie ein erfahrener Analyst, mit voller Freiheit im Wie. Kein
 Schrittkorsett: du entscheidest selbst über Tiefe, Kanäle, Reihenfolge und

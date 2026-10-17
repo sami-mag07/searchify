@@ -24,7 +24,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
-UA = "research-agent-papers/1.0"
+UA = "searchify-papers/1.0"
 TIMEOUT = 25
 S2_FIELDS = "title,year,venue,citationCount,externalIds,openAccessPdf,abstract,url"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Such-Start für den research-agent (nur stdlib).
+"""Such-Start für den searchify (nur stdlib).
 
 Eine Suche, mehrere Suchmaschinen: zuerst der eigene lokale Dienst (own, own-exa,
 tavily-clone auf OWN_SEARCH_URL, Standard http://127.0.0.1:8000), dann keyless
@@ -113,7 +113,7 @@ def http_json(url, body=None, headers=None, timeout=TIMEOUT):
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(url, data=data, headers={
         "Content-Type": "application/json", "Accept": "application/json",
-        "User-Agent": "research-agent/1.0", **(headers or {})})
+        "User-Agent": "searchify/1.0", **(headers or {})})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read().decode("utf-8", "replace"))

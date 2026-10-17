@@ -5,7 +5,7 @@ SKILL.md. Vor dem Verlassen gegen die Anbieterseite prüfen; Gelerntes als eine
 Zeile im passenden Abschnitt nachtragen.
 
 ## Erster Griff: search.py
-`python3 ~/.claude/skills/research-agent/references/search.py "query" ...`
+`python3 ~/.claude/skills/searchify/references/search.py "query" ...`
 - Seit 11.10.2026 fragt es zuerst den eigenen lokalen Dienst (tavily-clone,
   Desktop/APP/tavily-clone, `OWN_SEARCH_URL`, Standard http://127.0.0.1:8000):
   `own` (Tavily-Format /search) und `own-exa` (Exa-Format /exa/search), kostenlos.

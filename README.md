@@ -1,10 +1,10 @@
-# Research Agent
+# Searchify
 
 Stand vom Mac am 15.10.2026: der Recherche-Agent, sein Skill und der eigene Suchdienst in einem Repo.
 
 | Ordner | Was | Auf dem Mac liegt das Original unter |
 |---|---|---|
-| `skills/research-agent/` | Skill: `search.py` (Multi-Engine, `--fan`, Filter, Fundliste), `sources.py` (Beleg-Ledger und Verify-Gate), `fetch_hard.py`, `tools.md`, Such-Eval in `evals/` | `~/.claude/skills/research-agent` |
+| `skills/searchify/` | Skill: `search.py` (Multi-Engine, `--fan`, Filter, Fundliste), `sources.py` (Beleg-Ledger und Verify-Gate), `fetch_hard.py`, `tools.md`, Such-Eval in `evals/` | `~/.claude/skills/searchify` |
 | `agents/researcher.md` | spawnbarer Recherche-Agent für Claude Code | `~/.claude/agents/researcher.md` |
 | `skills/tool-clone/` | Skill für Clean-room-Nachbauten von Tools/APIs | `~/.claude/skills/tool-clone` |
 | `search-service/` | eigener Suchdienst, kompatibel zu Tavily, Exa, Serper und Jina, mit kompletter Git-Historie | `~/Desktop/APP/tavily-clone` |

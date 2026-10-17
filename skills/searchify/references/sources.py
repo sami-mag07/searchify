@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quellen-Ledger und Verify-Gate für den research-agent (nur stdlib).
+"""Quellen-Ledger und Verify-Gate für den searchify (nur stdlib).
 
 Zweck: jede Behauptung im Report bekommt eine Nummer [sNN] und ein wörtliches
 Zitat, das nachweislich im Quelltext steht. Vor "fertig" prüft `verify`, ob
@@ -100,7 +100,7 @@ def cmd_quote(args):
 
 
 def _fetch_ok(url, want_quote=None, timeout=15):
-    req = urllib.request.Request(url, headers={"User-Agent": "research-agent/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "searchify/1.0"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             if not (200 <= resp.status < 300):
