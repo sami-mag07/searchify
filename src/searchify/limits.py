@@ -115,6 +115,19 @@ def resolve(
                   cloud=bool(got["cloud_fallback"][0]))
 
 
+def explicit(
+    max_stage: Optional[str] = None,
+    budget: Optional[str] = None,
+    cloud_fallback: Optional[bool] = None,
+    profile: Optional[Mapping[str, object]] = None,
+) -> Dict[str, object]:
+    """Only what the request or the profile really set, as keyword arguments for
+    `read_pages_ex`. With nothing set the dict is empty, so the call stays the old one.
+    (The operator cap is applied again inside the reader.)"""
+    got = detail(max_stage, budget, cloud_fallback, profile)
+    return {name: value for name, (value, source) in got.items() if source in ("request", "profile")}
+
+
 def trim_text(text: str, max_chars: int) -> str:
     """Cut at a word boundary, like passages.trim."""
     text = text.strip()

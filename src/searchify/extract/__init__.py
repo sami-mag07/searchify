@@ -50,10 +50,8 @@ def extract_report(
     from .. import limits as limits_mod  # noqa: PLC0415
     from .. import profile as profile_mod  # noqa: PLC0415
 
-    got = limits_mod.detail(max_stage, budget, cloud_fallback,
-                            profile_mod.load() if use_profile else None)
-    # only what was really set travels on; the operator cap is applied again further down
-    kwargs = {name: value for name, (value, source) in got.items() if source in ("request", "profile")}
+    kwargs = limits_mod.explicit(max_stage, budget, cloud_fallback,
+                                 profile_mod.load() if use_profile else None)
     docs, failed, thin = read_pages_ex(list(urls), fmt, timeout, **kwargs)
     failed = [{"url": f.get("url"), "error": f.get("error"),
                "reason": f.get("reason") or code_for(f.get("error"))} for f in failed]

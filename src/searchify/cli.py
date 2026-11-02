@@ -35,7 +35,9 @@ def _fail(message: str, as_json: bool, **extra) -> None:
     raise typer.Exit(1)
 
 
-_CI_VARS = ("CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "JENKINS_URL", "TF_BUILD")
+from .interview import CI_VARS as _CI_VARS  # noqa: E402
+
+NO_INPUT_OPT = typer.Option(False, "--no-input", help="Never ask questions (the first-run interview).")
 _SHORT = {"rate_limited": "rate limited", "address_blocked": "address blocked",
           "no_main_text": "no text", "extract_failed": "unreadable", "not_html": "not HTML",
           "too_large": "too large"}
@@ -85,11 +87,14 @@ def search(
     time_range: Optional[str] = typer.Option(None, "--time-range", help="e.g. day, week, month, year."),
     include_domain: Optional[List[str]] = typer.Option(None, "--include-domain", help="Repeatable."),
     exclude_domain: Optional[List[str]] = typer.Option(None, "--exclude-domain", help="Repeatable."),
+    no_input: bool = NO_INPUT_OPT,
     as_json: bool = JSON_OPT,
 ) -> None:
     """Search the web and print the hits."""
+    from .interview import first_run
     from .search import BACKENDS, search_report
 
+    first_run(no_input)
     if backend is not None and backend not in BACKENDS:
         _fail(f"unknown backend {backend!r}, use {', '.join(BACKENDS)}", as_json, results=[])
     filters = {
@@ -122,22 +127,40 @@ def extract(
     urls: List[str] = typer.Argument(..., help="One or more page addresses."),
     fmt: str = typer.Option("text", "--format", "-f", help="text or markdown."),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="No progress line on stderr."),
+    max_stage: Optional[str] = typer.Option(
+        None, "--max-stage", help="Highest way to load a page: plain, tls, browser or stealth."),
+    budget: Optional[str] = typer.Option(
+        None, "--budget", help="low (short waits and pages), normal or high (long waits)."),
+    no_cloud: bool = typer.Option(False, "--no-cloud", help="Never ask Tavily (it costs credits)."),
+    no_input: bool = NO_INPUT_OPT,
     as_json: bool = JSON_OPT,
 ) -> None:
     """Fetch pages and print their clean article text.
 
     Each failed page comes with "error" (text) and "reason" (a fixed code such as
     blocked, rate_limited, timeout). At an interactive terminal a progress line
-    shows on stderr; pipes, agents and CI never get one.
+    shows on stderr; pipes, agents and CI never get one. --max-stage, --budget and
+    --no-cloud limit the load of this call; what you leave out comes from your
+    profile (`searchify config`), and the operator cap SEARCHIFY_MAX_STAGE wins.
     """
     if fmt not in ("text", "markdown"):
         _fail(f"unknown format {fmt!r}, use text or markdown", as_json)
+    from . import limits as limits_mod
+    from . import profile as profile_mod
     from .extract import read_pages_ex
+    from .interview import first_run
     from .reasons import code_for
+
+    first_run(no_input)
+    try:
+        wanted = limits_mod.explicit(max_stage, budget, False if no_cloud else None, profile_mod.load())
+    except ValueError as exc:
+        _fail(str(exc), as_json)
 
     ticker = _Ticker() if _ticker_allowed(quiet) else None
     try:
-        docs, failed, _thin = read_pages_ex(urls, fmt, progress=ticker.update if ticker else None)
+        docs, failed, _thin = read_pages_ex(urls, fmt, progress=ticker.update if ticker else None,
+                                            **wanted)
     finally:
         if ticker:
             ticker.clear()
@@ -173,12 +196,15 @@ def passages(
     time_range: Optional[str] = typer.Option(None, "--time-range", help="e.g. day, week, month, year."),
     include_domain: Optional[List[str]] = typer.Option(None, "--include-domain", help="Repeatable."),
     exclude_domain: Optional[List[str]] = typer.Option(None, "--exclude-domain", help="Repeatable."),
+    no_input: bool = NO_INPUT_OPT,
     as_json: bool = JSON_OPT,
 ) -> None:
     """Search, read the top pages and print their best paragraphs."""
+    from .interview import first_run
     from .passages import passages as best_passages
     from .search import BACKENDS, SearchBackendError
 
+    first_run(no_input)
     if backend is not None and backend not in BACKENDS:
         _fail(f"unknown backend {backend!r}, use {', '.join(BACKENDS)}", as_json, results=[])
     filters = {
@@ -202,6 +228,89 @@ def passages(
     for i, item in enumerate(found, 1):
         typer.secho(f"{i}. {item['content']}", bold=True)
         typer.echo(f"   {item['url']}")
+
+
+@app.command()
+def config(
+    show: bool = typer.Option(False, "--show", help="Print every setting and where it comes from."),
+    max_stage: Optional[str] = typer.Option(
+        None, "--max-stage", help="Save: plain, tls, browser or stealth ('default' clears it)."),
+    budget: Optional[str] = typer.Option(
+        None, "--budget", help="Save: low, normal or high ('default' clears it)."),
+    region: Optional[str] = typer.Option(
+        None, "--region", help="Save a DuckDuckGo search region such as de-de ('default' clears it)."),
+    no_input: bool = NO_INPUT_OPT,
+    as_json: bool = JSON_OPT,
+) -> None:
+    """Show or change your profile (how far searchify may go, budget, search region).
+
+    Without options, at a terminal, the three questions are asked again with your
+    current answers. With options, the values are saved directly. The profile is a
+    JSON file in your user config folder; the HTTP service and the MCP server never read it.
+    """
+    from . import interview
+    from . import limits as limits_mod
+    from . import profile as profile_mod
+    from .search.regions import is_region
+
+    changes = {"max_stage": max_stage, "budget": budget, "region": region}
+    asked = {k: v for k, v in changes.items() if v is not None}
+    if asked:
+        new = profile_mod.load(force=True)
+        try:
+            for key, value in asked.items():
+                word = value.strip().lower()
+                if word in interview.RESET:
+                    new.pop(key, None)
+                    continue
+                if key == "max_stage":
+                    limits_mod.resolve(max_stage=word)
+                elif key == "budget":
+                    limits_mod.resolve(budget=word)
+                elif not is_region(word):
+                    raise ValueError(f"unknown region {value!r}, use a DuckDuckGo code such as de-de")
+                new[key] = word
+        except ValueError as exc:
+            _fail(str(exc), as_json)
+        _save_profile(new, as_json)
+    elif not show:
+        if not interview.interactive(no_input):
+            _fail("`searchify config` asks questions and needs a terminal; use --show, or set "
+                  "values with --max-stage, --budget or --region", as_json)
+        answers = interview.run(current=profile_mod.load(force=True))
+        if answers is not None:
+            _save_profile(answers, as_json)
+    _print_config(as_json)
+
+
+def _save_profile(values: dict, as_json: bool) -> None:
+    from . import profile as profile_mod
+
+    try:
+        profile_mod.save(values)
+    except OSError as exc:
+        _fail(f"could not save the profile ({type(exc).__name__})", as_json)
+
+
+def _print_config(as_json: bool) -> None:
+    from . import limits as limits_mod
+    from . import profile as profile_mod
+
+    prof = profile_mod.load(force=True)
+    got = limits_mod.detail(profile=prof)
+    values = {name: {"value": value, "source": source} for name, (value, source) in got.items()}
+    values["region"] = ({"value": prof["region"], "source": "profile"} if "region" in prof
+                        else {"value": None, "source": "default"})
+    data = {"path": str(profile_mod.profile_path()), "exists": profile_mod.exists(),
+            "operator_cap": limits_mod.operator_cap(), "values": values}
+    if as_json:
+        _emit(data)
+        return
+    typer.echo(f"profile: {data['path']}" + ("" if data["exists"] else " (not created yet)"))
+    for name, item in values.items():
+        typer.echo(f"{name}: {item['value']} ({item['source']})")
+    if data["operator_cap"]:
+        typer.echo(f"operator cap: {data['operator_cap']} (SEARCHIFY_MAX_STAGE)")
 
 
 def main() -> None:  # extraction uses worker processes, so entry points need a real main

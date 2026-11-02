@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Limit the load ladder per request: `max_stage` (plain, tls, browser, stealth), `budget` (low, normal, high) and `cloud_fallback`, in `read_pages`, `read_pages_ex`, `extract_report`, the HTTP `/extract` body, the MCP `extract` tool and the CLI (`--max-stage`, `--budget`, `--no-cloud`). The effective stage is the lowest of the environment, the operator cap `SEARCHIFY_MAX_STAGE` and the request, so `READER_STEALTH=1` cannot override a request for `plain`. With nothing set the behaviour is unchanged.
+- User profile for the command line and `extract_report` (never the HTTP service or MCP): a first-run interview at a terminal (stage, budget, search region from the system locale as a suggestion), `searchify config` and `searchify config --show`. JSON file in the user config folder, written atomically.
 - Product pages carry a compact `product` (name, price, priceCurrency, availability, gtin list, sku, brand), read from the JSON-LD that is already parsed. Pages without a product get no `product`, and pages without any JSON-LD or namespaced meta no longer get an empty `structured`.
 - Region: `--country` (CLI), `country` (HTTP `/search`, Python filter) next to `language`. With a language, DuckDuckGo gets the matching region (`nl` gives `nl-nl`, `nl` + `BE` gives `be-nl`; table of 64 regions in `search/regions.py`); without one it stays `wt-wt`. `language=any` means no language parameter. SearXNG, Serper and Tavily ignore the new region mapping.
 - DuckDuckGo: a real zero-hit search is an empty list instead of an error; rate limit and timeout errors start with `rate_limited:` or `timeout:` (`searchify.search.error_code()` reads it from `search_report()`).

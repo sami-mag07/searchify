@@ -322,6 +322,39 @@ answered, and `error` is the last backend error (null when a query simply has no
 The browser stages need `pip install "searchify[browser]"` and
 `playwright install chromium-headless-shell`.
 
+## Limiting the load ladder
+
+By default `extract` goes as far as the environment allows. You can cap that per request:
+
+- `max_stage`: `plain` (httpx only, no Chrome-TLS fallback), `tls` (plus the Chrome-TLS fallback),
+  `browser` (plus the shared and the direct browser), `stealth` (plus Camoufox).
+- `budget`: `low` (each page cut to 4,000 characters, `truncated: true` on a cut page, timeouts
+  at 60 %), `normal` (exactly as before), `high` (timeouts doubled). The cache always holds the
+  full text; the cut happens after it.
+- `cloud_fallback`: `false` never asks Tavily (it costs credits). Default as before: on if
+  `TAVILY_API_KEY` is set.
+
+The effective stage is the lowest of what is installed and switched on (`READER_RENDER`,
+`READER_STEALTH`, ...), the operator cap `SEARCHIFY_MAX_STAGE` and the wish of the request. So
+`READER_STEALTH=1` cannot override a request for `plain`. A value in `SEARCHIFY_MAX_STAGE` that is
+not a stage counts as `plain`.
+
+Where to set it: the HTTP `/extract` body (`max_stage`, `budget`, `cloud_fallback`), the MCP
+`extract` tool (`max_stage`, `budget`), `searchify extract --max-stage tls --budget low --no-cloud`,
+and `extract_report(urls, max_stage=..., budget=..., cloud_fallback=...)`.
+
+**Your profile** (command line and `extract_report` only): the first time you run
+`searchify search`, `extract` or `passages` at a terminal, three questions ask for your default
+stage, budget and, if your system locale suggests one, a search region. Enter keeps today's
+behaviour, `later` asks again next time, and nothing is asked in pipes, CI, agents or with
+`--no-input`. Answers go to a JSON file in your config folder (macOS
+`~/Library/Application Support/searchify`, Linux `$XDG_CONFIG_HOME` or `~/.config/searchify`,
+Windows `%APPDATA%\searchify`; `SEARCHIFY_CONFIG_DIR` overrides it). `searchify config` asks again,
+`searchify config --show` prints each value and where it comes from, and `--max-stage`, `--budget`
+and `--region` set a value directly. Order: request, then profile, then default, all below the
+operator cap. The HTTP service and the MCP server never read the profile. The saved search region
+is stored but not applied to searches yet.
+
 ## Configuration
 
 Every setting is optional and read from the environment (see `.env.example`):
