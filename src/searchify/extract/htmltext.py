@@ -512,7 +512,9 @@ def _curl_session():
     if sess is None:
         from curl_cffi import requests as curl_requests  # noqa: PLC0415 (optional)
 
-        sess = curl_requests.Session(impersonate="chrome")
+        # trust_env=False: a proxy from the environment would resolve the host itself
+        # and see the request before the connected-IP check (blind SSRF).
+        sess = curl_requests.Session(impersonate="chrome", trust_env=False)
         _TLS.curl = sess
     return sess
 
@@ -561,7 +563,8 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
             # (eine Liste) nimmt curl_cffi nicht an: es warf TypeError, der still None
             # ergab, darum lief dieser Rueckfall nie. Stattdessen wird unten die IP geprueft,
             # mit der curl tatsaechlich verbunden ist, bevor ein Byte gelesen wird.
-            sess.curl_options = {CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"]}
+            sess.curl_options = {CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"],
+                                 CurlOpt.PROXY: ""}
             resp = sess.get(
                 url, timeout=max(0.1, deadline - time.monotonic()), allow_redirects=False, stream=True
             )

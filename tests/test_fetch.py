@@ -58,4 +58,13 @@ def test_curl_refuses_hosts_curl_would_read_differently(url):
 
 def test_curl_accepts_plain_hosts():
     assert h._plain_url("https://en.wikipedia.org/wiki/Ballon_d%27Or")
-# Stand: 02.11.2026
+
+
+def test_curl_fallback_ignores_proxies_from_the_environment(local_site, monkeypatch):
+    # a proxy would resolve the host itself and get the request before the IP check
+    pytest.importorskip("curl_cffi")
+    for var in ("http_proxy", "HTTP_PROXY", "https_proxy", "HTTPS_PROXY", "all_proxy", "ALL_PROXY"):
+        monkeypatch.setenv(var, "http://127.0.0.1:9")  # nothing listens there
+    monkeypatch.setattr(h, "_TLS", type(h._TLS)())     # fresh per-thread session
+    assert h._fetch_url_curl(local_site, 5) == PAGE.decode()
+# Stand: 03.11.2026
