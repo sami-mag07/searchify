@@ -30,12 +30,14 @@ dependencies = [
 
 [project.scripts]
 searchify = "searchify.cli:main"
+searchify-mcp = "searchify.cli:mcp_main"
 
 [project.optional-dependencies]
 rerank = ["sentence-transformers>=3.0"]
 browser = ["playwright>=1.44"]
 stealth = ["camoufox>=0.4"]
 api = ["fastapi>=0.110", "uvicorn>=0.29", "pydantic>=2.6"]
+mcp = ["mcp>=2.3,<3; python_version >= '3.10'"]
 dev = ["pytest>=8.0"]
 
 [project.urls]
@@ -48,4 +50,4 @@ include = ["searchify*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Stand: 24.10.2026
+# Stand: 02.11.2026

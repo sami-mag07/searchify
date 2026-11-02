@@ -57,6 +57,7 @@ pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify-l"
 | `api` | the HTTP service (`fastapi`, `uvicorn`) |
 | `browser` | the browser stages for JavaScript and bot-protected pages (`playwright`) |
 | `stealth` | the optional Camoufox stage |
+| `mcp` | the MCP server for Claude Code, Claude Desktop, Cursor and other hosts (`mcp`, Python 3.10+) |
 
 Then set nothing and search works. Copy `.env.example` to `.env` only if you want a SearXNG
 instance or a cloud fallback.
@@ -68,20 +69,56 @@ instance or a cloud fallback.
 | `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
 | `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Each page also carries `structured` (the page's JSON-LD blocks and `og:`/`product:` meta tags, untouched) and `stage` (which rung of the ladder read it). |
 | `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
-| `POST /search`, `POST /extract` | The same as an HTTP service, see below. |
+| `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
+| `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
+| `searchify-mcp` | The same as tools for any MCP host, see below. |
 
 ## Command line
 
 ```bash
 searchify search "Where is the Eiffel Tower?"
 searchify extract "https://en.wikipedia.org/wiki/Eiffel_Tower"
+searchify passages "How tall is the Eiffel Tower?" -k 3 --per-site 1
 ```
 
 Output is JSON by default (`{"results": [...]}`, errors as `{"error": ...}` with exit code 1),
 so agents and scripts can parse it. A search that found nothing because every backend failed
 (a DuckDuckGo rate limit, an unreachable SearXNG) reports that error instead of an empty list. Add `--no-json` for a readable view. `search` takes
 `-n`, `--backend`, `--language`, `--time-range`, `--include-domain` and `--exclude-domain`;
-`extract` takes `--format text|markdown` and several URLs.
+`extract` takes `--format text|markdown` and several URLs. `passages` takes the search options
+plus `-k` (passages to return), `--per-site`, `--max-chars` and `--rerank/--no-rerank`; it
+reranks by default when the `rerank` extra is installed.
+
+A full question in the user's words finds more than keywords: the query goes to the search
+engine as written and then ranks the paragraphs. Each command line call loads the reranker
+again, so for many questions in a row the HTTP service or the MCP server is faster.
+
+## MCP server
+
+`searchify-mcp` offers three tools to any MCP host: `passages` (start here for questions),
+`search` and `extract`. All of them only read from the web. The time filter offers models
+only `month` and `year`: with `day` or `week` they hide the answer to questions about past
+events.
+
+```bash
+pip install "searchify[mcp,rerank] @ git+https://github.com/sami-mag07/searchify-l"
+claude mcp add searchify -- searchify-mcp
+```
+
+Claude Desktop (`claude_desktop_config.json`) and Cursor (`.cursor/mcp.json`) take the same
+command. They start it with their own environment, so give the full path from
+`which searchify-mcp` and put settings in `env`:
+
+```json
+{
+  "mcpServers": {
+    "searchify": {
+      "command": "/full/path/to/searchify-mcp",
+      "env": {"SEARXNG_URL": "http://localhost:8080"}
+    }
+  }
+}
+```
 
 ## How the research agent works
 
@@ -229,6 +266,8 @@ curl -s http://localhost:8000/search  -H 'content-type: application/json' -d '{"
 curl -s http://localhost:8000/extract -H 'content-type: application/json' \
   -d '{"urls": ["https://en.wikipedia.org/wiki/Web_scraping",
                 "https://en.wikipedia.org/wiki/Data_scraping"]}'
+curl -s http://localhost:8000/passages -H 'content-type: application/json' \
+  -d '{"query": "How tall is the Eiffel Tower?", "top_k": 3}'
 ```
 
 In Python:
@@ -291,7 +330,7 @@ Every setting is optional and read from the environment (see `.env.example`):
 ## Tests
 
 ```bash
-pip install -e ".[dev,api]"
+pip install -e ".[dev,api,mcp]"
 pytest
 ```
 
@@ -305,4 +344,4 @@ pytest
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
-<!-- Stand: 24.10.2026 -->
+<!-- Stand: 02.11.2026 -->

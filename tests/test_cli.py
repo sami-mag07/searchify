@@ -51,4 +51,49 @@ def test_extract_json_and_failures(monkeypatch):
 def test_extract_rejects_bad_format():
     result = runner.invoke(cli.app, ["extract", "https://a.com", "-f", "pdf"])
     assert result.exit_code == 1
-# Stand: 24.10.2026
+
+
+PASSAGES = [{"title": "T", "url": "https://a.com", "content": "The tower is in Paris.", "rerank_score": 2.1}]
+
+
+def test_passages_json_passes_the_options_through(monkeypatch):
+    seen = {}
+
+    def fake(query, max_results, **kw):
+        seen.update(kw, query=query, max_results=max_results)
+        return PASSAGES
+    monkeypatch.setattr(sys.modules["searchify.passages"], "passages", fake)
+    result = runner.invoke(cli.app, ["passages", "Where is the tower?", "-n", "3", "-k", "2",
+                                     "--per-site", "1", "--no-rerank", "--language", "de"])
+    assert result.exit_code == 0
+    assert json.loads(result.stdout) == {"results": PASSAGES}
+    assert seen == {"query": "Where is the tower?", "max_results": 3, "top_k": 2, "per_site": 1,
+                    "max_chars": 600, "rerank": False, "backend": None, "language": "de"}
+
+
+def test_passages_rerank_defaults_to_auto(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(sys.modules["searchify.passages"], "passages",
+                        lambda q, n, **kw: seen.update(kw) or [])
+    result = runner.invoke(cli.app, ["passages", "q", "--no-json"])
+    assert seen["rerank"] is None and "No results." in result.stdout
+
+
+def test_passages_missing_extra_is_a_json_error(monkeypatch):
+    def boom(*a, **k):
+        raise ImportError("reranking needs the extra")
+    monkeypatch.setattr(sys.modules["searchify.passages"], "passages", boom)
+    result = runner.invoke(cli.app, ["passages", "q", "--rerank"])
+    assert result.exit_code == 1
+    assert json.loads(result.stdout) == {"error": "reranking needs the extra", "results": []}
+
+
+def test_mcp_entry_point_names_the_missing_extra(monkeypatch, capsys):
+    import pytest
+    monkeypatch.delitem(sys.modules, "searchify.mcp_server", raising=False)
+    for name in [m for m in sys.modules if m == "mcp" or m.startswith("mcp.")] + ["mcp"]:
+        monkeypatch.setitem(sys.modules, name, None)  # "import mcp" now fails like a missing package
+    with pytest.raises(cli.typer.Exit):
+        cli.mcp_main()
+    assert 'pip install "searchify[mcp]"' in capsys.readouterr().err
+# Stand: 02.11.2026
