@@ -1,4 +1,7 @@
-"""Optional HTTP service exposing search and extraction.
+"""Optional HTTP service exposing search, extraction and answer passages.
+
+The reranker stays loaded between requests, so passages answer faster here than
+from the command line, which loads the model on every call.
 
     uvicorn searchify.service:app
 
@@ -12,6 +15,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
 from .extract import extract as extract_urls
+from .passages import passages as best_passages
 from .search import SearchBackendError, search as web_search
 
 app = FastAPI(title="searchify", description="Local-first web search and clean extraction")
@@ -32,6 +36,14 @@ class ExtractRequest(BaseModel):
     fmt: str = "text"
 
 
+class PassagesRequest(SearchRequest):
+    max_results: int = Field(5, ge=1, le=20)
+    top_k: int = Field(8, ge=1, le=50)
+    per_site: Optional[int] = Field(None, ge=1)
+    max_chars: int = Field(600, ge=50, le=5000)
+    rerank: Optional[bool] = None
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
@@ -50,4 +62,17 @@ def search_endpoint(req: SearchRequest) -> dict:
 @app.post("/extract")
 def extract_endpoint(req: ExtractRequest) -> dict:
     return {"results": extract_urls(req.urls, fmt=req.fmt)}
-# Stand: 24.10.2026
+
+
+@app.post("/passages")
+def passages_endpoint(req: PassagesRequest) -> dict:
+    filters = req.model_dump(include={"language", "time_range", "include_domains",
+                                      "exclude_domains"}, exclude_none=True)
+    try:
+        found = best_passages(req.query, req.max_results, top_k=req.top_k,
+                              per_site=req.per_site, max_chars=req.max_chars,
+                              rerank=req.rerank, backend=req.backend, **filters)
+    except (SearchBackendError, ImportError) as exc:
+        return {"error": str(exc), "results": []}
+    return {"results": found}
+# Stand: 02.11.2026
