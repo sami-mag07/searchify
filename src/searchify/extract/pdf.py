@@ -15,6 +15,10 @@ reader once the normal fetch has refused a document, and:
   that writes more than 64 KB blocks until somebody reads, so joining first would
   report a timeout for every larger document. A crash or a hang only costs that one
   PDF, never the HTML worker pool or another PDF. No thread fallback.
+  The child is crash isolation, not a sandbox: it drops the environment variables
+  it inherited (API keys) before loading pdfium and answers in plain JSON, never
+  pickle, so a child taken over by a crafted PDF cannot run code in the parent
+  through its answer.
 * returns at most ``MAX_PAGES`` pages and ``MAX_CHARS`` characters, with ``[Seite N]``
   markers and ``page_count`` (the real page count of the file).
 
@@ -25,10 +29,10 @@ extract_failed, network error and address blocked, as for HTML.
 from __future__ import annotations
 
 import importlib.util
+import json
 import logging
 import multiprocessing
 import os
-import pickle
 import re
 import sys
 import threading
@@ -150,9 +154,18 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
 # ---------------------------------------------------------------- Extraction
 
 
+def _answer(conn, kind: str, payload) -> None:
+    """The child's one answer: JSON ["ok", {...}] or ["err", code]. ASCII escapes keep
+    lone surrogates from a broken text layer intact, as pickle did."""
+    conn.send_bytes(json.dumps([kind, payload]).encode("ascii"))
+
+
 def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
-    """Runs in its own process. Sends exactly one tuple, ("ok", dict) or ("err", code)."""
+    """Runs in its own process. Sends exactly one answer (see _answer)."""
     try:
+        # API keys and tokens have no business in a process parsing hostile input:
+        # gone before pypdfium2 is even imported (Security-Review 03.11.2026)
+        os.environ.clear()
         try:
             import resource  # noqa: PLC0415 - Unix only
 
@@ -168,7 +181,7 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
         except pdfium.PdfiumError as exc:
             # FPDF_ERR_PASSWORD = 4: encrypted and not openable without a password
             code = "pdf_encrypted" if getattr(exc, "err_code", None) == 4 else "extract_failed"
-            conn.send(("err", code))
+            _answer(conn, "err", code)
             return
         total = len(doc)
         parts = []
@@ -201,20 +214,20 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
             pass
         doc.close()
         if letters < MIN_TEXT_CHARS:
-            conn.send(("err", "pdf_no_text"))
+            _answer(conn, "err", "pdf_no_text")
             return
-        conn.send(("ok", {
+        _answer(conn, "ok", {
             "title": (meta.get("Title") or "").strip()[:MAX_META_CHARS],
             "author": (meta.get("Author") or "").strip()[:MAX_META_CHARS] or None,
             "page_count": total,
             "content": "\n\n".join(parts),
             "truncated": truncated,
-        }))
+        })
     except MemoryError:
-        conn.send(("err", "pdf_too_large"))
+        _answer(conn, "err", "pdf_too_large")
     except Exception:  # noqa: BLE001 - whatever pdfium throws, the parent just needs a code
         try:
-            conn.send(("err", "extract_failed"))
+            _answer(conn, "err", "extract_failed")
         except Exception:  # noqa: BLE001
             pass
     finally:
@@ -301,7 +314,7 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
     ctx = multiprocessing.get_context("spawn")
     recv_end, send_end = ctx.Pipe(duplex=False)
     proc = ctx.Process(target=_TARGET, args=(send_end, data, MAX_PAGES, MAX_CHARS), daemon=True)
-    result = None
+    raw = b""
     try:
         try:
             proc.start()
@@ -316,7 +329,7 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
             return None, failure
         try:
             # bounded: a child gone wrong cannot hand the parent an answer of any size
-            result = pickle.loads(recv_end.recv_bytes(maxlength=MAX_REPLY_BYTES))
+            raw = recv_end.recv_bytes(maxlength=MAX_REPLY_BYTES)
         except (EOFError, OSError):
             return None, "extract_failed"  # child died without an answer, or one too large
     finally:
@@ -326,10 +339,37 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
             if proc.is_alive():
                 proc.kill()
                 proc.join(2)
-    kind, payload = result
+    info, err = _read_answer(raw)
+    if err:
+        return None, err
+    return _document(url, info), None
+
+
+_CHILD_CODES = {"pdf_encrypted", "pdf_no_text", "pdf_too_large", "extract_failed"}
+
+
+def _read_answer(raw: bytes) -> Tuple[Optional[Dict], Optional[str]]:
+    """The child's JSON answer, checked field by field: anything unexpected is
+    extract_failed, never an exception in the parent."""
+    try:
+        kind, payload = json.loads(raw)
+    except (ValueError, TypeError):
+        return None, "extract_failed"
     if kind == "err":
-        return None, payload
-    return _document(url, payload), None
+        return None, payload if isinstance(payload, str) and payload in _CHILD_CODES else "extract_failed"
+    if kind != "ok" or not isinstance(payload, dict):
+        return None, "extract_failed"
+    content, pages = payload.get("content"), payload.get("page_count")
+    if not isinstance(content, str) or type(pages) is not int:
+        return None, "extract_failed"
+    title, author = payload.get("title"), payload.get("author")
+    return {
+        "content": content,
+        "page_count": pages,
+        "title": title if isinstance(title, str) else "",
+        "author": author if isinstance(author, str) else None,
+        "truncated": payload.get("truncated") is True,
+    }, None
 
 
 def _document(url: str, info: Dict) -> Dict:
