@@ -37,6 +37,18 @@ def _chain() -> List[str]:
     return [b for b in chain if b in BACKENDS]
 
 
+def error_code(error: Optional[str]) -> Optional[str]:
+    """The fixed code at the start of a backend error (``rate_limited``, ``timeout``,
+    ``error``) from ``search_report()["error"]``, e.g. "duckduckgo: rate_limited: ...";
+    None when the message carries none."""
+    if not error:
+        return None
+    for code in ("rate_limited", "timeout", "error"):
+        if error.split(": ", 1)[-1].startswith(code + ":"):
+            return code
+    return None
+
+
 def search_report(query: str, max_results: int = 10, *, backend: Optional[str] = None,
                   **filters) -> Dict[str, object]:
     """Like `search`, but says what happened: ``{"results", "error", "backend"}``.
@@ -48,6 +60,8 @@ def search_report(query: str, max_results: int = 10, *, backend: Optional[str] =
     chain = [backend] if backend else _chain()
     if not backend and get_settings().tavily_api_key and "tavily" not in chain:
         chain.append("tavily")
+    if filters.get("language") == "any":  # "any" means no language parameter
+        filters = {k: v for k, v in filters.items() if k != "language"}
     last_error: Optional[str] = None
     for name in chain:
         fn = BACKENDS.get(name)
@@ -69,7 +83,7 @@ def search(query: str, max_results: int = 10, *, backend: Optional[str] = None,
 
     Tries the configured backend, then the fallback, and returns the first that
     yields results. If all of them come back empty and TAVILY_API_KEY is set,
-    Tavily is asked as the last resort. `filters` may include topic, language, time_range,
+    Tavily is asked as the last resort. `filters` may include topic, language, country, time_range,
     include_domains, exclude_domains. Raises SearchBackendError only when one
     backend was pinned and it failed; `search_report` tells why otherwise.
     """
@@ -79,6 +93,6 @@ def search(query: str, max_results: int = 10, *, backend: Optional[str] = None,
     return list(report["results"])  # type: ignore[arg-type]
 
 
-__all__ = ["search", "search_report", "searxng_search", "ddgs_search", "serper_search",
+__all__ = ["search", "search_report", "error_code", "searxng_search", "ddgs_search", "serper_search",
            "tavily_search", "SearchBackendError", "BACKENDS"]
 # Stand: 24.10.2026

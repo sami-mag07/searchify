@@ -37,7 +37,8 @@ def search(
     query: str = typer.Argument(..., help="What to search for."),
     max_results: int = typer.Option(10, "--max-results", "-n", min=1, max=50),
     backend: Optional[str] = typer.Option(None, help="duckduckgo, searxng, serper or tavily."),
-    language: Optional[str] = typer.Option(None, help="Result language, e.g. en."),
+    language: Optional[str] = typer.Option(None, help="Result language, e.g. en, or any for none."),
+    country: Optional[str] = typer.Option(None, "--country", help="Country code, e.g. BE (with --language nl: Belgian Dutch)."),
     time_range: Optional[str] = typer.Option(None, "--time-range", help="e.g. day, week, month, year."),
     include_domain: Optional[List[str]] = typer.Option(None, "--include-domain", help="Repeatable."),
     exclude_domain: Optional[List[str]] = typer.Option(None, "--exclude-domain", help="Repeatable."),
@@ -50,6 +51,7 @@ def search(
         _fail(f"unknown backend {backend!r}, use {', '.join(BACKENDS)}", as_json, results=[])
     filters = {
         "language": language,
+        "country": country,
         "time_range": time_range,
         "include_domains": include_domain or None,
         "exclude_domains": exclude_domain or None,

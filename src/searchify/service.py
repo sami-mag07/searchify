@@ -26,6 +26,7 @@ class SearchRequest(BaseModel):
     max_results: int = Field(10, ge=1, le=50)
     backend: Optional[str] = None
     language: Optional[str] = None
+    country: Optional[str] = None
     time_range: Optional[str] = None
     include_domains: Optional[List[str]] = None
     exclude_domains: Optional[List[str]] = None
