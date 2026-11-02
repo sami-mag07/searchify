@@ -3,7 +3,7 @@
 Every failure keeps its human text (``error``) and gets one code from `REASONS`
 next to it (``reason``). This is the single place that maps text to a code.
 A code never contains exception text, so it is safe for a header or a log line.
-The pdf_* codes join the list when PDF reading lands.
+The pdf_* codes come from extract/pdf.py, whose error text is the code itself.
 """
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 REASONS = (
     "blocked", "rate_limited", "unavailable", "timeout", "not_html", "too_large",
     "address_blocked", "no_main_text", "extract_failed", "thin_content", "challenge",
+    "pdf_encrypted", "pdf_no_text", "pdf_too_large",
 )
 
 _HTTP_RE = re.compile(r"^HTTP (\d{3})")
@@ -20,6 +21,9 @@ _STATUS_RE = re.compile(r"\b(?:error|status|http)\s*(\d{3})\b", re.IGNORECASE)
 
 # (substring, code), first hit wins. Lower-case; the text is lower-cased before.
 _TEXT_RULES = (
+    ("pdf_encrypted", "pdf_encrypted"),
+    ("pdf_no_text", "pdf_no_text"),
+    ("pdf_too_large", "pdf_too_large"),
     ("address not", "address_blocked"),
     ("not html", "not_html"),
     ("too large", "too_large"),
