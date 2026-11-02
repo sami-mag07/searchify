@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import dataclasses
 import ipaddress
+import json
 import logging
 import multiprocessing
 import os
@@ -452,7 +453,10 @@ class PageCache:
             return len(value)
         if isinstance(value, dict):
             text = sum(len(v) for v in (value.get(k) for k in _SIZED_FIELDS) if isinstance(v, str))
-            return text + 120 * len(value.get("links") or [])
+            # JSON-LD and meta blocks can be as large as the page itself
+            blocks = sum(len(json.dumps(value[k], default=str)) for k in ("structured", "product")
+                         if value.get(k))
+            return text + blocks + 120 * len(value.get("links") or [])
         if isinstance(value, list):
             return 120 * len(value)
         return 0

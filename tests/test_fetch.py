@@ -80,4 +80,9 @@ def test_strip_line_ends_is_linear_on_long_space_runs():
     t = time.perf_counter()
     h.strip_line_ends("a" + " " * 200_000 + "b")
     assert time.perf_counter() - t < 0.5  # the regex needed seconds for 40,000 spaces
+
+
+def test_cache_counts_structured_blocks():
+    doc = {"content": "x", "structured": {"json_ld": [{"a": "b" * 10_000}], "meta": {}}}
+    assert h.PageCache._size(doc) > 10_000
 # Stand: 03.11.2026
