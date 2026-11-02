@@ -38,12 +38,16 @@ def _read_one(
     extractor: Callable = extract_mod.extract_document,
     prefix: str = "",
     max_bytes: Optional[int] = None,
+    plain: bool = False,
 ) -> Tuple[Optional[Dict], Optional[str]]:
     key = f"{prefix}{fmt}|{url}"
     cached = _docs().get(key)
     if cached:
         return cached, None
-    html = extract_mod.fetch_url(url, timeout, max_bytes)
+    if plain:  # ladder cap "plain": httpx only, no Chrome-TLS fallback
+        html = extract_mod.fetch_url(url, timeout, max_bytes, plain=True)
+    else:
+        html = extract_mod.fetch_url(url, timeout, max_bytes)
     pdf = pdf_mod.read_if_pdf(url, html, extract_mod.fetch_failure())  # None unless a PDF
     if pdf:
         doc, err = pdf
@@ -91,6 +95,7 @@ def read_pages(
     cache_prefix: str = "",
     max_bytes: Optional[int] = None,
     progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
+    plain: bool = False,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Liest URLs parallel. Rueckgabe: (dokumente, fehlschlaege[{url, error, reason}]),
     Dokumente in Eingabe-Reihenfolge. `fmt`: "text" oder "markdown".
@@ -99,11 +104,13 @@ def read_pages(
     Top-Level-Funktion html, url, fmt -> Dokument, laeuft im Prozess-Pool),
     `cache_prefix` und `max_bytes` erlauben andere Lese-Modi (z. B. den Reader).
     `progress(fertig, gesamt, gelesen, {grund: anzahl})` wird aus den Lese-Threads
-    aufgerufen, sobald eine Seite fertig ist (fuer die Fortschrittszeile der CLI)."""
+    aufgerufen, sobald eine Seite fertig ist (fuer die Fortschrittszeile der CLI).
+    `plain` laedt nur mit httpx, ohne den Chrome-TLS-Rueckfall (Leiter-Obergrenze plain)."""
     timeout = timeout or float(get_settings().fetch_timeout)
     fmt = "markdown" if fmt == "markdown" else "text"
+    extra = {"plain": True} if plain else {}
     futures = {
-        _READ_POOL.submit(_read_one, u, fmt, timeout, extractor, cache_prefix, max_bytes): u
+        _READ_POOL.submit(_read_one, u, fmt, timeout, extractor, cache_prefix, max_bytes, **extra): u
         for u in urls
     }
     if progress is not None:

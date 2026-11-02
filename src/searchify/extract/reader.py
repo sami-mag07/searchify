@@ -24,7 +24,9 @@ from . import pages as pages_mod
 from . import pdf as pdf_mod
 from . import render as render_mod
 from . import stealth as stealth_mod
+from .. import limits as limits_mod
 from ..config import get_settings
+from ..limits import Limits
 from ..search._common import SearchBackendError
 from ..search.cloud import tavily_post
 
@@ -528,16 +530,32 @@ def forget(urls: List[str], fmt: str) -> None:
 def read_pages_ex(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
     progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
+    *, max_stage: Optional[str] = None, budget: Optional[str] = None,
+    cloud_fallback: Optional[bool] = None,
 ) -> Tuple[List[Dict], List[Dict], Dict[str, str]]:
     """Wie `read_pages`, plus ein Wörterbuch {url: grund} der gelieferten Seiten,
     die nur duennen Text haben ("gelesen, aber duenn": thin_content oder challenge).
     Das Dokument selbst und der geteilte Cache-Eintrag bleiben unveraendert, der
-    Grund wird neben ihnen mitgefuehrt. Fehlschlaege tragen `reason`."""
+    Grund wird neben ihnen mitgefuehrt. Fehlschlaege tragen `reason`.
+
+    `max_stage` (plain, tls, browser, stealth) deckelt die Leiter fuer diese Anfrage,
+    `budget` (low, normal, high) stellt Zeitlimits und Textlaenge, `cloud_fallback`
+    schaltet Tavily. Alles gilt unterhalb der Betreiber-Obergrenze SEARCHIFY_MAX_STAGE
+    und unterhalb dessen, was Umgebung und Installation hergeben (siehe limits.py).
+    Ohne Angaben bleibt alles wie bisher; der Cache haelt immer den vollen Text."""
     fmt = "markdown" if fmt == "markdown" else "text"
+    limits = limits_mod.resolve(max_stage, budget, cloud_fallback)
+    scaled = limits.budget != limits_mod.DEFAULT_BUDGET
+    if timeout:
+        timeout = limits.scaled(timeout)
     deadline = time.monotonic() + timeout if timeout else None
+    fetch_timeout = timeout
+    if scaled and not fetch_timeout:
+        fetch_timeout = limits.scaled(float(pages_mod.get_settings().fetch_timeout))
+    extra: Dict = {"plain": True} if not limits.allows("tls") else {}
     docs, failed = pages_mod.read_pages(
-        urls, fmt, timeout, extractor=reader_document, cache_prefix=_PREFIX,
-        max_bytes=READER_MAX_BYTES, progress=progress,
+        urls, fmt, fetch_timeout, extractor=reader_document, cache_prefix=_PREFIX,
+        max_bytes=READER_MAX_BYTES, progress=progress, **extra,
     )
     thin_map: Dict[str, str] = {}
     for d in docs:
@@ -552,17 +570,31 @@ def read_pages_ex(
                                 "reason": _thin_code(d.get("content") or ""), "static": d}
                                for d in thin]
         if failed:
-            docs, failed = _render_failed(docs, failed, fmt, urls, deadline, thin=thin_map)
-    if failed and get_settings().tavily_api_key:
-        docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline)
+            docs, failed = _render_failed(docs, failed, fmt, urls, deadline, thin=thin_map,
+                                          limits=limits)
+    if failed and limits.cloud and get_settings().tavily_api_key:
+        docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline, limits=limits)
+    if limits.max_chars:
+        docs = [_trimmed(d, limits.max_chars) for d in docs]  # a copy: the cache keeps the full text
     return docs, failed, thin_map
+
+
+def _trimmed(doc: Dict, max_chars: int) -> Dict:
+    content = doc.get("content") or ""
+    if len(content) <= max_chars:
+        return doc
+    return dict(doc, content=limits_mod.trim_text(content, max_chars), truncated=True)
 
 
 def read_pages(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
+    *, max_stage: Optional[str] = None, budget: Optional[str] = None,
+    cloud_fallback: Optional[bool] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
-    """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB)."""
-    docs, failed, _thin = read_pages_ex(urls, fmt, timeout)
+    """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB).
+    `max_stage`, `budget` und `cloud_fallback` wie bei `read_pages_ex`."""
+    docs, failed, _thin = read_pages_ex(urls, fmt, timeout, max_stage=max_stage, budget=budget,
+                                        cloud_fallback=cloud_fallback)
     return docs, failed
 
 
@@ -573,12 +605,13 @@ TAVILY_MAX_URLS = 20  # Tavily Extract nimmt hoechstens 20 Adressen je Aufruf
 
 def _tavily_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
-    deadline: Optional[float] = None,
+    deadline: Optional[float] = None, limits: Optional[Limits] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Letzte Sicherheitsstufe: Seiten, an denen alle eigenen Stufen gescheitert
     sind, liest Tavily Extract. Laeuft nur mit TAVILY_API_KEY; scheitert der
     Aufruf, bleiben die Fehlschlaege wie sie waren."""
-    rest = TAVILY_TIMEOUT_S if deadline is None else min(TAVILY_TIMEOUT_S, deadline - time.monotonic())
+    cap = TAVILY_TIMEOUT_S if limits is None else limits.scaled(TAVILY_TIMEOUT_S)
+    rest = cap if deadline is None else min(cap, deadline - time.monotonic())
     if rest < TAVILY_MIN_REST_S:
         return docs, failed
     wanted = [f["url"] for f in failed if f.get("url")][:TAVILY_MAX_URLS]
@@ -632,6 +665,7 @@ def _thin_code(content: str) -> str:
 def _render_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
     deadline: Optional[float] = None, thin: Optional[Dict[str, str]] = None,
+    limits: Optional[Limits] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Reserve-Stufen fuer Fehlschlaege, jede nur, wenn die vorige scheitert:
     Stufe 2 rendert im geteilten Browser (alle Anfragen ueber httpx), Stufe 3 laesst
@@ -640,14 +674,18 @@ def _render_failed(
     Bot-Schutz-Seiten (Challenge-Text, kaum Woerter) zaehlen weiter als Fehler.
     Mit `deadline` (monotonic, aus x-timeout) bekommt jede Stufe nur die Restzeit;
     ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen.
-    Behaelt eine Seite nur ihren duennen statischen Text, steht ihr Grund in `thin`."""
+    Behaelt eine Seite nur ihren duennen statischen Text, steht ihr Grund in `thin`.
+    `limits` (limits.py) sperrt Stufen oberhalb der Obergrenze und skaliert die Zeitlimits."""
+    if limits is None:
+        limits = limits_mod.resolve()
     still: List[Dict] = []
     tried = 0  # echte Render-Versuche (Zeitlimit-Fehler und belegter Platz zaehlen nicht)
     stealth_tried = 0
-    busy = not render_mod.enabled()
-    stealth_busy = not stealth_mod.enabled()
+    busy = not (limits.allows("browser") and render_mod.enabled())
+    stealth_busy = not (limits.allows("stealth") and stealth_mod.enabled())
 
     def rest(cap: float) -> float:
+        cap = limits.scaled(cap)
         return cap if deadline is None else min(cap, deadline - time.monotonic())
 
     def give_up(fail: Dict) -> None:

@@ -10,6 +10,7 @@ Schwer-Abhaengigkeit importierbar bleibt (Tests/Dry-Run).
 
 from __future__ import annotations
 
+import dataclasses
 import ipaddress
 import logging
 import multiprocessing
@@ -608,14 +609,19 @@ def _connected_ip(resp) -> str:
 
 
 def fetch_url(
-    url: str, timeout: Optional[float] = None, max_bytes: Optional[int] = None
+    url: str, timeout: Optional[float] = None, max_bytes: Optional[int] = None,
+    *, plain: bool = False,
 ) -> Optional[str]:
     """Fetch a URL and return its HTML text (or None on failure).
 
     `timeout` applies to the whole download: httpx only counts per read step, so
-    a slow-dripping server could otherwise hold a worker indefinitely.
+    a slow-dripping server could otherwise hold a worker indefinitely. `plain`
+    forces httpx and switches the Chrome-TLS fallback off, whatever FETCH_CLIENT
+    and FETCH_FALLBACK say (the ladder cap ``plain``); the search path never sets it.
     """
     settings = get_settings()
+    if plain:
+        settings = dataclasses.replace(settings, fetch_client="httpx", fetch_fallback=False)
     timeout = timeout or settings.fetch_timeout
     limit = max_bytes or _MAX_BYTES
     _reset_failure()
