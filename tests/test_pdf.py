@@ -130,6 +130,15 @@ def _huge_child(conn, data, max_pages, max_chars):
         pass  # the parent refused it and closed the pipe
 
 
+def _greedy_child(conn, data, max_pages, max_chars):
+    # stands for pdfium inflating a crafted stream: grows by 16 MB every 20 ms (640 MB at most)
+    hoard = []
+    for _ in range(40):
+        hoard.append(b"x" * (16 << 20))
+        time.sleep(0.02)
+    time.sleep(60)
+
+
 # ---------------------------------------------------------------- tests
 
 
@@ -311,6 +320,26 @@ def test_an_oversized_answer_from_the_child_is_refused(site, monkeypatch):
     ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
     docs, failed = pages_mod.read_pages([site + "/a.pdf"])
     assert docs == [] and failed[0]["error"] == "extract_failed"
+
+
+@pytest.mark.skipif(not (sys.platform == "darwin" or sys.platform.startswith("linux")),
+                    reason="the RSS watch reads libproc or /proc")
+def test_a_child_growing_past_the_memory_cap_is_killed(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    monkeypatch.setattr(pdf_mod, "_TARGET", _greedy_child)
+    monkeypatch.setattr(pdf_mod, "MAX_CHILD_RSS", 256 << 20, raising=False)
+    monkeypatch.setattr(pdf_mod, "EXTRACT_TIMEOUT_S", 5)
+    ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
+    t = time.monotonic()
+    docs, failed = pages_mod.read_pages([site + "/a.pdf"], timeout=10, deadline_s=20)
+    assert docs == [] and failed[0]["error"] == "pdf_too_large"
+    assert time.monotonic() - t < 5  # killed while growing, not after the extract timeout
+
+
+def test_rss_of_a_live_and_a_gone_process():
+    if sys.platform == "darwin" or sys.platform.startswith("linux"):
+        assert pdf_mod._rss_bytes(os.getpid()) > 5 << 20
+    assert pdf_mod._rss_bytes(2**22 + 12345) is None  # no such pid
 
 
 def test_at_most_two_pdfs_at_once(site, monkeypatch):

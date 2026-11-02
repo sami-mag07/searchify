@@ -27,6 +27,7 @@ from __future__ import annotations
 import importlib.util
 import logging
 import multiprocessing
+import os
 import pickle
 import re
 import sys
@@ -156,11 +157,11 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
             import resource  # noqa: PLC0415 - Unix only
 
             resource.setrlimit(resource.RLIMIT_CPU, (30, 30))
-            if sys.platform.startswith("linux"):
-                resource.setrlimit(resource.RLIMIT_AS, (3 << 30, 3 << 30))
         except Exception:  # noqa: BLE001 - limits are a bonus
             pass
         import pypdfium2 as pdfium  # noqa: PLC0415
+
+        _limit_address_space()
 
         try:
             doc = pdfium.PdfDocument(data)
@@ -220,7 +221,71 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
         conn.close()
 
 
+def _limit_address_space() -> None:
+    """Linux: at most MAX_CHILD_RSS more address space than after loading pdfium (an
+    absolute cap would also count what pdfium reserves at start). macOS refuses
+    RLIMIT_AS with ValueError; there only the parent's RSS watch below holds."""
+    try:
+        import resource  # noqa: PLC0415 - Unix only
+
+        with open("/proc/self/statm") as f:
+            now = int(f.read().split()[0]) * os.sysconf("SC_PAGE_SIZE")
+        resource.setrlimit(resource.RLIMIT_AS, (now + MAX_CHILD_RSS, now + MAX_CHILD_RSS))
+    except Exception:  # noqa: BLE001 - no /proc or no RLIMIT_AS: the watch still applies
+        pass
+
+
 _TARGET = _worker  # tests swap this for a slow or crashing child
+
+# Memory watch on the child (Security-Review 03.11.2026): a 522 KB PDF drove a child
+# to 1081 MB RSS, and macOS has no working RLIMIT_AS. The parent reads the child's
+# resident size while it waits and kills it above MAX_CHILD_RSS ("pdf_too_large").
+MAX_CHILD_RSS = 1 << 30
+_WATCH_EVERY_S = 0.05
+_LIBPROC = None
+
+
+def _rss_bytes(pid: int) -> Optional[int]:
+    """Resident size of `pid` in bytes; None when unknown (process gone, other OS).
+    macOS: proc_pidinfo(PROC_PIDTASKINFO), Linux: /proc/<pid>/statm. No subprocess."""
+    global _LIBPROC
+    try:
+        if sys.platform == "darwin":
+            import ctypes  # noqa: PLC0415
+            import struct  # noqa: PLC0415
+
+            if _LIBPROC is None:
+                lib = ctypes.CDLL("/usr/lib/libproc.dylib")
+                lib.proc_pidinfo.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_uint64,
+                                             ctypes.c_void_p, ctypes.c_int]
+                lib.proc_pidinfo.restype = ctypes.c_int
+                _LIBPROC = lib
+            buf = ctypes.create_string_buffer(96)  # struct proc_taskinfo
+            if _LIBPROC.proc_pidinfo(pid, 4, 0, buf, 96) != 96:  # 4 = PROC_PIDTASKINFO
+                return None
+            return struct.unpack_from("=Q", buf, 8)[0]  # pti_resident_size
+        with open(f"/proc/{pid}/statm") as f:
+            return int(f.read().split()[1]) * os.sysconf("SC_PAGE_SIZE")
+    except (OSError, ValueError, IndexError, AttributeError):
+        return None
+
+
+def _wait_for_answer(recv_end, proc) -> Optional[str]:
+    """Waits until the child answers or dies (None), up to EXTRACT_TIMEOUT_S ("timeout").
+    Reads the child's RSS between polls and kills it above MAX_CHILD_RSS ("pdf_too_large").
+    The poll returns as soon as the answer is there, so a normal PDF waits no longer."""
+    deadline = time.monotonic() + EXTRACT_TIMEOUT_S
+    while True:
+        left = deadline - time.monotonic()
+        if left <= 0:
+            return "timeout"
+        if recv_end.poll(min(_WATCH_EVERY_S, left)):
+            return None
+        rss = _rss_bytes(proc.pid)
+        if rss is not None and rss > MAX_CHILD_RSS:
+            proc.kill()  # at once: every further poll lets it grow
+            log.warning("pdf child killed at %d MB resident", rss >> 20)
+            return "pdf_too_large"
 
 
 def _extract(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
@@ -246,8 +311,9 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
         send_end.close()  # parent keeps only the read end, so a dead child gives EOF
         # Poll and read FIRST. Joining a child that is blocked writing >64 KB would
         # deadlock until the timeout and wrongly report every large PDF as too slow.
-        if not recv_end.poll(EXTRACT_TIMEOUT_S):
-            return None, "timeout"
+        failure = _wait_for_answer(recv_end, proc)
+        if failure:
+            return None, failure
         try:
             # bounded: a child gone wrong cannot hand the parent an answer of any size
             result = pickle.loads(recv_end.recv_bytes(maxlength=MAX_REPLY_BYTES))
