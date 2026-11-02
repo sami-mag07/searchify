@@ -122,6 +122,7 @@ def extract(
     urls: List[str] = typer.Argument(..., help="One or more page addresses."),
     fmt: str = typer.Option("text", "--format", "-f", help="text or markdown."),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="No progress line on stderr."),
+    structured: bool = typer.Option(False, "--structured", help="Add the raw JSON-LD and meta tags."),
     as_json: bool = JSON_OPT,
 ) -> None:
     """Fetch pages and print their clean article text.
@@ -137,7 +138,8 @@ def extract(
 
     ticker = _Ticker() if _ticker_allowed(quiet) else None
     try:
-        docs, failed, _thin = read_pages_ex(urls, fmt, progress=ticker.update if ticker else None)
+        docs, failed, _thin = read_pages_ex(urls, fmt, progress=ticker.update if ticker else None,
+                                           structured=structured)
     finally:
         if ticker:
             ticker.clear()

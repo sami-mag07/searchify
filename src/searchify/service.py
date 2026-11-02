@@ -37,6 +37,7 @@ class ExtractRequest(BaseModel):
     urls: List[str]
     fmt: str = "text"
     detail: bool = False
+    structured: bool = False
 
 
 class PassagesRequest(SearchRequest):
@@ -84,7 +85,7 @@ def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
     failed or came back thin; after a clean run the body has no ``status``. With
     ``detail`` every failed entry also carries its reason code. The header
     X-Searchify-Status repeats the reason counts."""
-    docs, failed, thin = read_pages_ex(req.urls, req.fmt)
+    docs, failed, thin = read_pages_ex(req.urls, req.fmt, structured=req.structured)
     body = {
         "results": docs,
         "failed": [

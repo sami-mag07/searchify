@@ -75,7 +75,7 @@ def test_service_extract_returns_failed_with_reasons(monkeypatch):
 
     ok = {"url": "https://a.example/", "title": "A", "content": "text", "stage": "static"}
     monkeypatch.setattr(service, "read_pages_ex",
-                        lambda urls, fmt, timeout=None: ([ok], [{"url": "https://b.example/", "error": "HTTP 403", "static": {"x": 1}}], {}))
+                        lambda urls, fmt, timeout=None, **_: ([ok], [{"url": "https://b.example/", "error": "HTTP 403", "static": {"x": 1}}], {}))
     out = TestClient(service.app).post("/extract", json={"urls": ["https://a.example/", "https://b.example/"]}).json()
     assert out["results"] == [ok]
     assert out["failed"] == [{"url": "https://b.example/", "error": "HTTP 403"}]

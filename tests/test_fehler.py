@@ -195,7 +195,7 @@ def test_extract_status_appears_only_when_something_went_wrong(monkeypatch):
 
 def test_status_header_never_carries_free_text(monkeypatch):
     evil = {"url": "https://x.example/", "error": "boom\r\nX-Evil: 1", "reason": "x\r\nX-Evil: 1"}
-    monkeypatch.setattr(service, "read_pages_ex", lambda urls, fmt, timeout=None: ([], [evil], {}))
+    monkeypatch.setattr(service, "read_pages_ex", lambda urls, fmt, timeout=None, **_: ([], [evil], {}))
     resp = client.post("/extract", json={"urls": ["https://x.example/"]})
     assert resp.status_code == 200
     assert "x-evil" not in resp.headers
@@ -268,7 +268,7 @@ def test_cli_extract_prints_no_ticker_when_piped(monkeypatch):
 
     seen = {}
 
-    def fake(urls, fmt, timeout=None, progress=None):
+    def fake(urls, fmt, timeout=None, progress=None, **_):
         seen["progress"] = progress
         return [], [{"url": "https://b.com", "error": "HTTP 429"}], {}
     monkeypatch.setattr(sys.modules["searchify.extract"], "read_pages_ex", fake)

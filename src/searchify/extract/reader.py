@@ -528,11 +528,13 @@ def forget(urls: List[str], fmt: str) -> None:
 def read_pages_ex(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
     progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
+    structured: bool = False,
 ) -> Tuple[List[Dict], List[Dict], Dict[str, str]]:
     """Wie `read_pages`, plus ein Wörterbuch {url: grund} der gelieferten Seiten,
     die nur duennen Text haben ("gelesen, aber duenn": thin_content oder challenge).
     Das Dokument selbst und der geteilte Cache-Eintrag bleiben unveraendert, der
-    Grund wird neben ihnen mitgefuehrt. Fehlschlaege tragen `reason`."""
+    Grund wird neben ihnen mitgefuehrt. Fehlschlaege tragen `reason`. Das rohe
+    `structured` (JSON-LD, og:/twitter:-Meta) liefert nur `structured=True`."""
     fmt = "markdown" if fmt == "markdown" else "text"
     deadline = time.monotonic() + timeout if timeout else None
     docs, failed = pages_mod.read_pages(
@@ -555,14 +557,18 @@ def read_pages_ex(
             docs, failed = _render_failed(docs, failed, fmt, urls, deadline, thin=thin_map)
     if failed and get_settings().tavily_api_key:
         docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline)
+    if not structured:  # Kopie ohne den Schluessel, das gecachte Objekt bleibt wie es ist
+        docs = [{k: v for k, v in d.items() if k != "structured"} if "structured" in d else d
+                for d in docs]
     return docs, failed, thin_map
 
 
 def read_pages(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
+    structured: bool = False,
 ) -> Tuple[List[Dict], List[Dict]]:
     """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB)."""
-    docs, failed, _thin = read_pages_ex(urls, fmt, timeout)
+    docs, failed, _thin = read_pages_ex(urls, fmt, timeout, structured=structured)
     return docs, failed
 
 
