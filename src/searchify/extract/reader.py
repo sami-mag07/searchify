@@ -450,7 +450,7 @@ def structured_data(tree) -> Dict:
         if not raw:
             continue
         try:
-            data = json.loads(raw)
+            data = json.loads(raw, parse_constant=lambda _c: None)  # NaN/Infinity -> null
         except ValueError:
             continue
         out["json_ld"].extend(data if isinstance(data, list) else [data])

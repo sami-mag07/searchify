@@ -36,6 +36,16 @@ def test_document_carries_json_ld_and_meta():
     assert "description" not in s["meta"]  # plain meta names stay in the document fields
 
 
+def test_nan_and_infinity_in_json_ld_stay_valid_json():
+    html = ('<html><head><script type="application/ld+json">{"@type":"Product","name":"X",'
+            '"offers":{"price":NaN,"priceCurrency":"EUR"},"weight":Infinity}</script></head>'
+            "<body><p>" + "word " * 80 + "</p></body></html>")
+    doc = reader.reader_document(html, "https://a.example/", "text")
+    json.dumps(doc, allow_nan=False)  # raises on nan / inf
+    assert doc["structured"]["json_ld"][0]["offers"]["price"] is None
+    assert doc.get("product", {}).get("price") != "nan"
+
+
 def test_document_without_structured_data_leaves_the_key_out():
     doc = reader.reader_document("<html><body><p>Just a paragraph of text here.</p></body></html>", "", "text")
     assert "structured" not in doc
