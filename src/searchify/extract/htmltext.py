@@ -277,7 +277,13 @@ def extract_page(html: str, url: str = "") -> Tuple[Optional[str], List[Dict[str
     return text, links, _metadata(html, url)
 
 
-_USER_AGENT = "Mozilla/5.0 (compatible; rag-search-bot/0.1; +self-hosted-clean-room)"
+# Wikimedia (and others) answer 403 to bots whose User-Agent names no contact, except for
+# pages their edge cache already holds: with the old "rag-search-bot ... clean-room" agent
+# Wikipedia's popular articles loaded and most others never did. Operators can put their
+# own contact here (SEARCHIFY_USER_AGENT), as the Wikimedia policy asks.
+_USER_AGENT = os.environ.get("SEARCHIFY_USER_AGENT") or (
+    "Mozilla/5.0 (compatible; searchify; +https://github.com/sami-mag07/searchify)"
+)
 _MAX_BYTES = 1_000_000  # groessere Seiten werden abgeschnitten, nicht komplett geladen
 
 _CLIENT: Optional[httpx.Client] = None
@@ -521,7 +527,11 @@ def _plain_url(url: str) -> bool:
         parts.port  # noqa: B018 - wirft bei ungueltigem Port
     except ValueError:
         return False
-    return parts.scheme in ("http", "https") and bool(parts.hostname) and "@" not in parts.netloc
+    # Kein % und nur ASCII im Host: curl dekodiert %-Folgen und wandelt Unicode nach
+    # IDNA2008 ("faß" -> xn--fa-hia), Python prueft dagegen den Rohtext bzw. IDNA2003
+    # ("fass"). Dann loeste curl einen ungeprueften Host selbst auf.
+    netloc_ok = parts.netloc.isascii() and "%" not in parts.netloc and "@" not in parts.netloc
+    return parts.scheme in ("http", "https") and bool(parts.hostname) and netloc_ok
 
 
 def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Optional[str]:
@@ -546,17 +556,19 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
             port = parts.port or (443 if parts.scheme == "https" else 80)
             sess = _curl_session()
             pinned = ",".join(f"[{ip}]" if ":" in ip else ip for ip in ips)
-            # CONNECT_TO ohne Host/Port gilt fuer jede Verbindung: selbst wenn curl die URL
-            # anders liest als urlparse, verbindet es nur zur geprueften IP.
-            first = f"[{ips[0]}]" if ":" in ips[0] else ips[0]
-            sess.curl_options = {
-                CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"],
-                CurlOpt.CONNECT_TO: [f"::{first}:{port}"],
-            }
+            # RESOLVE nagelt den geprueften Host auf die geprueften IPs fest. CONNECT_TO
+            # (eine Liste) nimmt curl_cffi nicht an: es warf TypeError, der still None
+            # ergab, darum lief dieser Rueckfall nie. Stattdessen wird unten die IP geprueft,
+            # mit der curl tatsaechlich verbunden ist, bevor ein Byte gelesen wird.
+            sess.curl_options = {CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"]}
             resp = sess.get(
                 url, timeout=max(0.1, deadline - time.monotonic()), allow_redirects=False, stream=True
             )
             try:
+                if _connected_ip(resp) not in {str(ipaddress.ip_address(ip)) for ip in ips}:
+                    log.warning("curl fallback connected to an unchecked address, dropped: %s", url)
+                    _note_failure("address not public or not resolvable")
+                    return None
                 if resp.status_code in _REDIRECTS and resp.headers.get("location"):
                     url = urljoin(url, resp.headers["location"])
                     continue
@@ -579,10 +591,20 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
             finally:
                 resp.close()
     except Exception as exc:  # noqa: BLE001 - curl_cffi wirft eigene Fehlertypen
+        log.debug("curl fallback failed for %s: %r", url, exc)
         _note_failure(f"network error ({type(exc).__name__})")
         return None
     _note_failure("too many redirects")
     return None
+
+
+def _connected_ip(resp) -> str:
+    """The address curl really connected to, in ipaddress's normal form ("" if unreadable)."""
+    raw = (getattr(resp, "primary_ip", "") or "").strip("[]").split("%")[0]
+    try:
+        return str(ipaddress.ip_address(raw))
+    except ValueError:
+        return ""
 
 
 def fetch_url(

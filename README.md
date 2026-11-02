@@ -325,7 +325,7 @@ The browser stages need `pip install "searchify[browser]"` and
 
 Every setting is optional and read from the environment (see `.env.example`):
 `SEARCH_BACKEND`, `SEARCH_FALLBACK`, `SEARXNG_URL`, `SERPER_API_KEY`, `TAVILY_API_KEY`,
-`RERANKER_MODEL`, `FETCH_TIMEOUT`. No key is ever read from code.
+`RERANKER_MODEL`, `FETCH_TIMEOUT`, `SEARCHIFY_USER_AGENT`. No key is ever read from code.
 
 ## Tests
 
