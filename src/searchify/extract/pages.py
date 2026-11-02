@@ -43,12 +43,17 @@ def _read_one(
     html = extract_mod.fetch_url(url, timeout, max_bytes)
     if not html:
         return None, extract_mod.fetch_failure() or "page could not be loaded"
+    pool: Optional[ProcessPoolExecutor] = None
     try:
-        pool: ProcessPoolExecutor = extract_mod._extract_pool()
+        pool = extract_mod._extract_pool()
         doc = pool.submit(extractor, html, url, fmt).result(timeout=15)
     except FuturesTimeout:
         return None, "Extraktion zu langsam"
-    except (BrokenProcessPool, RuntimeError):  # kaputter/geschlossener Pool: im Thread
+    except BrokenProcessPool:  # Worker abgestuerzt: diese Seite im Thread, Pool neu anlegen
+        if pool is not None:
+            extract_mod.discard_extract_pool(pool)
+        doc = extractor(html, url, fmt)
+    except RuntimeError:  # geschlossener Pool (Herunterfahren): im Thread
         doc = extractor(html, url, fmt)
     except Exception as exc:  # noqa: BLE001 - Extraktor-Fehler: nicht doppelt rechnen
         return None, f"Extraktion fehlgeschlagen ({type(exc).__name__})"
