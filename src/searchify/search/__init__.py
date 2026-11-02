@@ -33,8 +33,11 @@ BACKENDS = {
 def _chain() -> List[str]:
     s = get_settings()
     chain = [s.search_backend]
-    if s.search_fallback and s.search_fallback != s.search_backend:
-        chain.append(s.search_fallback)
+    fb = s.search_fallback
+    # The fallback only joins when it is usable; a pinned primary keeps its own error.
+    configured = {"searxng": bool(s.searxng_url), "serper": bool(s.serper_api_key)}
+    if fb and fb != s.search_backend and configured.get(fb, True):
+        chain.append(fb)
     return [b for b in chain if b in BACKENDS]
 
 
@@ -55,8 +58,9 @@ def search_report(query: str, max_results: int = 10, *, backend: Optional[str] =
     """Like `search`, but says what happened: ``{"results", "error", "backend"}``.
 
     ``backend`` names the backend that answered (None when nothing did), and
-    ``error`` is the last backend error, so a rate limit or an unreachable
-    instance is told apart from a query that simply has no hits. If any backend
+    ``error`` is the FIRST backend error, or None when a backend answered cleanly
+    with no hits, so a rate limit or an unreachable instance is told apart from a
+    query that simply has no hits. If any backend
     failed, ``errors`` lists ``{engine, reason}`` per failure (reason is a fixed code
     such as rate_limited or timeout), also when a later backend still delivered. The
     key is absent when nothing failed.
@@ -66,7 +70,8 @@ def search_report(query: str, max_results: int = 10, *, backend: Optional[str] =
         chain.append("tavily")
     if filters.get("language") == "any":  # "any" means no language parameter
         filters = {k: v for k, v in filters.items() if k != "language"}
-    last_error: Optional[str] = None
+    first_error: Optional[str] = None
+    clean_empty = False
     errors: List[Dict[str, str]] = []
     for name in chain:
         fn = BACKENDS.get(name)
@@ -79,11 +84,13 @@ def search_report(query: str, max_results: int = 10, *, backend: Optional[str] =
                 if errors:
                     done["errors"] = errors
                 return done
+            clean_empty = True
         except SearchBackendError as exc:
-            last_error = f"{name}: {exc}"
+            first_error = first_error or f"{name}: {exc}"
             errors.append({"engine": name, "reason": code_for(str(exc), default="unavailable")})
             continue
-    failed: Dict[str, object] = {"results": [], "error": last_error, "backend": None}
+    failed: Dict[str, object] = {"results": [], "error": None if clean_empty else first_error,
+                              "backend": None}
     if errors:
         failed["errors"] = errors
     return failed
