@@ -41,7 +41,7 @@ def test_search_rejects_unknown_backend():
 def test_extract_json_and_failures(monkeypatch):
     doc = {"url": "https://a.com", "title": "T", "content": "body"}
     monkeypatch.setattr(sys.modules["searchify.extract"], "read_pages_ex",
-                        lambda urls, fmt, progress=None: ([doc], [{"url": "https://b.com", "error": "HTTP 403"}], {}))
+                        lambda urls, fmt, progress=None, **_: ([doc], [{"url": "https://b.com", "error": "HTTP 403"}], {}))
     result = runner.invoke(cli.app, ["extract", "https://a.com", "https://b.com"])
     assert result.exit_code == 0
     out = json.loads(result.stdout)

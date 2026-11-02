@@ -76,6 +76,7 @@ def test_nothing_set_passes_no_limits_down(monkeypatch):
     seen = {}
 
     def fake(urls, fmt, timeout=None, **kw):
+        assert kw.pop("structured", False) is False  # raw structured stays opt-in
         seen.update(kw)
         return [], [], {}
     monkeypatch.setattr(sys.modules["searchify.extract"], "read_pages_ex", fake)
@@ -110,6 +111,7 @@ def test_extract_without_limits_calls_the_core_exactly_as_before(monkeypatch):
     seen = {}
 
     def fake(urls, fmt, timeout=None, **kw):
+        assert kw.pop("structured", False) is False  # raw structured stays opt-in
         seen.update(kw, urls=urls)
         return [], [], {}
     monkeypatch.setattr(service, "read_pages_ex", fake)
@@ -169,6 +171,7 @@ async def test_mcp_extract_passes_limits_and_never_reads_the_profile(monkeypatch
     seen = {}
 
     def fake(urls, fmt, **kw):
+        assert kw.pop("structured", False) is False  # raw structured stays opt-in
         seen.update(kw)
         return [], []
     monkeypatch.setattr(mcp_server, "read_pages", fake)

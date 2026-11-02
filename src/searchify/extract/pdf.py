@@ -67,14 +67,25 @@ def is_pdf_failure(fail: Dict) -> bool:
     return str(fail.get("error") or "").startswith("pdf_") or "page_count" in (fail.get("static") or {})
 
 
+_PDF_TYPES = ("application/pdf", "application/x-pdf", "application/octet-stream",
+              "binary/octet-stream", "application/download", "application/force-download")
+
+
+def _pdf_like(failure: Optional[str]) -> bool:
+    """A "not HTML: <type>" refusal whose type can hide a PDF."""
+    text = failure or ""
+    return text.startswith("not HTML:") and text[len("not HTML:"):].strip().lower() in _PDF_TYPES
+
+
 def read_if_pdf(
     url: str, html: Optional[str], failure: Optional[str]
 ) -> Optional[Tuple[Optional[Dict], Optional[str]]]:
     """Called after the normal fetch of `url`. Returns None when this is not a
     case for the PDF path (extra missing, or the fetch did not hint at a PDF), so
     the caller carries on as before. Otherwise (document, None) or (None, reason).
-    A "hint" is a refusal as non-HTML or a body that starts with %PDF-."""
-    hinted = (failure or "").startswith("not HTML:") or (html or "").startswith("%PDF-")
+    A "hint" is a refusal as non-HTML with a PDF-like type or a body that starts
+    with %PDF-; png, json, zip and the like cost no second request."""
+    hinted = _pdf_like(failure) or (html or "").startswith("%PDF-")
     if not hinted or not available():
         return None
     got = _download(url)
@@ -99,18 +110,19 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
                 return None
             ctype = resp.headers.get("content-type", "").lower()
             declared = resp.headers.get("content-length", "")
-            if declared.isdigit() and int(declared) > MAX_BYTES:
+            # only a declared PDF is refused by length; anything else must show %PDF- first
+            if declared.isdigit() and int(declared) > MAX_BYTES and "pdf" in ctype:
                 return None, "pdf_too_large"
             body = bytearray()
             sniffed = "application/pdf" in ctype
             for part in resp.iter_bytes():
                 body.extend(part)
-                if len(body) > MAX_BYTES:
-                    return None, "pdf_too_large"
-                if not sniffed and len(body) >= 5:
+                if not sniffed and len(body) >= 5:  # first bytes before the size verdict
                     if b"%PDF-" not in bytes(body[:_SNIFF]):
                         return None
                     sniffed = True
+                if len(body) > MAX_BYTES:
+                    return None, "pdf_too_large"
                 if time.monotonic() > deadline:
                     return None, "timeout"
     except httpx.TimeoutException:
@@ -244,8 +256,8 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
 def _document(url: str, info: Dict) -> Dict:
     title = info.get("title") or _title_from_url(url)
     doc = htmltext._doc(url, {"title": title, "author": info.get("author")}, info["content"], [])
-    doc["structured"] = {"json_ld": [], "meta": {}}
     doc["page_count"] = info["page_count"]
+    doc["stage"] = "static"
     if info.get("truncated"):
         doc["truncated"] = True
     return doc

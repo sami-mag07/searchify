@@ -31,7 +31,7 @@ def extract(urls: List[str], fmt: str = "text", timeout: Optional[float] = None)
 def extract_report(
     urls: List[str], fmt: str = "text", timeout: Optional[float] = None,
     *, max_stage: Optional[str] = None, budget: Optional[str] = None,
-    cloud_fallback: Optional[bool] = None, use_profile: bool = True,
+    cloud_fallback: Optional[bool] = None, use_profile: bool = True, structured: bool = False,
 ) -> Dict:
     """Like `extract`, but says what happened: ``{"results", "failed", "status"}``.
 
@@ -46,13 +46,14 @@ def extract_report(
     ``cloud_fallback`` limit the load for this call. What a call leaves out comes from
     the user profile (``searchify config``) unless ``use_profile=False``, then from
     today's defaults; everything stays below the operator cap SEARCHIFY_MAX_STAGE.
+    The raw ``structured`` block (JSON-LD, og:/twitter: meta) is left out unless ``structured``.
     """
     from .. import limits as limits_mod  # noqa: PLC0415
     from .. import profile as profile_mod  # noqa: PLC0415
 
     kwargs = limits_mod.explicit(max_stage, budget, cloud_fallback,
                                  profile_mod.load() if use_profile else None)
-    docs, failed, thin = read_pages_ex(list(urls), fmt, timeout, **kwargs)
+    docs, failed, thin = read_pages_ex(list(urls), fmt, timeout, structured=structured, **kwargs)
     failed = [{"url": f.get("url"), "error": f.get("error"),
                "reason": f.get("reason") or code_for(f.get("error"))} for f in failed]
     return {"results": docs, "failed": failed, "status": status_for(len(docs), failed, thin.values())}

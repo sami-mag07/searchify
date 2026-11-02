@@ -27,6 +27,7 @@ def searxng_search(
     include_domains: Optional[List[str]] = None,
     exclude_domains: Optional[List[str]] = None,
     engines: Optional[str] = None,
+    country: Optional[str] = None,  # accepted and ignored, like the cloud backends
 ) -> List[Dict[str, str]]:
     """Return search hits as a list of dicts: {title, url, content, engine}."""
     settings = get_settings()

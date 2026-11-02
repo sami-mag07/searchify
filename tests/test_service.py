@@ -24,6 +24,13 @@ def test_passages_endpoint_returns_results_and_passes_options(monkeypatch):
                     "max_chars": 600, "rerank": None, "backend": None, "language": "de"}
 
 
+def test_passages_endpoint_passes_country_on(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(service, "best_passages", lambda query, max_results, **kw: seen.update(kw) or [])
+    client.post("/passages", json={"query": "q", "country": "BE", "language": "nl"})
+    assert seen["country"] == "BE" and seen["language"] == "nl"
+
+
 def test_passages_endpoint_reports_search_failures(monkeypatch):
     def boom(*a, **k):
         raise SearchBackendError("down")

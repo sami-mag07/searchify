@@ -452,7 +452,7 @@ def structured_data(tree) -> Dict:
         if not raw:
             continue
         try:
-            data = json.loads(raw)
+            data = json.loads(raw, parse_constant=lambda _c: None)  # NaN/Infinity -> null
         except ValueError:
             continue
         out["json_ld"].extend(data if isinstance(data, list) else [data])
@@ -501,6 +501,7 @@ def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
     # htmldate den Baum veraendern darf.
     meta = _reader_metadata(html, url, tree)
     doc = extract_mod._doc(url, meta, content, links)
+    doc["stage"] = "static"  # which rung of the ladder produced the page
     if structured["json_ld"] or structured["meta"]:  # leere Seiten bleiben so klein wie vorher
         doc["structured"] = structured
     try:
@@ -531,7 +532,7 @@ def read_pages_ex(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
     progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
     *, max_stage: Optional[str] = None, budget: Optional[str] = None,
-    cloud_fallback: Optional[bool] = None,
+    cloud_fallback: Optional[bool] = None, structured: bool = False,
 ) -> Tuple[List[Dict], List[Dict], Dict[str, str]]:
     """Wie `read_pages`, plus ein Wörterbuch {url: grund} der gelieferten Seiten,
     die nur duennen Text haben ("gelesen, aber duenn": thin_content oder challenge).
@@ -542,7 +543,8 @@ def read_pages_ex(
     `budget` (low, normal, high) stellt Zeitlimits und Textlaenge, `cloud_fallback`
     schaltet Tavily. Alles gilt unterhalb der Betreiber-Obergrenze SEARCHIFY_MAX_STAGE
     und unterhalb dessen, was Umgebung und Installation hergeben (siehe limits.py).
-    Ohne Angaben bleibt alles wie bisher; der Cache haelt immer den vollen Text."""
+    Ohne Angaben bleibt alles wie bisher; der Cache haelt immer den vollen Text.
+    Das rohe `structured` (JSON-LD, og:/twitter:-Meta) liefert nur `structured=True`."""
     fmt = "markdown" if fmt == "markdown" else "text"
     limits = limits_mod.resolve(max_stage, budget, cloud_fallback)
     scaled = limits.budget != limits_mod.DEFAULT_BUDGET
@@ -558,8 +560,6 @@ def read_pages_ex(
         max_bytes=READER_MAX_BYTES, progress=progress, **extra,
     )
     thin_map: Dict[str, str] = {}
-    for d in docs:
-        d.setdefault("stage", "static")  # which rung of the ladder produced the page
     if render_mod.enabled() or stealth_mod.enabled():
         # Duenne Ergebnisse (JS-Huelle, "Skip to main content", Challenge-Seite) zaehlen
         # fuer die Stufen wie Fehler; scheitern alle, bleibt der statische Text.
@@ -576,6 +576,9 @@ def read_pages_ex(
         docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline, limits=limits)
     if limits.max_chars:
         docs = [_trimmed(d, limits.max_chars) for d in docs]  # a copy: the cache keeps the full text
+    if not structured:  # Kopie ohne den Schluessel, das gecachte Objekt bleibt wie es ist
+        docs = [{k: v for k, v in d.items() if k != "structured"} if "structured" in d else d
+                for d in docs]
     return docs, failed, thin_map
 
 
@@ -589,12 +592,12 @@ def _trimmed(doc: Dict, max_chars: int) -> Dict:
 def read_pages(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
     *, max_stage: Optional[str] = None, budget: Optional[str] = None,
-    cloud_fallback: Optional[bool] = None,
+    cloud_fallback: Optional[bool] = None, structured: bool = False,
 ) -> Tuple[List[Dict], List[Dict]]:
     """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB).
-    `max_stage`, `budget` und `cloud_fallback` wie bei `read_pages_ex`."""
+    `max_stage`, `budget`, `cloud_fallback` und `structured` wie bei `read_pages_ex`."""
     docs, failed, _thin = read_pages_ex(urls, fmt, timeout, max_stage=max_stage, budget=budget,
-                                        cloud_fallback=cloud_fallback)
+                                        cloud_fallback=cloud_fallback, structured=structured)
     return docs, failed
 
 

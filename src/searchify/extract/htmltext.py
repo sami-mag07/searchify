@@ -440,11 +440,15 @@ class _PinnedBackend(httpcore.SyncBackend):
         raise last_error  # type: ignore[misc]
 
 
+class _BlockedAddress(httpx.RequestError):
+    """The request goes to an internal or invalid address (reported as "address not allowed")."""
+
+
 def _block_internal(request: httpx.Request) -> None:
     """SSRF protection: applies to the first request AND every redirect, so a
     page cannot redirect to a private or link-local address (e.g. 169.254.x)."""
     if request.url.scheme not in ("http", "https") or not _host_is_public(request.url.host):
-        raise httpx.RequestError("Interne oder ungueltige Adresse blockiert", request=request)
+        raise _BlockedAddress("Interne oder ungueltige Adresse blockiert", request=request)
 
 
 def _client() -> httpx.Client:
@@ -639,7 +643,7 @@ def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]
         with _client().stream("GET", url, timeout=timeout) as resp:
             blocked = resp.status_code in _BLOCKED and settings.fetch_fallback
             if not blocked:
-                if resp.status_code >= 400:
+                if not resp.is_success:
                     _note_failure(f"HTTP {resp.status_code}")
                     return None
                 ctype = resp.headers.get("content-type", "")
@@ -659,6 +663,9 @@ def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]
     except httpx.TimeoutException:
         _note_failure("timeout")
         return None
+    except _BlockedAddress:
+        _note_failure("address not allowed")
+        return None
     except httpx.HTTPError as exc:
         _note_failure(f"network error ({type(exc).__name__})")
         return None
@@ -666,12 +673,17 @@ def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]
     # Chrome-TLS-Profil nachladen (gemessen 14.10.: +4,7 % der Trefferseiten lesbar).
     remaining = deadline - time.monotonic()
     if remaining < 0.3:
-        _note_failure("timeout")
-        return None
+        return None  # no time for the retry: the block status noted above stays
     blocked_status = fetch_failure()
     html = _fetch_url_curl(url, remaining, limit)
     if html is None and blocked_status:
-        _note_failure(f"{blocked_status}, also after retry")
+        retry = fetch_failure()
+        blocked_again = (retry or "").startswith("HTTP ") and (retry or "")[5:8].isdigit() \
+            and int(retry[5:8]) in _BLOCKED
+        if blocked_again:
+            _note_failure(f"{blocked_status}, also after retry")
+        elif retry and retry != blocked_status:
+            _note_failure(f"{blocked_status}, retry: {retry}")
     return html
 
 

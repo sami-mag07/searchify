@@ -36,6 +36,16 @@ def test_document_carries_json_ld_and_meta():
     assert "description" not in s["meta"]  # plain meta names stay in the document fields
 
 
+def test_nan_and_infinity_in_json_ld_stay_valid_json():
+    html = ('<html><head><script type="application/ld+json">{"@type":"Product","name":"X",'
+            '"offers":{"price":NaN,"priceCurrency":"EUR"},"weight":Infinity}</script></head>'
+            "<body><p>" + "word " * 80 + "</p></body></html>")
+    doc = reader.reader_document(html, "https://a.example/", "text")
+    json.dumps(doc, allow_nan=False)  # raises on nan / inf
+    assert doc["structured"]["json_ld"][0]["offers"]["price"] is None
+    assert doc.get("product", {}).get("price") != "nan"
+
+
 def test_document_without_structured_data_leaves_the_key_out():
     doc = reader.reader_document("<html><body><p>Just a paragraph of text here.</p></body></html>", "", "text")
     assert "structured" not in doc
@@ -59,12 +69,21 @@ def test_fetch_failure_reason_resets_per_fetch(monkeypatch):
 
 
 def test_static_documents_carry_stage(monkeypatch):
+    html = "<html><body><article><p>" + "word " * 80 + "</p></article></body></html>"
+    assert reader.reader_document(html, "https://a.example/", "text")["stage"] == "static"
+    from searchify.extract import pdf as pdf_mod
+
+    pdf_doc = pdf_mod._document("https://a.example/x.pdf", {"title": "T", "content": "Text", "page_count": 1})
+    assert pdf_doc["stage"] == "static"
+
+
+def test_read_pages_does_not_touch_the_cached_documents(monkeypatch):
     doc = {"url": "https://a.example/", "content": " ".join(["word"] * 60)}
-    monkeypatch.setattr(pages, "read_pages", lambda *a, **k: ([dict(doc)], []))
+    monkeypatch.setattr(pages, "read_pages", lambda *a, **k: ([doc], []))
     monkeypatch.setattr(reader.render_mod, "enabled", lambda: False)
     monkeypatch.setattr(reader.stealth_mod, "enabled", lambda: False)
     docs, failed = reader.read_pages(["https://a.example/"], "text")
-    assert docs[0]["stage"] == "static" and failed == []
+    assert "stage" not in doc and failed == []
 
 
 def test_service_extract_returns_failed_with_reasons(monkeypatch):
@@ -75,7 +94,7 @@ def test_service_extract_returns_failed_with_reasons(monkeypatch):
 
     ok = {"url": "https://a.example/", "title": "A", "content": "text", "stage": "static"}
     monkeypatch.setattr(service, "read_pages_ex",
-                        lambda urls, fmt, timeout=None: ([ok], [{"url": "https://b.example/", "error": "HTTP 403", "static": {"x": 1}}], {}))
+                        lambda urls, fmt, timeout=None, **_: ([ok], [{"url": "https://b.example/", "error": "HTTP 403", "static": {"x": 1}}], {}))
     out = TestClient(service.app).post("/extract", json={"urls": ["https://a.example/", "https://b.example/"]}).json()
     assert out["results"] == [ok]
     assert out["failed"] == [{"url": "https://b.example/", "error": "HTTP 403"}]
@@ -87,13 +106,13 @@ def test_search_report_tells_rate_limit_from_no_hits(monkeypatch):
     search_pkg = sys.modules["searchify.search"]
 
     def limited(q, n, **f):
-        raise SearchBackendError("ddgs error: RatelimitException")
+        raise SearchBackendError("rate_limited: ddgs DDGSException")
 
     monkeypatch.setattr(search_pkg, "BACKENDS", {"duckduckgo": limited})
     monkeypatch.setattr(search_pkg, "_chain", lambda: ["duckduckgo"])
     monkeypatch.setattr(search_pkg, "get_settings", lambda: type("S", (), {"tavily_api_key": ""})())
     r = search_report("anything")
-    assert r == {"results": [], "error": "duckduckgo: ddgs error: RatelimitException", "backend": None,
+    assert r == {"results": [], "error": "duckduckgo: rate_limited: ddgs DDGSException", "backend": None,
                  "errors": [{"engine": "duckduckgo", "reason": "rate_limited"}]}
 
     monkeypatch.setattr(search_pkg, "BACKENDS", {"duckduckgo": lambda q, n, **f: []})
@@ -112,9 +131,9 @@ def test_service_search_reports_backend_error(monkeypatch):
 
     from searchify import service
 
-    monkeypatch.setattr(service, "search_report", lambda q, n, backend=None, **f: {"results": [], "error": "duckduckgo: ddgs error: RatelimitException", "backend": None})
+    monkeypatch.setattr(service, "search_report", lambda q, n, backend=None, **f: {"results": [], "error": "duckduckgo: rate_limited: ddgs DDGSException", "backend": None})
     out = TestClient(service.app).post("/search", json={"query": "q"}).json()
-    assert out["results"] == [] and "Ratelimit" in out["error"]
+    assert out["results"] == [] and "rate_limited" in out["error"]
 
 
 def test_cli_search_shows_backend_error(monkeypatch):

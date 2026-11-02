@@ -93,6 +93,10 @@ LANGUAGE_REGION: Dict[str, str] = {
 }
 
 
+# ISO country codes DuckDuckGo spells differently.
+_COUNTRY_ALIAS: Dict[str, str] = {"gb": "uk", "sa": "xa"}
+
+
 def is_region(code: str) -> bool:
     """True for a well-formed code that DuckDuckGo knows."""
     return bool(_FORMAT.match(code)) and code in DDG_REGIONS
@@ -115,6 +119,9 @@ def ddg_region(language: Optional[str] = None, country: Optional[str] = None) ->
             return lang
         lang, _, tail = lang.partition("-")
         cc = cc or tail
+    cc = _COUNTRY_ALIAS.get(cc, cc)
+    if lang == "zh" and cc in ("tw", "hk"):  # DuckDuckGo calls traditional Chinese "tzh"
+        lang = "tzh"
     for code in (f"{cc}-{lang}",):
         if is_region(code):
             return code

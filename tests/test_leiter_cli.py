@@ -27,6 +27,7 @@ def seen(monkeypatch):
     got = {}
 
     def fake(urls, fmt, timeout=None, progress=None, **kw):
+        assert kw.pop("structured", False) is False  # raw structured stays opt-in
         got.clear()
         got.update(kw)
         return [{"url": urls[0], "title": "T", "content": "body"}], [], {}

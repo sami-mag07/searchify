@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 
 from .extract import read_pages_ex
 from .passages import passages as best_passages
-from .reasons import code_for, extract_header, parse_search_error, search_header, status_for
+from .reasons import code_for, extract_header, search_header, status_for
 from .search import SearchBackendError, search_report
 
 app = FastAPI(title="searchify", description="Local-first web search and clean extraction")
@@ -42,6 +42,7 @@ class ExtractRequest(BaseModel):
     max_stage: Optional[Literal["plain", "tls", "browser", "stealth"]] = None
     budget: Optional[Literal["low", "normal", "high"]] = None
     cloud_fallback: Optional[bool] = None
+    structured: bool = False
 
 
 class PassagesRequest(SearchRequest):
@@ -62,7 +63,7 @@ STATUS_HEADER = "X-Searchify-Status"  # fixed codes only, never exception text
 
 @app.post("/search")
 def search_endpoint(req: SearchRequest, response: Response) -> dict:
-    """Hits, plus ``error`` (the last backend error, or null) and ``backend`` (the
+    """Hits, plus ``error`` (the first backend error, or null) and ``backend`` (the
     one that answered), so an empty list can be told from a rate limit. When the
     list is empty because a backend failed, ``status: {reason, engine}`` names the
     fixed code and the engine. The header X-Searchify-Status lists every backend
@@ -70,7 +71,7 @@ def search_endpoint(req: SearchRequest, response: Response) -> dict:
     filters = req.model_dump(exclude={"query", "max_results", "backend"}, exclude_none=True)
     report = search_report(req.query, req.max_results, backend=req.backend, **filters)
     body = {"results": report["results"], "error": report["error"], "backend": report["backend"]}
-    errors = report.get("errors") or ([parse_search_error(report["error"])] if report["error"] else [])
+    errors = report.get("errors") or []
     if errors:
         header = search_header(errors)
         if header:
@@ -90,9 +91,10 @@ def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
     ``detail`` every failed entry also carries its reason code. The header
     X-Searchify-Status repeats the reason counts. ``max_stage`` (plain, tls, browser,
     stealth), ``budget`` (low, normal, high) and ``cloud_fallback`` limit the load of
-    this request; a trimmed page carries ``truncated: true``."""
+    this request; a trimmed page carries ``truncated: true``. The raw ``structured``
+    block comes only with ``structured: true``."""
     limits = req.model_dump(include={"max_stage", "budget", "cloud_fallback"}, exclude_none=True)
-    docs, failed, thin = read_pages_ex(req.urls, req.fmt, **limits)
+    docs, failed, thin = read_pages_ex(req.urls, req.fmt, structured=req.structured, **limits)
     body = {
         "results": docs,
         "failed": [
@@ -112,7 +114,7 @@ def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
 
 @app.post("/passages")
 def passages_endpoint(req: PassagesRequest) -> dict:
-    filters = req.model_dump(include={"language", "time_range", "include_domains",
+    filters = req.model_dump(include={"language", "country", "time_range", "include_domains",
                                       "exclude_domains"}, exclude_none=True)
     try:
         found = best_passages(req.query, req.max_results, top_k=req.top_k,

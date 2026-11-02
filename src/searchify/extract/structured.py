@@ -41,7 +41,7 @@ def jsonld_items(tree):
         raw = (script.text or "").strip()
         raw = raw.replace("<![CDATA[", "").replace("]]>", "")
         try:
-            data = json.loads(raw)
+            data = json.loads(raw, parse_constant=lambda _c: None)  # NaN/Infinity -> null
         except ValueError:
             continue  # kaputer block einfach weiter
 

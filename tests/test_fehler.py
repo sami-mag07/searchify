@@ -29,6 +29,7 @@ def test_read_one_replaces_a_broken_extract_pool(monkeypatch):
 # ------------------------------------------------------------ reason codes
 import json
 import sys
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -63,7 +64,7 @@ def test_reason_code_mapping(text, code):
 
 
 def test_search_errors_map_to_codes_without_exception_text():
-    assert reasons.parse_search_error("duckduckgo: ddgs error: RatelimitException") == {
+    assert reasons.parse_search_error("duckduckgo: rate_limited: ddgs DDGSException") == {
         "engine": "duckduckgo", "reason": "rate_limited"}
     assert reasons.parse_search_error("serper: Serper error 429: slow down") == {
         "engine": "serper", "reason": "rate_limited"}
@@ -123,7 +124,9 @@ def test_thin_page_counts_as_read_but_thin_without_touching_the_document(monkeyp
     assert thin == {url: "challenge"}
     assert "reason" not in docs[0] and "thin" not in docs[0]
     cached = cache.get(f"reader-text|{url}")
-    assert set(cached) == set(docs[0])  # no extra key landed in the shared entry
+    # no extra key landed in the shared entry: exactly the document keys of the reader
+    assert set(cached) == {"url", "title", "published", "author", "description", "content",
+                           "links", "stage"}
 
     report = extract_report([url], "text")
     assert report["status"] == {"read": 1, "failed": 0, "thin": 1, "reasons": {"challenge": 1}}
@@ -169,17 +172,37 @@ def _clean_pipeline(monkeypatch):
     monkeypatch.setattr(htmltext, "fetch_url", fetch)
 
 
-def test_golden_extract_body_is_unchanged_on_full_success(monkeypatch):
+GOLDEN = Path(__file__).parent / "golden"  # bytes written once by the code of commit 4cf8206
+GOLDEN_URLS = ["https://good.example/a", "https://good.example/b"]
+
+
+def _golden_pipeline(monkeypatch):
+    html = (GOLDEN / "page.html").read_text()
     _clean_pipeline(monkeypatch)
-    urls = ["https://good.example/a", "https://good.example/b"]
-    old_docs, old_failed = reader.read_pages(urls, "text")  # the unchanged public function
-    assert old_failed == []
-    expected = json.dumps({"results": old_docs, "failed": []}, ensure_ascii=False,
-                          allow_nan=False, separators=(",", ":")).encode()
-    resp = client.post("/extract", json={"urls": urls})
+    monkeypatch.setattr(htmltext, "fetch_url", lambda url, timeout=None, max_bytes=None: html)
+
+
+def test_golden_extract_body_is_unchanged_on_full_success(monkeypatch):
+    _golden_pipeline(monkeypatch)
+    resp = client.post("/extract", json={"urls": GOLDEN_URLS})
     assert resp.status_code == 200
-    assert resp.content == expected  # byte for byte what the endpoint returned before
+    assert resp.content == (GOLDEN / "extract_ok.json").read_bytes()
     assert "x-searchify-status" not in resp.headers
+
+
+def test_golden_cli_extract_output_is_unchanged(monkeypatch):
+    from typer.testing import CliRunner
+
+    _golden_pipeline(monkeypatch)
+    result = CliRunner().invoke(cli.app, ["extract", *GOLDEN_URLS])
+    assert result.exit_code == 0
+    assert result.stdout == (GOLDEN / "cli_extract_ok.json").read_text()
+
+
+def test_golden_search_body_is_unchanged_on_success(monkeypatch):
+    hits = [{"title": "Eiffel Tower", "url": "https://a.com", "content": "In Paris.", "engine": "x"}]
+    resp = _search(monkeypatch, {"results": hits, "error": None, "backend": "x"})
+    assert resp.content == (GOLDEN / "search_ok.json").read_bytes()
 
 
 def test_extract_status_appears_only_when_something_went_wrong(monkeypatch):
@@ -195,7 +218,7 @@ def test_extract_status_appears_only_when_something_went_wrong(monkeypatch):
 
 def test_status_header_never_carries_free_text(monkeypatch):
     evil = {"url": "https://x.example/", "error": "boom\r\nX-Evil: 1", "reason": "x\r\nX-Evil: 1"}
-    monkeypatch.setattr(service, "read_pages_ex", lambda urls, fmt, timeout=None: ([], [evil], {}))
+    monkeypatch.setattr(service, "read_pages_ex", lambda urls, fmt, timeout=None, **_: ([], [evil], {}))
     resp = client.post("/extract", json={"urls": ["https://x.example/"]})
     assert resp.status_code == 200
     assert "x-evil" not in resp.headers
@@ -209,11 +232,11 @@ def _search(monkeypatch, report):
 
 def test_search_status_only_for_an_empty_list_after_a_backend_error(monkeypatch):
     err = [{"engine": "duckduckgo", "reason": "rate_limited"}]
-    empty = _search(monkeypatch, {"results": [], "error": "duckduckgo: ddgs error: RatelimitException",
+    empty = _search(monkeypatch, {"results": [], "error": "duckduckgo: rate_limited: ddgs DDGSException",
                                   "backend": None, "errors": err})
     assert empty.json()["status"] == {"reason": "rate_limited", "engine": "duckduckgo"}
     assert empty.headers["x-searchify-status"] == "duckduckgo=rate_limited"
-    assert "Ratelimit" not in empty.headers["x-searchify-status"]
+    assert "DDGS" not in empty.headers["x-searchify-status"]
 
     hit = [{"title": "t", "url": "https://x", "content": "", "engine": "searxng"}]
     fallback = _search(monkeypatch, {"results": hit, "error": None, "backend": "searxng", "errors": err})
@@ -268,10 +291,21 @@ def test_cli_extract_prints_no_ticker_when_piped(monkeypatch):
 
     seen = {}
 
-    def fake(urls, fmt, timeout=None, progress=None):
+    def fake(urls, fmt, timeout=None, progress=None, **_):
         seen["progress"] = progress
         return [], [{"url": "https://b.com", "error": "HTTP 429"}], {}
     monkeypatch.setattr(sys.modules["searchify.extract"], "read_pages_ex", fake)
     result = CliRunner().invoke(cli.app, ["extract", "https://b.com"])
     assert seen["progress"] is None  # CliRunner is no TTY
     assert json.loads(result.stdout)["failed"][0]["reason"] == "rate_limited"
+
+
+def test_leading_code_of_a_ddgs_error_is_read():
+    from searchify.search import error_code
+
+    assert reasons.code_for("rate_limited: ddgs DDGSException", default="unavailable") == "rate_limited"
+    assert reasons.code_for("timeout: ddgs DDGSException", default="unavailable") == "timeout"
+    assert reasons.code_for("error: ddgs DDGSException", default="unavailable") == "unavailable"
+    assert error_code("duckduckgo: rate_limited: ddgs DDGSException") == "rate_limited"
+    assert error_code("duckduckgo: error: ddgs DDGSException") == "error"
+    assert error_code("searxng: SearXNG unreachable: ConnectError") is None
