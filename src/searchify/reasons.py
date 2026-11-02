@@ -13,7 +13,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 REASONS = (
     "blocked", "rate_limited", "unavailable", "timeout", "not_html", "too_large",
     "address_blocked", "no_main_text", "extract_failed", "thin_content", "challenge",
-    "pdf_encrypted", "pdf_no_text", "pdf_too_large",
+    "pdf_encrypted", "pdf_no_text", "pdf_too_large", "not_found",
 )
 
 _HTTP_RE = re.compile(r"^HTTP (\d{3})")
@@ -47,6 +47,8 @@ def _status_code(status: int) -> str:
         return "rate_limited"
     if status in (401, 403, 451):
         return "blocked"
+    if status in (404, 410):  # the page is gone, not the server
+        return "not_found"
     return "unavailable"
 
 

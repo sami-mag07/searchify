@@ -44,7 +44,7 @@ from searchify.extract import reader
     ("HTTP 403, also after retry", "blocked"),
     ("HTTP 429", "rate_limited"),
     ("HTTP 503", "unavailable"),
-    ("HTTP 404", "unavailable"),
+    ("HTTP 404", "not_found"),
     ("timeout", "timeout"),
     ("Zeitlimit", "timeout"),
     ("Extraktion zu langsam", "timeout"),
@@ -310,3 +310,10 @@ def test_leading_code_of_a_ddgs_error_is_read():
     assert error_code("duckduckgo: rate_limited: ddgs DDGSException") == "rate_limited"
     assert error_code("duckduckgo: error: ddgs DDGSException") == "error"
     assert error_code("searxng: SearXNG unreachable: ConnectError") is None
+
+
+@pytest.mark.parametrize("text, code", [("HTTP 404", "not_found"), ("HTTP 410", "not_found"),
+                                        ("HTTP 503", "unavailable"), ("HTTP 403", "blocked")])
+def test_a_missing_page_is_not_found_not_unavailable(text, code):
+    assert reasons.code_for(text) == code
+
