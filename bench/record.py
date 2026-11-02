@@ -60,10 +60,13 @@ def main() -> None:
     ap.add_argument("--gap", type=float, default=4.0, help="Seconds between searches.")
     ap.add_argument("--limit", type=int, default=0, help="Only the first N questions.")
     ap.add_argument("--until", default="", help="Stop recording at HH:MM and keep what is there.")
+    ap.add_argument("--reverse", action="store_true", help="Last question first (a second recorder).")
     args = ap.parse_args()
     end = stop_at(args.until)
     backend = os.environ.get("BENCH_BACKEND", "duckduckgo")
     queries = load_queries(args.split)[: args.limit or None]
+    if args.reverse:
+        queries.reverse()
     missing = 0
     for i, q in enumerate(queries, 1):
         for form in FORMS:

@@ -180,6 +180,10 @@ def options(d: Data) -> Dict[str, List]:
 
 
 def deadline(args) -> float:
+    """--hours, else --until; a file out/until.txt (HH:MM) overrides both for a running night."""
+    override = OUT / "until.txt"
+    if override.exists():
+        return stop_at(override.read_text(encoding="utf-8").strip())
     return time.time() + args.hours * 3600 if args.hours else stop_at(args.until)
 
 
@@ -292,9 +296,12 @@ def main() -> None:
     ap.add_argument("--max-configs", type=int, default=0)
     ap.add_argument("--report-only", action="store_true")
     args = ap.parse_args()
-    queries = load_queries("all")
+    # only questions recorded in both query forms count; a cut-short night must not
+    # read as "the answer was never found"
+    queries = [q for q in load_queries("all") if all(recorded_hits(f, q["id"]) for f in FORMS)]
     dev = [q for q in queries if q["split"] == "dev"]
     test = [q for q in queries if q["split"] == "test"]
+    log("loop.questions", dev=len(dev), test=len(test))
     d = Data(queries, load_models())
     seen = {}
     if args.report_only:
