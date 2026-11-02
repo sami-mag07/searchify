@@ -33,6 +33,16 @@ def test_language_and_country_fallback():
     assert ddg_region("en") == "us-en" and ddg_region("de") == "de-de"
 
 
+@pytest.mark.parametrize("lang,country,region", [
+    ("en", "GB", "uk-en"), ("en-GB", None, "uk-en"), ("en_gb", None, "uk-en"), ("en", "UK", "uk-en"),
+    ("ar", "SA", "xa-ar"), ("ar-SA", None, "xa-ar"),
+    ("zh", "TW", "tw-tzh"), ("zh-TW", None, "tw-tzh"), ("zh", "HK", "hk-tzh"), ("zh-HK", None, "hk-tzh"),
+    ("zh", "CN", "cn-zh"), ("zh", None, "cn-zh"), ("zh-CN", None, "cn-zh"),
+])
+def test_country_aliases_for_duckduckgo(lang, country, region):
+    assert ddg_region(lang, country) == region
+
+
 def test_ready_region_code_and_garbage():
     assert ddg_region("be-nl") == "be-nl"
     assert ddg_region("nl_BE") == "be-nl"
