@@ -84,7 +84,7 @@ searchify passages "How tall is the Eiffel Tower?" -k 3 --per-site 1
 Output is JSON by default (`{"results": [...]}`, errors as `{"error": ...}` with exit code 1),
 so agents and scripts can parse it. A search that found nothing because every backend failed
 (a DuckDuckGo rate limit, an unreachable SearXNG) reports that error instead of an empty list. Add `--no-json` for a readable view. `search` takes
-`-n`, `--backend`, `--language`, `--time-range`, `--include-domain` and `--exclude-domain`;
+`-n`, `--backend`, `--language`, `--country` (with `--language nl` DuckDuckGo gets `nl-nl`, with `--country BE` `be-nl`; no language means worldwide, `any` too), `--time-range`, `--include-domain` and `--exclude-domain`;
 `extract` takes `--format text|markdown` and several URLs. `passages` takes the search options
 plus `-k` (passages to return), `--per-site`, `--max-chars` and `--rerank/--no-rerank`; it
 reranks by default when the `rerank` extra is installed.
