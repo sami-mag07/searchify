@@ -28,7 +28,11 @@ def extract(urls: List[str], fmt: str = "text", timeout: Optional[float] = None)
 # Stand: 24.10.2026
 
 
-def extract_report(urls: List[str], fmt: str = "text", timeout: Optional[float] = None) -> Dict:
+def extract_report(
+    urls: List[str], fmt: str = "text", timeout: Optional[float] = None,
+    *, max_stage: Optional[str] = None, budget: Optional[str] = None,
+    cloud_fallback: Optional[bool] = None, use_profile: bool = True,
+) -> Dict:
     """Like `extract`, but says what happened: ``{"results", "failed", "status"}``.
 
     ``results`` are the clean pages, exactly as `extract` returns them. ``failed``
@@ -37,8 +41,20 @@ def extract_report(urls: List[str], fmt: str = "text", timeout: Optional[float] 
     not_html, too_large, address_blocked, no_main_text, extract_failed). ``status`` is
     ``{read, failed, thin, reasons: {code: n}}``; ``thin`` counts delivered pages that
     carry little text (thin_content or challenge) and is part of ``read``.
+
+    ``max_stage`` (plain, tls, browser, stealth), ``budget`` (low, normal, high) and
+    ``cloud_fallback`` limit the load for this call. What a call leaves out comes from
+    the user profile (``searchify config``) unless ``use_profile=False``, then from
+    today's defaults; everything stays below the operator cap SEARCHIFY_MAX_STAGE.
     """
-    docs, failed, thin = read_pages_ex(list(urls), fmt, timeout)
+    from .. import limits as limits_mod  # noqa: PLC0415
+    from .. import profile as profile_mod  # noqa: PLC0415
+
+    got = limits_mod.detail(max_stage, budget, cloud_fallback,
+                            profile_mod.load() if use_profile else None)
+    # only what was really set travels on; the operator cap is applied again further down
+    kwargs = {name: value for name, (value, source) in got.items() if source in ("request", "profile")}
+    docs, failed, thin = read_pages_ex(list(urls), fmt, timeout, **kwargs)
     failed = [{"url": f.get("url"), "error": f.get("error"),
                "reason": f.get("reason") or code_for(f.get("error"))} for f in failed]
     return {"results": docs, "failed": failed, "status": status_for(len(docs), failed, thin.values())}

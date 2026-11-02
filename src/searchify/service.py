@@ -9,7 +9,7 @@ Needs the optional extra: ``pip install "searchify[api]"``.
 """
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from fastapi import FastAPI, Response
 from pydantic import BaseModel, Field
@@ -37,6 +37,11 @@ class ExtractRequest(BaseModel):
     urls: List[str]
     fmt: str = "text"
     detail: bool = False
+    # Limits for this request only. They stay below the operator cap SEARCHIFY_MAX_STAGE.
+    # The service never reads a user profile.
+    max_stage: Optional[Literal["plain", "tls", "browser", "stealth"]] = None
+    budget: Optional[Literal["low", "normal", "high"]] = None
+    cloud_fallback: Optional[bool] = None
 
 
 class PassagesRequest(SearchRequest):
@@ -83,8 +88,11 @@ def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
     ``status: {read, failed, thin, reasons: {code: n}}`` appears only when a page
     failed or came back thin; after a clean run the body has no ``status``. With
     ``detail`` every failed entry also carries its reason code. The header
-    X-Searchify-Status repeats the reason counts."""
-    docs, failed, thin = read_pages_ex(req.urls, req.fmt)
+    X-Searchify-Status repeats the reason counts. ``max_stage`` (plain, tls, browser,
+    stealth), ``budget`` (low, normal, high) and ``cloud_fallback`` limit the load of
+    this request; a trimmed page carries ``truncated: true``."""
+    limits = req.model_dump(include={"max_stage", "budget", "cloud_fallback"}, exclude_none=True)
+    docs, failed, thin = read_pages_ex(req.urls, req.fmt, **limits)
     body = {
         "results": docs,
         "failed": [
