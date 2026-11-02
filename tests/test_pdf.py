@@ -381,6 +381,11 @@ def test_non_pdf_types_cost_one_request_only(site, monkeypatch):
     assert sorted(HITS) == ["/x.json", "/x.png", "/x.zip"]  # no second GET
 
 
+def test_pdf_document_has_no_empty_structured_block():
+    doc = pdf_mod._document("https://a.example/x.pdf", {"title": "T", "content": "Text", "page_count": 1})
+    assert "structured" not in doc and doc["page_count"] == 1
+
+
 @pytest.mark.parametrize("ctype", ["application/x-pdf", "binary/octet-stream", "application/download",
                                    "application/force-download"])
 def test_pdf_like_types_still_get_the_second_look(site, monkeypatch, ctype):
