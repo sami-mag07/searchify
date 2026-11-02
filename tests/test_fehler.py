@@ -27,6 +27,7 @@ def test_read_one_replaces_a_broken_extract_pool(monkeypatch):
 
 
 # ------------------------------------------------------------ reason codes
+# ruff: noqa: E402 - the reason-code tests were appended to this file with their own imports
 import json
 import sys
 from pathlib import Path

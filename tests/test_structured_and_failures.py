@@ -87,7 +87,7 @@ def test_read_pages_does_not_touch_the_cached_documents(monkeypatch):
 
 
 def test_service_extract_returns_failed_with_reasons(monkeypatch):
-    fastapi = pytest.importorskip("fastapi")
+    pytest.importorskip("fastapi")
     from fastapi.testclient import TestClient
 
     from searchify import service

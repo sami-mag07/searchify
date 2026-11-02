@@ -19,7 +19,7 @@ from typing import Callable, Dict, Mapping, Optional, TextIO, Tuple
 
 from . import profile
 from .limits import BUDGETS, STAGES
-from .search.regions import DDG_REGIONS, ddg_region, is_region
+from .search.regions import DDG_REGIONS, ddg_region
 
 CI_VARS = ("CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "JENKINS_URL", "TF_BUILD")
 LATER = {"later", "spaeter", "später"}

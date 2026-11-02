@@ -1,6 +1,5 @@
 """Das rohe `structured` ist opt-in: Standardausgabe waechst nicht, der Cache bleibt heil."""
 import json
-import sys
 
 import pytest
 
