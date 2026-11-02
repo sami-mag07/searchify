@@ -58,17 +58,23 @@ class _Ticker:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._shown = False
+        self._closed = False
+        self._last = 0
 
     def update(self, done: int, total: int, read: int, reasons: Dict[str, int]) -> None:
         parts = [f"reading {done}/{total}", f"{read} read"]
         parts += [f"{n} {_SHORT.get(code, code)}" for code, n in sorted(reasons.items())]
         with self._lock:
+            if self._closed or done < self._last:  # after clear(), or an older snapshot
+                return
+            self._last = done
             sys.stderr.write("\r\x1b[K" + " \u00b7 ".join(parts))
             sys.stderr.flush()
             self._shown = True
 
     def clear(self) -> None:
         with self._lock:
+            self._closed = True
             if self._shown:
                 sys.stderr.write("\r\x1b[K")
                 sys.stderr.flush()
