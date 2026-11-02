@@ -11,11 +11,12 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from pydantic import BaseModel, Field
 
-from .extract import read_pages
+from .extract import read_pages_ex
 from .passages import passages as best_passages
+from .reasons import code_for, extract_header, parse_search_error, search_header, status_for
 from .search import SearchBackendError, search_report
 
 app = FastAPI(title="searchify", description="Local-first web search and clean extraction")
@@ -34,6 +35,7 @@ class SearchRequest(BaseModel):
 class ExtractRequest(BaseModel):
     urls: List[str]
     fmt: str = "text"
+    detail: bool = False
 
 
 class PassagesRequest(SearchRequest):
@@ -49,21 +51,54 @@ def health() -> dict:
     return {"status": "ok"}
 
 
+STATUS_HEADER = "X-Searchify-Status"  # fixed codes only, never exception text
+
+
 @app.post("/search")
-def search_endpoint(req: SearchRequest) -> dict:
+def search_endpoint(req: SearchRequest, response: Response) -> dict:
     """Hits, plus ``error`` (the last backend error, or null) and ``backend`` (the
-    one that answered), so an empty list can be told from a rate limit."""
+    one that answered), so an empty list can be told from a rate limit. When the
+    list is empty because a backend failed, ``status: {reason, engine}`` names the
+    fixed code and the engine. The header X-Searchify-Status lists every backend
+    that failed, also when a fallback still delivered."""
     filters = req.model_dump(exclude={"query", "max_results", "backend"}, exclude_none=True)
     report = search_report(req.query, req.max_results, backend=req.backend, **filters)
-    return {"results": report["results"], "error": report["error"], "backend": report["backend"]}
+    body = {"results": report["results"], "error": report["error"], "backend": report["backend"]}
+    errors = report.get("errors") or ([parse_search_error(report["error"])] if report["error"] else [])
+    if errors:
+        header = search_header(errors)
+        if header:
+            response.headers[STATUS_HEADER] = header
+        if not report["results"]:
+            last = errors[-1]
+            body["status"] = {"reason": last["reason"], "engine": last["engine"]}
+    return body
 
 
 @app.post("/extract")
-def extract_endpoint(req: ExtractRequest) -> dict:
+def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
     """Clean pages under ``results`` (each with ``stage``: static, browser,
-    browser-direct, stealth or tavily) and the rest under ``failed`` with a reason."""
-    docs, failed = read_pages(req.urls, req.fmt)
-    return {"results": docs, "failed": [{"url": f.get("url"), "error": f.get("error")} for f in failed]}
+    browser-direct, stealth or tavily) and the rest under ``failed`` with a reason.
+    ``status: {read, failed, thin, reasons: {code: n}}`` appears only when a page
+    failed or came back thin; after a clean run the body has no ``status``. With
+    ``detail`` every failed entry also carries its reason code. The header
+    X-Searchify-Status repeats the reason counts."""
+    docs, failed, thin = read_pages_ex(req.urls, req.fmt)
+    body = {
+        "results": docs,
+        "failed": [
+            {"url": f.get("url"), "error": f.get("error"),
+             **({"reason": f.get("reason") or code_for(f.get("error"))} if req.detail else {})}
+            for f in failed
+        ],
+    }
+    if failed or thin:
+        status = status_for(len(docs), failed, thin.values())
+        body["status"] = status
+        header = extract_header(status["reasons"])
+        if header:
+            response.headers[STATUS_HEADER] = header
+    return body
 
 
 @app.post("/passages")

@@ -7,7 +7,10 @@ for a human-readable view.
 from __future__ import annotations
 
 import json
-from typing import List, Optional
+import os
+import sys
+import threading
+from typing import Dict, List, Optional
 
 import typer
 
@@ -30,6 +33,46 @@ def _fail(message: str, as_json: bool, **extra) -> None:
     else:
         typer.secho(f"error: {message}", fg=typer.colors.RED, err=True)
     raise typer.Exit(1)
+
+
+_CI_VARS = ("CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "JENKINS_URL", "TF_BUILD")
+_SHORT = {"rate_limited": "rate limited", "address_blocked": "address blocked",
+          "no_main_text": "no text", "extract_failed": "unreadable", "not_html": "not HTML",
+          "too_large": "too large"}
+
+
+def _ticker_allowed(quiet: bool) -> bool:
+    """A person at a terminal only: stdin and stderr are TTYs, no CI variable, not --quiet.
+    Agents and pipes never see the ticker, because their stderr goes to the model or a file."""
+    if quiet or any(os.environ.get(v) for v in _CI_VARS):
+        return False
+    try:
+        return sys.stdin.isatty() and sys.stderr.isatty()
+    except (AttributeError, ValueError):
+        return False
+
+
+class _Ticker:
+    """One line on stderr that overwrites itself: ``reading 7/10 · 5 read · 2 blocked``."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._shown = False
+
+    def update(self, done: int, total: int, read: int, reasons: Dict[str, int]) -> None:
+        parts = [f"reading {done}/{total}", f"{read} read"]
+        parts += [f"{n} {_SHORT.get(code, code)}" for code, n in sorted(reasons.items())]
+        with self._lock:
+            sys.stderr.write("\r\x1b[K" + " \u00b7 ".join(parts))
+            sys.stderr.flush()
+            self._shown = True
+
+    def clear(self) -> None:
+        with self._lock:
+            if self._shown:
+                sys.stderr.write("\r\x1b[K")
+                sys.stderr.flush()
+                self._shown = False
 
 
 @app.command()
@@ -76,15 +119,28 @@ def search(
 def extract(
     urls: List[str] = typer.Argument(..., help="One or more page addresses."),
     fmt: str = typer.Option("text", "--format", "-f", help="text or markdown."),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="No progress line on stderr."),
     as_json: bool = JSON_OPT,
 ) -> None:
-    """Fetch pages and print their clean article text."""
+    """Fetch pages and print their clean article text.
+
+    Each failed page comes with "error" (text) and "reason" (a fixed code such as
+    blocked, rate_limited, timeout). At an interactive terminal a progress line
+    shows on stderr; pipes, agents and CI never get one.
+    """
     if fmt not in ("text", "markdown"):
         _fail(f"unknown format {fmt!r}, use text or markdown", as_json)
-    from .extract import read_pages
+    from .extract import read_pages_ex
+    from .reasons import code_for
 
-    docs, failed = read_pages(urls, fmt)
-    failed = [{"url": f.get("url"), "error": f.get("error")} for f in failed]
+    ticker = _Ticker() if _ticker_allowed(quiet) else None
+    try:
+        docs, failed, _thin = read_pages_ex(urls, fmt, progress=ticker.update if ticker else None)
+    finally:
+        if ticker:
+            ticker.clear()
+    failed = [{"url": f.get("url"), "error": f.get("error"),
+               "reason": f.get("reason") or code_for(f.get("error"))} for f in failed]
     if as_json:
         _emit({"results": docs, "failed": failed})
     else:

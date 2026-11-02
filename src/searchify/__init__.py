@@ -16,14 +16,14 @@ API key; cloud providers are an optional fallback, off unless you set their key.
 """
 from __future__ import annotations
 
-from .extract import extract, extract_document, extract_main_text, extract_page, read_pages
+from .extract import extract, extract_document, extract_report, extract_main_text, extract_page, read_pages
 from .passages import passages
 from .rerank import rerank, score
 from .search import SearchBackendError, search
 
 __all__ = [
     "search", "extract", "rerank", "passages", "score", "read_pages",
-    "extract_document", "extract_main_text", "extract_page", "SearchBackendError",
+    "extract_report", "extract_document", "extract_main_text", "extract_page", "SearchBackendError",
 ]
 __version__ = "0.2.0"
 # Stand: 02.11.2026

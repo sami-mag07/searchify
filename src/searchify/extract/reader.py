@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 from . import htmltext as extract_mod
 from . import pages as pages_mod
@@ -515,16 +515,21 @@ def forget(urls: List[str], fmt: str) -> None:
     pages_mod.forget(urls, fmt, prefix=_PREFIX)
 
 
-def read_pages(
+def read_pages_ex(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
-) -> Tuple[List[Dict], List[Dict]]:
-    """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB)."""
+    progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
+) -> Tuple[List[Dict], List[Dict], Dict[str, str]]:
+    """Wie `read_pages`, plus ein Wörterbuch {url: grund} der gelieferten Seiten,
+    die nur duennen Text haben ("gelesen, aber duenn": thin_content oder challenge).
+    Das Dokument selbst und der geteilte Cache-Eintrag bleiben unveraendert, der
+    Grund wird neben ihnen mitgefuehrt. Fehlschlaege tragen `reason`."""
     fmt = "markdown" if fmt == "markdown" else "text"
     deadline = time.monotonic() + timeout if timeout else None
     docs, failed = pages_mod.read_pages(
         urls, fmt, timeout, extractor=reader_document, cache_prefix=_PREFIX,
-        max_bytes=READER_MAX_BYTES,
+        max_bytes=READER_MAX_BYTES, progress=progress,
     )
+    thin_map: Dict[str, str] = {}
     for d in docs:
         d.setdefault("stage", "static")  # which rung of the ladder produced the page
     if render_mod.enabled() or stealth_mod.enabled():
@@ -533,11 +538,21 @@ def read_pages(
         thin = [d for d in docs if _poor(d.get("content") or "")]
         if thin:
             docs = [d for d in docs if d not in thin]
-            failed = failed + [{"url": d.get("url"), "error": "Zu wenig Text", "static": d} for d in thin]
+            failed = failed + [{"url": d.get("url"), "error": "Zu wenig Text",
+                                "reason": _thin_code(d.get("content") or ""), "static": d}
+                               for d in thin]
         if failed:
-            docs, failed = _render_failed(docs, failed, fmt, urls, deadline)
+            docs, failed = _render_failed(docs, failed, fmt, urls, deadline, thin=thin_map)
     if failed and get_settings().tavily_api_key:
         docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline)
+    return docs, failed, thin_map
+
+
+def read_pages(
+    urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
+) -> Tuple[List[Dict], List[Dict]]:
+    """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB)."""
+    docs, failed, _thin = read_pages_ex(urls, fmt, timeout)
     return docs, failed
 
 
@@ -598,9 +613,15 @@ def _poor(content: str) -> bool:
     return n < RENDER_MIN_WORDS or (n < 300 and bool(_CHALLENGE_RE.search(content)))
 
 
+def _thin_code(content: str) -> str:
+    """challenge (Bot-Schutz-Text) oder thin_content (schlicht zu wenig Text)."""
+    n = _words(content)
+    return "challenge" if n < 300 and _CHALLENGE_RE.search(content or "") else "thin_content"
+
+
 def _render_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
-    deadline: Optional[float] = None,
+    deadline: Optional[float] = None, thin: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Reserve-Stufen fuer Fehlschlaege, jede nur, wenn die vorige scheitert:
     Stufe 2 rendert im geteilten Browser (alle Anfragen ueber httpx), Stufe 3 laesst
@@ -608,7 +629,8 @@ def _render_failed(
     Stufe 4 ist Camoufox (stealth.py), hoechstens einmal je Anfrage.
     Bot-Schutz-Seiten (Challenge-Text, kaum Woerter) zaehlen weiter als Fehler.
     Mit `deadline` (monotonic, aus x-timeout) bekommt jede Stufe nur die Restzeit;
-    ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen."""
+    ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen.
+    Behaelt eine Seite nur ihren duennen statischen Text, steht ihr Grund in `thin`."""
     still: List[Dict] = []
     tried = 0  # echte Render-Versuche (Zeitlimit-Fehler und belegter Platz zaehlen nicht)
     stealth_tried = 0
@@ -622,6 +644,8 @@ def _render_failed(
         static = fail.pop("static", None)
         if static and (static.get("content") or "").strip():
             docs.append(static)  # duenner Text ist besser als nichts
+            if thin is not None and fail.get("url"):
+                thin[fail["url"]] = _thin_code(static.get("content") or "")
         else:
             still.append(fail)
 

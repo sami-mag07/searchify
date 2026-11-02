@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 
 from ..config import get_settings
+from ..reasons import code_for
 from ._common import SearchBackendError
 from .cloud import serper_search, tavily_search
 from .duckduckgo import ddgs_search
@@ -43,12 +44,16 @@ def search_report(query: str, max_results: int = 10, *, backend: Optional[str] =
 
     ``backend`` names the backend that answered (None when nothing did), and
     ``error`` is the last backend error, so a rate limit or an unreachable
-    instance is told apart from a query that simply has no hits.
+    instance is told apart from a query that simply has no hits. If any backend
+    failed, ``errors`` lists ``{engine, reason}`` per failure (reason is a fixed code
+    such as rate_limited or timeout), also when a later backend still delivered. The
+    key is absent when nothing failed.
     """
     chain = [backend] if backend else _chain()
     if not backend and get_settings().tavily_api_key and "tavily" not in chain:
         chain.append("tavily")
     last_error: Optional[str] = None
+    errors: List[Dict[str, str]] = []
     for name in chain:
         fn = BACKENDS.get(name)
         if fn is None:
@@ -56,11 +61,18 @@ def search_report(query: str, max_results: int = 10, *, backend: Optional[str] =
         try:
             hits = fn(query, max_results, **filters)
             if hits:
-                return {"results": hits, "error": None, "backend": name}
+                done: Dict[str, object] = {"results": hits, "error": None, "backend": name}
+                if errors:
+                    done["errors"] = errors
+                return done
         except SearchBackendError as exc:
             last_error = f"{name}: {exc}"
+            errors.append({"engine": name, "reason": code_for(str(exc), default="unavailable")})
             continue
-    return {"results": [], "error": last_error, "backend": None}
+    failed: Dict[str, object] = {"results": [], "error": last_error, "backend": None}
+    if errors:
+        failed["errors"] = errors
+    return failed
 
 
 def search(query: str, max_results: int = 10, *, backend: Optional[str] = None,

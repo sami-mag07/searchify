@@ -74,8 +74,8 @@ def test_service_extract_returns_failed_with_reasons(monkeypatch):
     from searchify import service
 
     ok = {"url": "https://a.example/", "title": "A", "content": "text", "stage": "static"}
-    monkeypatch.setattr(service, "read_pages",
-                        lambda urls, fmt, timeout=None: ([ok], [{"url": "https://b.example/", "error": "HTTP 403", "static": {"x": 1}}]))
+    monkeypatch.setattr(service, "read_pages_ex",
+                        lambda urls, fmt, timeout=None: ([ok], [{"url": "https://b.example/", "error": "HTTP 403", "static": {"x": 1}}], {}))
     out = TestClient(service.app).post("/extract", json={"urls": ["https://a.example/", "https://b.example/"]}).json()
     assert out["results"] == [ok]
     assert out["failed"] == [{"url": "https://b.example/", "error": "HTTP 403"}]
@@ -93,7 +93,8 @@ def test_search_report_tells_rate_limit_from_no_hits(monkeypatch):
     monkeypatch.setattr(search_pkg, "_chain", lambda: ["duckduckgo"])
     monkeypatch.setattr(search_pkg, "get_settings", lambda: type("S", (), {"tavily_api_key": ""})())
     r = search_report("anything")
-    assert r == {"results": [], "error": "duckduckgo: ddgs error: RatelimitException", "backend": None}
+    assert r == {"results": [], "error": "duckduckgo: ddgs error: RatelimitException", "backend": None,
+                 "errors": [{"engine": "duckduckgo", "reason": "rate_limited"}]}
 
     monkeypatch.setattr(search_pkg, "BACKENDS", {"duckduckgo": lambda q, n, **f: []})
     r = search_report("anything")
