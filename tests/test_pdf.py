@@ -350,3 +350,42 @@ def test_pdf_failures_get_their_own_reason_code(code):
     from searchify.reasons import REASONS, code_for
     assert code in REASONS and code_for(code) == code
 
+
+def test_big_non_pdf_is_not_called_pdf_too_large(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    monkeypatch.setattr(pdf_mod, "MAX_BYTES", 1000)
+    ROUTES["/v.mp4"] = ("video/mp4", b"\x00\x00\x00\x18ftypmp42" + b"0" * 5000)
+    ROUTES["/big.bin"] = ("application/octet-stream", b"PK\x03\x04" + b"0" * 5000)
+    docs, failed = pages_mod.read_pages([site + "/v.mp4", site + "/big.bin"])
+    errors = {f["url"]: (f["error"], f["reason"]) for f in failed}
+    assert docs == []
+    assert errors[site + "/v.mp4"] == ("not HTML: video/mp4", "not_html")
+    assert errors[site + "/big.bin"] == ("not HTML: application/octet-stream", "not_html")
+
+
+def test_big_pdf_behind_a_wrong_type_is_still_too_large(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    monkeypatch.setattr(pdf_mod, "MAX_BYTES", 1000)
+    ROUTES["/dl"] = ("application/octet-stream", b"%PDF-1.4\n" + b"0" * 5000)
+    docs, failed = pages_mod.read_pages([site + "/dl"])
+    assert docs == [] and failed[0]["error"] == "pdf_too_large"
+
+
+def test_non_pdf_types_cost_one_request_only(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    ROUTES["/x.png"] = ("image/png", b"\x89PNG\r\n\x1a\n" + b"0" * 200)
+    ROUTES["/x.json"] = ("application/json", b'{"a": 1}')
+    ROUTES["/x.zip"] = ("application/zip", b"PK\x03\x04" + b"0" * 100)
+    docs, failed = pages_mod.read_pages([site + "/x.png", site + "/x.json", site + "/x.zip"])
+    assert docs == [] and len(failed) == 3
+    assert sorted(HITS) == ["/x.json", "/x.png", "/x.zip"]  # no second GET
+
+
+@pytest.mark.parametrize("ctype", ["application/x-pdf", "binary/octet-stream", "application/download",
+                                   "application/force-download"])
+def test_pdf_like_types_still_get_the_second_look(site, monkeypatch, ctype):
+    _fresh_cache(monkeypatch)
+    ROUTES["/f"] = (ctype, make_pdf(["Text hinter dem Typ"]))
+    docs, failed = pages_mod.read_pages([site + "/f"])
+    assert failed == [] and "Text hinter" in docs[0]["content"]
+
