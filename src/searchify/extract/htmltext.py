@@ -417,6 +417,9 @@ _CLIENT: Optional[httpx.Client] = None
 _POOL: Optional[ThreadPoolExecutor] = None
 
 
+_SIZED_FIELDS = ("content", "title", "author", "description")
+
+
 class PageCache:
     """Extrahierte Seitentexte im Speicher (LRU + TTL), threadsicher.
 
@@ -434,11 +437,13 @@ class PageCache:
 
     @staticmethod
     def _size(value) -> int:
-        """Grobe Groesse in Zeichen: Text bzw. content + Links eines Dokuments."""
+        """Grobe Groesse in Zeichen: Text bzw. content, Titel, Autor, Beschreibung und
+        Links eines Dokuments (ein 8-MB-PDF-Titel zaehlte vorher 0, Security-Review 03.11.2026)."""
         if isinstance(value, str):
             return len(value)
         if isinstance(value, dict):
-            return len(value.get("content") or "") + 120 * len(value.get("links") or [])
+            text = sum(len(v) for v in (value.get(k) for k in _SIZED_FIELDS) if isinstance(v, str))
+            return text + 120 * len(value.get("links") or [])
         if isinstance(value, list):
             return 120 * len(value)
         return 0

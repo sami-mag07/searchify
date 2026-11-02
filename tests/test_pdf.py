@@ -122,6 +122,14 @@ def _chatty_child(conn, data, max_pages, max_chars):
     conn.close()
 
 
+def _huge_child(conn, data, max_pages, max_chars):
+    # a child gone wrong: an answer far above anything the real worker sends
+    try:
+        conn.send(("ok", {"title": "T", "page_count": 1, "content": "x" * 3_000_000, "truncated": False}))
+    except OSError:
+        pass  # the parent refused it and closed the pipe
+
+
 # ---------------------------------------------------------------- tests
 
 
@@ -277,6 +285,32 @@ def test_result_larger_than_a_pipe_is_read_before_the_join(site, monkeypatch):
     ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
     docs, failed = pages_mod.read_pages([site + "/a.pdf"])
     assert failed == [] and len(docs[0]["content"]) == 600_000
+
+
+def test_title_and_author_are_capped(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    # make_pdf writes << /Title (...) >>: the ") /Author (" smuggles in a second entry
+    ROUTES["/meta.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"],
+                                                       title="T" * 50_000 + ") /Author (" + "A" * 50_000))
+    docs, failed = pages_mod.read_pages([site + "/meta.pdf"])
+    assert failed == []
+    assert docs[0]["title"] == "T" * 300
+    assert docs[0]["author"] == "A" * 300
+
+
+def test_cache_size_counts_title_author_and_description():
+    doc = {"content": "x", "title": "T" * 1000, "author": "A" * 10, "description": "D" * 100,
+           "published": "2026-11-03", "links": [{"text": "a", "url": "https://a.example/"}]}
+    assert h.PageCache._size(doc) == 1 + 1000 + 10 + 100 + 120
+
+
+def test_an_oversized_answer_from_the_child_is_refused(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    monkeypatch.setattr(pdf_mod, "_TARGET", _huge_child)
+    monkeypatch.setattr(pdf_mod, "EXTRACT_TIMEOUT_S", 10)
+    ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
+    docs, failed = pages_mod.read_pages([site + "/a.pdf"])
+    assert docs == [] and failed[0]["error"] == "extract_failed"
 
 
 def test_at_most_two_pdfs_at_once(site, monkeypatch):

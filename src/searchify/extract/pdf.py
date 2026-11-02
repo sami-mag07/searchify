@@ -27,6 +27,7 @@ from __future__ import annotations
 import importlib.util
 import logging
 import multiprocessing
+import pickle
 import re
 import sys
 import threading
@@ -47,6 +48,10 @@ MAX_PARALLEL = 2
 MAX_PAGES = 50
 MAX_CHARS = 60_000
 MIN_TEXT_CHARS = 10  # less than this on all read pages = a scan without a text layer
+MAX_META_CHARS = 300  # title and author; an 8 MB /Title used to arrive whole
+# Largest answer the parent accepts from a child: MAX_CHARS of text at up to 6 bytes
+# per character (JSON escapes) plus title and author fit many times over.
+MAX_REPLY_BYTES = 1 << 20
 _SNIFF = 1024  # the PDF header may follow a few junk bytes, the spec allows 1024
 
 _SLOTS = threading.BoundedSemaphore(MAX_PARALLEL)
@@ -198,8 +203,8 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
             conn.send(("err", "pdf_no_text"))
             return
         conn.send(("ok", {
-            "title": (meta.get("Title") or "").strip(),
-            "author": (meta.get("Author") or "").strip() or None,
+            "title": (meta.get("Title") or "").strip()[:MAX_META_CHARS],
+            "author": (meta.get("Author") or "").strip()[:MAX_META_CHARS] or None,
             "page_count": total,
             "content": "\n\n".join(parts),
             "truncated": truncated,
@@ -244,9 +249,10 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
         if not recv_end.poll(EXTRACT_TIMEOUT_S):
             return None, "timeout"
         try:
-            result = recv_end.recv()
+            # bounded: a child gone wrong cannot hand the parent an answer of any size
+            result = pickle.loads(recv_end.recv_bytes(maxlength=MAX_REPLY_BYTES))
         except (EOFError, OSError):
-            return None, "extract_failed"  # child died without an answer
+            return None, "extract_failed"  # child died without an answer, or one too large
     finally:
         recv_end.close()
         if proc.pid is not None:
@@ -261,8 +267,9 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
 
 
 def _document(url: str, info: Dict) -> Dict:
-    title = info.get("title") or _title_from_url(url)
-    doc = htmltext._doc(url, {"title": title, "author": info.get("author")}, info["content"], [])
+    title = (info.get("title") or "")[:MAX_META_CHARS] or _title_from_url(url)
+    author = (info.get("author") or "")[:MAX_META_CHARS] or None
+    doc = htmltext._doc(url, {"title": title, "author": author}, info["content"], [])
     doc["page_count"] = info["page_count"]
     doc["stage"] = "static"
     if info.get("truncated"):
