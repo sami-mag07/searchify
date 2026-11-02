@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- PDFs are read as normal documents (extra `pdf`, `pip install "searchify[pdf]"`, pypdfium2): up to 20 MB, 50 pages and 60,000 characters, with `[Seite N]` markers and `page_count`, text extraction in its own process per PDF. Failures say `pdf_encrypted`, `pdf_no_text` or `pdf_too_large` and skip the browser stages. Without the extra nothing changes.
 - Every extracted page carries `structured` (its JSON-LD blocks and namespaced meta tags, untouched) and `stage` (static, browser, browser-direct, stealth or tavily).
 - Failures say why: `fetch_failure()` records the reason of the last fetch (`HTTP 403, also after retry`, `not HTML: application/pdf`, `timeout`, ...), the HTTP service returns a `failed` list next to `results`, and `search_report()` tells a backend error (rate limit, unreachable instance) apart from a query with no hits. `/search` and the CLI report that error.
 - `passages(query)`: search, read the top pages and return the paragraphs that answer the query, best first, with their source URLs. Also as `searchify passages` on the command line and `POST /passages` in the HTTP service.

@@ -37,6 +37,7 @@ rerank = ["sentence-transformers>=3.0"]
 browser = ["playwright>=1.44"]
 stealth = ["camoufox>=0.4"]
 api = ["fastapi>=0.110", "uvicorn>=0.29", "pydantic>=2.6"]
+pdf = ["pypdfium2>=5.14,<6"]
 mcp = ["mcp>=2.3,<3; python_version >= '3.10'"]
 dev = ["pytest>=8.0"]
 

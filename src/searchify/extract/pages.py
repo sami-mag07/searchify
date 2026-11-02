@@ -15,6 +15,7 @@ from concurrent.futures import wait
 from typing import Callable, Dict, List, Optional, Tuple
 
 from . import htmltext as extract_mod
+from . import pdf as pdf_mod
 from .config import get_settings
 
 # Dedicated, bounded pool for reading pages, so large read jobs (many URLs,
@@ -41,6 +42,12 @@ def _read_one(
     if cached:
         return cached, None
     html = extract_mod.fetch_url(url, timeout, max_bytes)
+    pdf = pdf_mod.read_if_pdf(url, html, extract_mod.fetch_failure())  # None unless a PDF
+    if pdf:
+        doc, err = pdf
+        if doc:
+            _docs().put(key, doc)
+        return doc, err
     if not html:
         return None, extract_mod.fetch_failure() or "page could not be loaded"
     try:

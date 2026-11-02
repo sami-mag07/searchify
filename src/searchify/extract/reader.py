@@ -21,6 +21,7 @@ from typing import Dict, List, Optional, Tuple
 
 from . import htmltext as extract_mod
 from . import pages as pages_mod
+from . import pdf as pdf_mod
 from . import render as render_mod
 from . import stealth as stealth_mod
 from ..config import get_settings
@@ -633,7 +634,8 @@ def _render_failed(
         return None
 
     for fail in failed:
-        if fail.get("error") == "Zeitlimit" or rest(RENDER_TIMEOUT_S) < RENDER_MIN_REST_S:
+        if (fail.get("error") == "Zeitlimit" or pdf_mod.is_pdf_failure(fail)
+                or rest(RENDER_TIMEOUT_S) < RENDER_MIN_REST_S):
             give_up(fail)
             continue
         doc = None
