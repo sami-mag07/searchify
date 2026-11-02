@@ -98,13 +98,17 @@ def _fetch(method: str, url: str, headers: Dict[str, str], body: Optional[bytes]
     ohne Redirects zu folgen. None = blockiert oder Netzfehler."""
     if not url_allowed(url):
         return None
+    # only encodings iter_decoded can decode with an output cap (compression bomb)
+    headers = {k: v for k, v in headers.items() if k.lower() != "accept-encoding"}
+    headers["accept-encoding"] = extract_mod.ACCEPT_ENCODING
     try:
         with extract_mod._client().stream(method, url, headers=headers, content=body,
                                           follow_redirects=False, timeout=8.0) as resp:
             data = bytearray()
-            for part in resp.iter_bytes():
+            for part in extract_mod.iter_decoded(resp):
                 data.extend(part)
                 if len(data) >= _MAX_BODY:
+                    del data[_MAX_BODY:]
                     break
             return resp.status_code, dict(resp.headers), bytes(data)
     except Exception:  # noqa: BLE001 - blockiert (intern) oder Netzfehler
