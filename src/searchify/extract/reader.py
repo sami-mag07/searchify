@@ -499,6 +499,7 @@ def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
     # htmldate den Baum veraendern darf.
     meta = _reader_metadata(html, url, tree)
     doc = extract_mod._doc(url, meta, content, links)
+    doc["stage"] = "static"  # which rung of the ladder produced the page
     if structured["json_ld"] or structured["meta"]:  # leere Seiten bleiben so klein wie vorher
         doc["structured"] = structured
     try:
@@ -542,8 +543,6 @@ def read_pages_ex(
         max_bytes=READER_MAX_BYTES, progress=progress,
     )
     thin_map: Dict[str, str] = {}
-    for d in docs:
-        d.setdefault("stage", "static")  # which rung of the ladder produced the page
     if render_mod.enabled() or stealth_mod.enabled():
         # Duenne Ergebnisse (JS-Huelle, "Skip to main content", Challenge-Seite) zaehlen
         # fuer die Stufen wie Fehler; scheitern alle, bleibt der statische Text.

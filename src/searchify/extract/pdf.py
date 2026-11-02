@@ -257,6 +257,7 @@ def _document(url: str, info: Dict) -> Dict:
     title = info.get("title") or _title_from_url(url)
     doc = htmltext._doc(url, {"title": title, "author": info.get("author")}, info["content"], [])
     doc["page_count"] = info["page_count"]
+    doc["stage"] = "static"
     if info.get("truncated"):
         doc["truncated"] = True
     return doc

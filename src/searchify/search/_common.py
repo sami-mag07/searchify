@@ -9,9 +9,6 @@ class SearchBackendError(RuntimeError):
     """Raised when a search backend is unreachable or returns nothing usable."""
 
 
-# Map a language code to a DuckDuckGo region. "wt-wt" means no region.
-DDGS_REGION = {"en": "us-en", "de": "de-de", "es": "es-es", "fr": "fr-fr"}
-
 # Map a language code to a Google country code for the cloud backend.
 COUNTRY_FOR_LANG = {"en": "us", "de": "de", "es": "es", "fr": "fr"}
 

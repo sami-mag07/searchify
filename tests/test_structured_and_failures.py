@@ -69,12 +69,21 @@ def test_fetch_failure_reason_resets_per_fetch(monkeypatch):
 
 
 def test_static_documents_carry_stage(monkeypatch):
+    html = "<html><body><article><p>" + "word " * 80 + "</p></article></body></html>"
+    assert reader.reader_document(html, "https://a.example/", "text")["stage"] == "static"
+    from searchify.extract import pdf as pdf_mod
+
+    pdf_doc = pdf_mod._document("https://a.example/x.pdf", {"title": "T", "content": "Text", "page_count": 1})
+    assert pdf_doc["stage"] == "static"
+
+
+def test_read_pages_does_not_touch_the_cached_documents(monkeypatch):
     doc = {"url": "https://a.example/", "content": " ".join(["word"] * 60)}
-    monkeypatch.setattr(pages, "read_pages", lambda *a, **k: ([dict(doc)], []))
+    monkeypatch.setattr(pages, "read_pages", lambda *a, **k: ([doc], []))
     monkeypatch.setattr(reader.render_mod, "enabled", lambda: False)
     monkeypatch.setattr(reader.stealth_mod, "enabled", lambda: False)
     docs, failed = reader.read_pages(["https://a.example/"], "text")
-    assert docs[0]["stage"] == "static" and failed == []
+    assert "stage" not in doc and failed == []
 
 
 def test_service_extract_returns_failed_with_reasons(monkeypatch):
