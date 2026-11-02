@@ -1,0 +1,157 @@
+{
+ "browser_only": {
+  "docs": [
+   {
+    "author": null,
+    "content": "wort0 wort1 wort2 wort3 wort4 wort5 wort6 wort7 wort8 wort9 wort10 wort11 wort12 wort13 wort14 wort15 wort16 wort17 wort18 wort19 wort20 wort21 wort22 wort23 wort24 wort25 wort26 wort27 wort28 wort29 wort30 wort31 wort32 wort33 wort34 wort35 wort36 wort37 wort38 wort39 wort40 wort41 wort42 wort43 wort44 wort45 wort46 wort47 wort48 wort49 wort50 wort51 wort52 wort53 wort54 wort55 wort56 wort57 wort58 wort59 wort60 wort61 wort62 wort63 wort64 wort65 wort66 wort67 wort68 wort69 wort70 wort71 wort72 wort73 wort74 wort75 wort76 wort77 wort78 wort79 wort80 wort81 wort82 wort83 wort84 wort85 wort86 wort87 wort88 wort89 wort90 wort91 wort92 wort93 wort94 wort95 wort96 wort97 wort98 wort99 wort100 wort101 wort102 wort103 wort104 wort105 wort106 wort107 wort108 wort109 wort110 wort111 wort112 wort113 wort114 wort115 wort116 wort117 wort118 wort119 wort120 wort121 wort122 wort123 wort124 wort125 wort126 wort127 wort128 wort129 wort130 wort131 wort132 wort133 wort134 wort135 wort136 wort137 wort138 wort139 wort140 wort141 wort142 wort143 wort144 wort145 wort146 wort147 wort148 wort149 wort150 wort151 wort152 wort153 wort154 wort155 wort156 wort157 wort158 wort159 wort160 wort161 wort162 wort163 wort164 wort165 wort166 wort167 wort168 wort169 wort170 wort171 wort172 wort173 wort174 wort175 wort176 wort177 wort178 wort179 wort180 wort181 wort182 wort183 wort184 wort185 wort186 wort187 wort188 wort189 wort190 wort191 wort192 wort193 wort194 wort195 wort196 wort197 wort198 wort199",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": "Artikel",
+    "url": "https://article.example/"
+   },
+   {
+    "author": null,
+    "content": "echt0 echt1 echt2 echt3 echt4 echt5 echt6 echt7 echt8 echt9 echt10 echt11 echt12 echt13 echt14 echt15 echt16 echt17 echt18 echt19 echt20 echt21 echt22 echt23 echt24 echt25 echt26 echt27 echt28 echt29 echt30 echt31 echt32 echt33 echt34 echt35 echt36 echt37 echt38 echt39 echt40 echt41 echt42 echt43 echt44 echt45 echt46 echt47 echt48 echt49 echt50 echt51 echt52 echt53 echt54 echt55 echt56 echt57 echt58 echt59 echt60 echt61 echt62 echt63 echt64 echt65 echt66 echt67 echt68 echt69 echt70 echt71 echt72 echt73 echt74 echt75 echt76 echt77 echt78 echt79 echt80 echt81 echt82 echt83 echt84 echt85 echt86 echt87 echt88 echt89 echt90 echt91 echt92 echt93 echt94 echt95 echt96 echt97 echt98 echt99 echt100 echt101 echt102 echt103 echt104 echt105 echt106 echt107 echt108 echt109 echt110 echt111 echt112 echt113 echt114 echt115 echt116 echt117 echt118 echt119",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "browser",
+    "title": "Gerendert",
+    "url": "https://wall.example/"
+   },
+   {
+    "author": null,
+    "content": "Just a moment... verifying you are human.",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": null,
+    "url": "https://stuck.example/"
+   }
+  ],
+  "failed": [
+   {
+    "error": "HTTP 403",
+    "reason": "blocked",
+    "url": "https://blocked.example/"
+   },
+   {
+    "error": "HTTP 403",
+    "reason": "blocked",
+    "url": "https://cloud.example/"
+   }
+  ],
+  "thin": {
+   "https://stuck.example/": "challenge"
+  }
+ },
+ "full": {
+  "docs": [
+   {
+    "author": null,
+    "content": "wort0 wort1 wort2 wort3 wort4 wort5 wort6 wort7 wort8 wort9 wort10 wort11 wort12 wort13 wort14 wort15 wort16 wort17 wort18 wort19 wort20 wort21 wort22 wort23 wort24 wort25 wort26 wort27 wort28 wort29 wort30 wort31 wort32 wort33 wort34 wort35 wort36 wort37 wort38 wort39 wort40 wort41 wort42 wort43 wort44 wort45 wort46 wort47 wort48 wort49 wort50 wort51 wort52 wort53 wort54 wort55 wort56 wort57 wort58 wort59 wort60 wort61 wort62 wort63 wort64 wort65 wort66 wort67 wort68 wort69 wort70 wort71 wort72 wort73 wort74 wort75 wort76 wort77 wort78 wort79 wort80 wort81 wort82 wort83 wort84 wort85 wort86 wort87 wort88 wort89 wort90 wort91 wort92 wort93 wort94 wort95 wort96 wort97 wort98 wort99 wort100 wort101 wort102 wort103 wort104 wort105 wort106 wort107 wort108 wort109 wort110 wort111 wort112 wort113 wort114 wort115 wort116 wort117 wort118 wort119 wort120 wort121 wort122 wort123 wort124 wort125 wort126 wort127 wort128 wort129 wort130 wort131 wort132 wort133 wort134 wort135 wort136 wort137 wort138 wort139 wort140 wort141 wort142 wort143 wort144 wort145 wort146 wort147 wort148 wort149 wort150 wort151 wort152 wort153 wort154 wort155 wort156 wort157 wort158 wort159 wort160 wort161 wort162 wort163 wort164 wort165 wort166 wort167 wort168 wort169 wort170 wort171 wort172 wort173 wort174 wort175 wort176 wort177 wort178 wort179 wort180 wort181 wort182 wort183 wort184 wort185 wort186 wort187 wort188 wort189 wort190 wort191 wort192 wort193 wort194 wort195 wort196 wort197 wort198 wort199",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": "Artikel",
+    "url": "https://article.example/"
+   },
+   {
+    "author": null,
+    "content": "echt0 echt1 echt2 echt3 echt4 echt5 echt6 echt7 echt8 echt9 echt10 echt11 echt12 echt13 echt14 echt15 echt16 echt17 echt18 echt19 echt20 echt21 echt22 echt23 echt24 echt25 echt26 echt27 echt28 echt29 echt30 echt31 echt32 echt33 echt34 echt35 echt36 echt37 echt38 echt39 echt40 echt41 echt42 echt43 echt44 echt45 echt46 echt47 echt48 echt49 echt50 echt51 echt52 echt53 echt54 echt55 echt56 echt57 echt58 echt59 echt60 echt61 echt62 echt63 echt64 echt65 echt66 echt67 echt68 echt69 echt70 echt71 echt72 echt73 echt74 echt75 echt76 echt77 echt78 echt79 echt80 echt81 echt82 echt83 echt84 echt85 echt86 echt87 echt88 echt89 echt90 echt91 echt92 echt93 echt94 echt95 echt96 echt97 echt98 echt99 echt100 echt101 echt102 echt103 echt104 echt105 echt106 echt107 echt108 echt109 echt110 echt111 echt112 echt113 echt114 echt115 echt116 echt117 echt118 echt119",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "browser",
+    "title": "Gerendert",
+    "url": "https://wall.example/"
+   },
+   {
+    "author": null,
+    "content": "echt0 echt1 echt2 echt3 echt4 echt5 echt6 echt7 echt8 echt9 echt10 echt11 echt12 echt13 echt14 echt15 echt16 echt17 echt18 echt19 echt20 echt21 echt22 echt23 echt24 echt25 echt26 echt27 echt28 echt29 echt30 echt31 echt32 echt33 echt34 echt35 echt36 echt37 echt38 echt39 echt40 echt41 echt42 echt43 echt44 echt45 echt46 echt47 echt48 echt49 echt50 echt51 echt52 echt53 echt54 echt55 echt56 echt57 echt58 echt59 echt60 echt61 echt62 echt63 echt64 echt65 echt66 echt67 echt68 echt69 echt70 echt71 echt72 echt73 echt74 echt75 echt76 echt77 echt78 echt79 echt80 echt81 echt82 echt83 echt84 echt85 echt86 echt87 echt88 echt89 echt90 echt91 echt92 echt93 echt94 echt95 echt96 echt97 echt98 echt99 echt100 echt101 echt102 echt103 echt104 echt105 echt106 echt107 echt108 echt109 echt110 echt111 echt112 echt113 echt114 echt115 echt116 echt117 echt118 echt119",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "stealth",
+    "title": "Gerendert",
+    "url": "https://blocked.example/"
+   },
+   {
+    "author": null,
+    "content": "Just a moment... verifying you are human.",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": null,
+    "url": "https://stuck.example/"
+   },
+   {
+    "author": null,
+    "content": "cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text cloud text",
+    "description": null,
+    "links": [],
+    "published": null,
+    "source": "tavily",
+    "stage": "tavily",
+    "title": null,
+    "url": "https://cloud.example/"
+   }
+  ],
+  "failed": [],
+  "thin": {
+   "https://stuck.example/": "challenge"
+  }
+ },
+ "static_only": {
+  "docs": [
+   {
+    "author": null,
+    "content": "wort0 wort1 wort2 wort3 wort4 wort5 wort6 wort7 wort8 wort9 wort10 wort11 wort12 wort13 wort14 wort15 wort16 wort17 wort18 wort19 wort20 wort21 wort22 wort23 wort24 wort25 wort26 wort27 wort28 wort29 wort30 wort31 wort32 wort33 wort34 wort35 wort36 wort37 wort38 wort39 wort40 wort41 wort42 wort43 wort44 wort45 wort46 wort47 wort48 wort49 wort50 wort51 wort52 wort53 wort54 wort55 wort56 wort57 wort58 wort59 wort60 wort61 wort62 wort63 wort64 wort65 wort66 wort67 wort68 wort69 wort70 wort71 wort72 wort73 wort74 wort75 wort76 wort77 wort78 wort79 wort80 wort81 wort82 wort83 wort84 wort85 wort86 wort87 wort88 wort89 wort90 wort91 wort92 wort93 wort94 wort95 wort96 wort97 wort98 wort99 wort100 wort101 wort102 wort103 wort104 wort105 wort106 wort107 wort108 wort109 wort110 wort111 wort112 wort113 wort114 wort115 wort116 wort117 wort118 wort119 wort120 wort121 wort122 wort123 wort124 wort125 wort126 wort127 wort128 wort129 wort130 wort131 wort132 wort133 wort134 wort135 wort136 wort137 wort138 wort139 wort140 wort141 wort142 wort143 wort144 wort145 wort146 wort147 wort148 wort149 wort150 wort151 wort152 wort153 wort154 wort155 wort156 wort157 wort158 wort159 wort160 wort161 wort162 wort163 wort164 wort165 wort166 wort167 wort168 wort169 wort170 wort171 wort172 wort173 wort174 wort175 wort176 wort177 wort178 wort179 wort180 wort181 wort182 wort183 wort184 wort185 wort186 wort187 wort188 wort189 wort190 wort191 wort192 wort193 wort194 wort195 wort196 wort197 wort198 wort199",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": "Artikel",
+    "url": "https://article.example/"
+   },
+   {
+    "author": null,
+    "content": "Just a moment... verifying you are human.",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": null,
+    "url": "https://wall.example/"
+   },
+   {
+    "author": null,
+    "content": "Just a moment... verifying you are human.",
+    "description": null,
+    "links": [],
+    "published": null,
+    "stage": "static",
+    "title": null,
+    "url": "https://stuck.example/"
+   }
+  ],
+  "failed": [
+   {
+    "error": "HTTP 403",
+    "reason": "blocked",
+    "url": "https://blocked.example/"
+   },
+   {
+    "error": "HTTP 403",
+    "reason": "blocked",
+    "url": "https://cloud.example/"
+   }
+  ],
+  "thin": {}
+ }
+}
