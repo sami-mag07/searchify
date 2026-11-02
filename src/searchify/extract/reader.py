@@ -339,7 +339,6 @@ def reader_links(tree, base_url: str = "", limit: int = MAX_LINKS) -> List[Dict[
     return extract_mod.extract_links(None, base_url, limit=limit, keep_self=True, tree=tree)
 
 
-_TRAIL_WS_RE = re.compile(r"[ \t]+\n")
 _BLANKS_RE = re.compile(r"\n{3,}")
 INLINE_WINDOW = 1500  # Anker-Text hoechstens so weit hinter der letzten Fundstelle suchen
 _ANCHOR_MAX = 200
@@ -483,7 +482,7 @@ def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
             pass
     if content:
         # Leerzeilen-Stapel (leere Formularfelder, Tabellen) wie beim Original auf eine
-        content = _BLANKS_RE.sub("\n\n", _TRAIL_WS_RE.sub("\n", content))
+        content = _BLANKS_RE.sub("\n\n", extract_mod.strip_line_ends(content))
     try:
         links = reader_links(tree, url)
     except Exception:  # noqa: BLE001

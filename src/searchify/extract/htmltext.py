@@ -35,6 +35,15 @@ from .config import get_settings
 log = logging.getLogger("rag-search")
 
 
+def strip_line_ends(text: str) -> str:
+    """Spaces and tabs before each line break removed, in linear time.
+
+    Same result as re.sub(r"[ \t]+\n", "\n", text), which backtracks quadratically on
+    a long run of spaces without a line break (40,000 spaces took 2 s)."""
+    lines = text.split("\n")
+    return "\n".join([line.rstrip(" \t") for line in lines[:-1]] + lines[-1:])
+
+
 def chunk_text(text: str, chunk_size: int = 350, overlap: int = 60) -> List[str]:
     """Teilt Text in sich ueberlappende Wort-Fenster.
 

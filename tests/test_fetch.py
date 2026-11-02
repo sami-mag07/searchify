@@ -67,4 +67,17 @@ def test_curl_fallback_ignores_proxies_from_the_environment(local_site, monkeypa
         monkeypatch.setenv(var, "http://127.0.0.1:9")  # nothing listens there
     monkeypatch.setattr(h, "_TLS", type(h._TLS)())     # fresh per-thread session
     assert h._fetch_url_curl(local_site, 5) == PAGE.decode()
+
+
+@pytest.mark.parametrize("text", ["x  \nfoo\t\t\n\n  bar \n", "end without break   ", "", "\n\n", " \t\n"])
+def test_strip_line_ends_matches_the_old_regex(text):
+    import re
+    assert h.strip_line_ends(text) == re.sub(r"[ \t]+\n", "\n", text)
+
+
+def test_strip_line_ends_is_linear_on_long_space_runs():
+    import time
+    t = time.perf_counter()
+    h.strip_line_ends("a" + " " * 200_000 + "b")
+    assert time.perf_counter() - t < 0.5  # the regex needed seconds for 40,000 spaces
 # Stand: 03.11.2026

@@ -61,7 +61,6 @@ _SNIFF = 1024  # the PDF header may follow a few junk bytes, the spec allows 102
 
 _SLOTS = threading.BoundedSemaphore(MAX_PARALLEL)
 _BLANKS = re.compile(r"\n{3,}")
-_TRAIL_WS = re.compile(r"[ \t]+\n")
 
 
 def available() -> bool:
@@ -192,7 +191,7 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
             page = doc[i]
             textpage = page.get_textpage()
             text = (textpage.get_text_range() or "").replace("\r\n", "\n").replace("\r", "\n")
-            text = _BLANKS.sub("\n\n", _TRAIL_WS.sub("\n", text)).strip()
+            text = _BLANKS.sub("\n\n", htmltext.strip_line_ends(text)).strip()
             textpage.close()
             page.close()
             if not text:
