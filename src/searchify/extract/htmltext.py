@@ -705,8 +705,16 @@ def warm_up() -> None:
         fut.result()
 
 
-def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], Dict]:
+def discard_extract_pool(pool: ProcessPoolExecutor) -> None:
+    """Einen abgestuerzten Pool verwerfen, damit der naechste Aufruf einen neuen
+    anlegt. Nur genau diesen Pool: ein schon neu angelegter bleibt."""
     global _EXTRACT_POOL
+    with _INIT_LOCK:
+        if _EXTRACT_POOL is pool:
+            _EXTRACT_POOL = None
+
+
+def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], Dict]:
     if _CLOSED:
         return None, [], {}
     pool = _extract_pool()
@@ -716,9 +724,7 @@ def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], 
         return None, [], {}  # pathologische Seite: nicht noch einmal im Thread rechnen
     except BrokenProcessPool:
         log.warning("Extraktions-Pool kaputt, wird neu angelegt")
-        with _INIT_LOCK:
-            if _EXTRACT_POOL is pool:  # nur den kaputten Pool verwerfen, nicht einen neuen
-                _EXTRACT_POOL = None
+        discard_extract_pool(pool)
         return extract_page(html, url)
     except RuntimeError:  # Pool nicht verfuegbar (z. B. beim Herunterfahren)
         return extract_page(html, url)
