@@ -498,7 +498,16 @@ def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
     # htmldate den Baum veraendern darf.
     meta = _reader_metadata(html, url, tree)
     doc = extract_mod._doc(url, meta, content, links)
-    doc["structured"] = structured
+    if structured["json_ld"] or structured["meta"]:  # leere Seiten bleiben so klein wie vorher
+        doc["structured"] = structured
+    try:
+        from .structured import product_from_items  # noqa: PLC0415
+
+        product = product_from_items(structured["json_ld"])  # aus dem schon geparsten JSON-LD
+    except Exception:  # noqa: BLE001 - Beiwerk
+        product = None
+    if product:
+        doc["product"] = product
     if title:
         doc["title"] = title
     return doc

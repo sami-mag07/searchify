@@ -289,6 +289,7 @@ print(answer.json())   # the clean text for each address
   `Product` with `offers.price`, `priceCurrency`, `availability` and `gtin13` comes out without
   any model reading the text; `structured.meta` holds the namespaced meta tags (`og:title`,
   `product:price:amount`, ...).
+- `product` appears only on product pages: `name`, `price`, `priceCurrency`, `availability`, `gtin` (list), `sku`, `brand`, taken from the page's JSON-LD (also inside `@graph`, with offers as list or `AggregateOffer`). `structured` is left out when the page has no JSON-LD and no namespaced meta.
 - `stage` says which rung read the page: `static`, `browser`, `browser-direct`, `stealth` or
   `tavily`.
 - `failed` lists each page that could not be read with a reason: `HTTP 403, also after retry`,
