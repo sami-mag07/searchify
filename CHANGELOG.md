@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Product pages carry a compact `product` (name, price, priceCurrency, availability, gtin list, sku, brand), read from the JSON-LD that is already parsed. Pages without a product get no `product`, and pages without any JSON-LD or namespaced meta no longer get an empty `structured`.
 - Every extracted page carries `structured` (its JSON-LD blocks and namespaced meta tags, untouched) and `stage` (static, browser, browser-direct, stealth or tavily).
 - Failures say why: `fetch_failure()` records the reason of the last fetch (`HTTP 403, also after retry`, `not HTML: application/pdf`, `timeout`, ...), the HTTP service returns a `failed` list next to `results`, and `search_report()` tells a backend error (rate limit, unreachable instance) apart from a query with no hits. `/search` and the CLI report that error.
 - `passages(query)`: search, read the top pages and return the paragraphs that answer the query, best first, with their source URLs. Also as `searchify passages` on the command line and `POST /passages` in the HTTP service.

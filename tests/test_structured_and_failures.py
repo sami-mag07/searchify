@@ -36,9 +36,9 @@ def test_document_carries_json_ld_and_meta():
     assert "description" not in s["meta"]  # plain meta names stay in the document fields
 
 
-def test_document_without_structured_data_has_empty_blocks():
-    s = reader.reader_document("<html><body><p>Just a paragraph of text here.</p></body></html>", "", "text")["structured"]
-    assert s == {"json_ld": [], "meta": {}}
+def test_document_without_structured_data_leaves_the_key_out():
+    doc = reader.reader_document("<html><body><p>Just a paragraph of text here.</p></body></html>", "", "text")
+    assert "structured" not in doc
 
 
 def test_fetch_failure_reason_is_reported(monkeypatch):
