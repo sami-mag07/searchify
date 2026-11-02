@@ -3,11 +3,14 @@
 Everything runs against a local server on 127.0.0.1; the SSRF check is patched to
 treat it as public only inside the fixture."""
 import gzip
+import socket
 import threading
+import time
 import tracemalloc
 import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import httpcore
 import pytest
 
 from searchify import reasons
@@ -167,3 +170,84 @@ def test_the_browser_proxy_caps_a_bomb_too(site, bombs, monkeypatch):
     assert got[0] == 200 and len(got[2]) == 100_000
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
     assert SEEN["/bomb"]["Accept-Encoding"] == h.ACCEPT_ENCODING
+
+
+# ---------------------------------------------------------------- overall deadline
+
+DRIP = b"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nX-Pad: aaaaaaaaaaaa\r\n\r\n<p>hi</p>"
+
+
+@pytest.fixture
+def dripping(monkeypatch):
+    """A server that sends its status line and headers one byte every 50 ms (3.5 s
+    in all): each gap is far below any read timeout."""
+    sock = socket.socket()
+    sock.bind(("127.0.0.1", 0))
+    sock.listen(8)
+    stop = threading.Event()
+
+    def drip(conn):
+        try:
+            conn.recv(65536)
+            for byte in DRIP:
+                if stop.is_set():
+                    return
+                conn.sendall(bytes([byte]))
+                time.sleep(0.05)
+        except OSError:
+            pass
+        finally:
+            conn.close()
+
+    def serve():
+        while not stop.is_set():
+            try:
+                conn, _ = sock.accept()
+            except OSError:
+                return
+            threading.Thread(target=drip, args=(conn,), daemon=True).start()
+
+    threading.Thread(target=serve, daemon=True).start()
+    monkeypatch.setattr(h, "_public_ips", lambda host: ["127.0.0.1"])
+    yield f"http://localhost:{sock.getsockname()[1]}"
+    stop.set()
+    sock.close()
+
+
+def test_dripped_headers_end_at_the_overall_timeout(dripping):
+    t = time.monotonic()
+    assert h.fetch_url(dripping + "/", timeout=0.8) is None
+    took = time.monotonic() - t
+    assert took < 1.6, f"a 0.8 s budget took {took:.1f} s"
+    assert h.fetch_failure() == "timeout"
+
+
+def test_dripped_headers_end_the_pdf_download_in_time(dripping, monkeypatch):
+    monkeypatch.setattr(pdf_mod, "DOWNLOAD_TIMEOUT_S", 0.8)
+    t = time.monotonic()
+    assert pdf_mod._download(dripping + "/x.pdf") == (None, "timeout")
+    took = time.monotonic() - t
+    assert took < 1.6, f"a 0.8 s budget took {took:.1f} s"
+
+
+def test_the_deadline_is_per_thread_and_restored():
+    assert getattr(h._TLS, "deadline", None) is None
+    with h.overall_deadline(5) as outer:
+        with h.overall_deadline(60) as inner:
+            assert inner == outer  # an inner call never extends the outer budget
+        assert h._TLS.deadline == outer
+    assert h._TLS.deadline is None
+
+
+def test_at_most_four_addresses_are_tried(monkeypatch):
+    tried = []
+
+    def refuse(self, host, port, timeout=None, local_address=None, socket_options=None):
+        tried.append(host)
+        raise httpcore.ConnectError("refused")
+
+    monkeypatch.setattr(httpcore.SyncBackend, "connect_tcp", refuse)
+    monkeypatch.setattr(h, "_public_ips", lambda host: [f"203.0.113.{i}" for i in range(1, 11)])
+    with pytest.raises(httpcore.ConnectError):
+        h._PinnedBackend().connect_tcp("many.example", 443, timeout=1)
+    assert tried == ["203.0.113.1", "203.0.113.2", "203.0.113.3", "203.0.113.4"]

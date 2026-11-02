@@ -102,8 +102,9 @@ def _fetch(method: str, url: str, headers: Dict[str, str], body: Optional[bytes]
     headers = {k: v for k, v in headers.items() if k.lower() != "accept-encoding"}
     headers["accept-encoding"] = extract_mod.ACCEPT_ENCODING
     try:
-        with extract_mod._client().stream(method, url, headers=headers, content=body,
-                                          follow_redirects=False, timeout=8.0) as resp:
+        with extract_mod.overall_deadline(8.0), \
+                extract_mod._client().stream(method, url, headers=headers, content=body,
+                                             follow_redirects=False, timeout=8.0) as resp:
             data = bytearray()
             for part in extract_mod.iter_decoded(resp):
                 data.extend(part)

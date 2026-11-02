@@ -108,8 +108,9 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
     try:
         # identity only: a compressed PDF gains nothing, and httpx would decode it
         # without an output cap (compression bomb, Security-Review 03.11.2026)
-        with htmltext._client().stream("GET", url, timeout=DOWNLOAD_TIMEOUT_S,
-                                       headers={"Accept-Encoding": "identity"}) as resp:
+        with htmltext.overall_deadline(DOWNLOAD_TIMEOUT_S), \
+                htmltext._client().stream("GET", url, timeout=DOWNLOAD_TIMEOUT_S,
+                                          headers={"Accept-Encoding": "identity"}) as resp:
             if resp.status_code >= 400:
                 return None
             if htmltext.content_encodings(resp):

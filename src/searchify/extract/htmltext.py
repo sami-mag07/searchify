@@ -539,6 +539,68 @@ def _host_is_public(host: str) -> bool:
     return bool(_public_ips(host))
 
 
+# The overall budget of one fetch (Security-Review 03.11.2026): httpx only knows a
+# timeout per read, and the body loop only checked the budget once the headers were
+# in. A server dripping 64 header bytes every 0.1 s held a 2 s budget for 6.4 s.
+# The caller sets a deadline for its thread (overall_deadline); every connect,
+# TLS handshake, read and write of the pinned client then gets at most the time left.
+_MAX_CONNECT_IPS = 4  # addresses tried per host, each with its own connect timeout
+
+
+class overall_deadline:  # noqa: N801 - used like a function: with overall_deadline(5): ...
+    """All network I/O of the pinned client in this thread ends `seconds` from now
+    (or at an earlier deadline already set) with a timeout error."""
+
+    __slots__ = ("_seconds", "_outer")
+
+    def __init__(self, seconds: float) -> None:
+        self._seconds = seconds
+
+    def __enter__(self) -> float:
+        self._outer = getattr(_TLS, "deadline", None)
+        deadline = time.monotonic() + self._seconds
+        _TLS.deadline = deadline if self._outer is None else min(self._outer, deadline)
+        return _TLS.deadline
+
+    def __exit__(self, *exc) -> None:
+        _TLS.deadline = self._outer
+
+
+def _time_left(timeout: Optional[float], error: type) -> Optional[float]:
+    deadline = getattr(_TLS, "deadline", None)
+    if deadline is None:
+        return timeout
+    left = deadline - time.monotonic()
+    if left <= 0:
+        raise error("overall time budget used up")
+    return left if timeout is None else min(timeout, left)
+
+
+class _DeadlineStream(httpcore.NetworkStream):
+    """A connection whose every step is capped by the deadline of the thread using it."""
+
+    def __init__(self, inner: httpcore.NetworkStream) -> None:
+        self._inner = inner
+
+    def read(self, max_bytes: int, timeout: Optional[float] = None) -> bytes:
+        return self._inner.read(max_bytes, _time_left(timeout, httpcore.ReadTimeout))
+
+    def write(self, buffer: bytes, timeout: Optional[float] = None) -> None:
+        self._inner.write(buffer, _time_left(timeout, httpcore.WriteTimeout))
+
+    def close(self) -> None:
+        self._inner.close()
+
+    def start_tls(self, ssl_context, server_hostname=None, timeout=None) -> "_DeadlineStream":
+        # Python bounds the whole handshake by the socket timeout, not each step
+        inner = self._inner.start_tls(ssl_context, server_hostname,
+                                      _time_left(timeout, httpcore.ConnectTimeout))
+        return _DeadlineStream(inner)
+
+    def get_extra_info(self, info: str):
+        return self._inner.get_extra_info(info)
+
+
 class _PinnedBackend(httpcore.SyncBackend):
     """Verbindet nur zu geprueften, oeffentlichen IPs (Schutz gegen DNS-Rebinding).
 
@@ -552,17 +614,20 @@ class _PinnedBackend(httpcore.SyncBackend):
         ips = _public_ips(host)
         if not ips:
             raise httpcore.ConnectError(f"Interne oder unaufloesbare Adresse blockiert: {host}")
-        # Wie socket.create_connection: alle gepruefte Adressen der Reihe nach,
-        # damit ein toter erster A-Record (oder IPv6 ohne Route) den Host nicht kippt.
+        # Wie socket.create_connection: gepruefte Adressen der Reihe nach, damit ein
+        # toter erster A-Record (oder IPv6 ohne Route) den Host nicht kippt. Hoechstens
+        # _MAX_CONNECT_IPS, sonst kosten 50 tote Records 50 Connect-Timeouts.
         last_error: Optional[Exception] = None
-        for ip in ips:
+        for ip in ips[:_MAX_CONNECT_IPS]:
             try:
-                return super().connect_tcp(
-                    ip, port, timeout=timeout, local_address=local_address,
-                    socket_options=socket_options,
+                stream = super().connect_tcp(
+                    ip, port, timeout=_time_left(timeout, httpcore.ConnectTimeout),
+                    local_address=local_address, socket_options=socket_options,
                 )
             except (httpcore.ConnectError, httpcore.ConnectTimeout) as exc:
                 last_error = exc
+                continue
+            return _DeadlineStream(stream)
         raise last_error  # type: ignore[misc]
 
 
@@ -748,9 +813,9 @@ def fetch_url(
 ) -> Optional[str]:
     """Fetch a URL and return its HTML text (or None on failure).
 
-    `timeout` applies to the whole download: httpx only counts per read step, so
-    a slow-dripping server could otherwise hold a worker indefinitely. `plain`
-    forces httpx and switches the Chrome-TLS fallback off, whatever FETCH_CLIENT
+    `timeout` applies to the whole download, headers included (overall_deadline):
+    httpx only counts per read step, so a slow-dripping server could otherwise hold
+    a worker indefinitely. `plain` forces httpx and switches the Chrome-TLS fallback off, whatever FETCH_CLIENT
     and FETCH_FALLBACK say (the ladder cap ``plain``); the search path never sets it.
     """
     settings = get_settings()
@@ -767,7 +832,7 @@ def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]
         return _fetch_url_curl(url, timeout, limit)
     deadline = time.monotonic() + timeout
     try:
-        with _client().stream("GET", url, timeout=timeout) as resp:
+        with overall_deadline(timeout), _client().stream("GET", url, timeout=timeout) as resp:
             blocked = resp.status_code in _BLOCKED and settings.fetch_fallback
             if not blocked:
                 if not resp.is_success:
