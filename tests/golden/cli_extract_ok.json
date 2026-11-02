@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "url": "https://good.example/a",
+      "title": null,
+      "published": null,
+      "author": null,
+      "description": null,
+      "content": "wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort",
+      "links": [],
+      "stage": "static"
+    },
+    {
+      "url": "https://good.example/b",
+      "title": null,
+      "published": null,
+      "author": null,
+      "description": null,
+      "content": "wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort wort",
+      "links": [],
+      "stage": "static"
+    }
+  ],
+  "failed": []
+}

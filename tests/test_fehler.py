@@ -29,6 +29,7 @@ def test_read_one_replaces_a_broken_extract_pool(monkeypatch):
 # ------------------------------------------------------------ reason codes
 import json
 import sys
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -123,7 +124,9 @@ def test_thin_page_counts_as_read_but_thin_without_touching_the_document(monkeyp
     assert thin == {url: "challenge"}
     assert "reason" not in docs[0] and "thin" not in docs[0]
     cached = cache.get(f"reader-text|{url}")
-    assert set(cached) == set(docs[0])  # no extra key landed in the shared entry
+    # no extra key landed in the shared entry: exactly the document keys of the reader
+    assert set(cached) == {"url", "title", "published", "author", "description", "content",
+                           "links", "stage"}
 
     report = extract_report([url], "text")
     assert report["status"] == {"read": 1, "failed": 0, "thin": 1, "reasons": {"challenge": 1}}
@@ -169,17 +172,37 @@ def _clean_pipeline(monkeypatch):
     monkeypatch.setattr(htmltext, "fetch_url", fetch)
 
 
-def test_golden_extract_body_is_unchanged_on_full_success(monkeypatch):
+GOLDEN = Path(__file__).parent / "golden"  # bytes written once by the code of commit 4cf8206
+GOLDEN_URLS = ["https://good.example/a", "https://good.example/b"]
+
+
+def _golden_pipeline(monkeypatch):
+    html = (GOLDEN / "page.html").read_text()
     _clean_pipeline(monkeypatch)
-    urls = ["https://good.example/a", "https://good.example/b"]
-    old_docs, old_failed = reader.read_pages(urls, "text")  # the unchanged public function
-    assert old_failed == []
-    expected = json.dumps({"results": old_docs, "failed": []}, ensure_ascii=False,
-                          allow_nan=False, separators=(",", ":")).encode()
-    resp = client.post("/extract", json={"urls": urls})
+    monkeypatch.setattr(htmltext, "fetch_url", lambda url, timeout=None, max_bytes=None: html)
+
+
+def test_golden_extract_body_is_unchanged_on_full_success(monkeypatch):
+    _golden_pipeline(monkeypatch)
+    resp = client.post("/extract", json={"urls": GOLDEN_URLS})
     assert resp.status_code == 200
-    assert resp.content == expected  # byte for byte what the endpoint returned before
+    assert resp.content == (GOLDEN / "extract_ok.json").read_bytes()
     assert "x-searchify-status" not in resp.headers
+
+
+def test_golden_cli_extract_output_is_unchanged(monkeypatch):
+    from typer.testing import CliRunner
+
+    _golden_pipeline(monkeypatch)
+    result = CliRunner().invoke(cli.app, ["extract", *GOLDEN_URLS])
+    assert result.exit_code == 0
+    assert result.stdout == (GOLDEN / "cli_extract_ok.json").read_text()
+
+
+def test_golden_search_body_is_unchanged_on_success(monkeypatch):
+    hits = [{"title": "Eiffel Tower", "url": "https://a.com", "content": "In Paris.", "engine": "x"}]
+    resp = _search(monkeypatch, {"results": hits, "error": None, "backend": "x"})
+    assert resp.content == (GOLDEN / "search_ok.json").read_bytes()
 
 
 def test_extract_status_appears_only_when_something_went_wrong(monkeypatch):
