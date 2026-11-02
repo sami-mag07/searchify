@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 
 from ..config import get_settings
-from ..reasons import code_for
+from ..reasons import REASONS, code_for, leading_code
 from ._common import SearchBackendError
 from .cloud import serper_search, tavily_search
 from .duckduckgo import ddgs_search
@@ -45,12 +45,8 @@ def error_code(error: Optional[str]) -> Optional[str]:
     """The fixed code at the start of a backend error (``rate_limited``, ``timeout``,
     ``error``) from ``search_report()["error"]``, e.g. "duckduckgo: rate_limited: ...";
     None when the message carries none."""
-    if not error:
-        return None
-    for code in ("rate_limited", "timeout", "error"):
-        if error.split(": ", 1)[-1].startswith(code + ":"):
-            return code
-    return None
+    lead = leading_code(error.split(": ", 1)[-1]) if error else None
+    return lead if lead in REASONS or lead == "error" else None
 
 
 def search_report(query: str, max_results: int = 10, *, backend: Optional[str] = None,

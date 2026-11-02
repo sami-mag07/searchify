@@ -63,7 +63,7 @@ def test_reason_code_mapping(text, code):
 
 
 def test_search_errors_map_to_codes_without_exception_text():
-    assert reasons.parse_search_error("duckduckgo: ddgs error: RatelimitException") == {
+    assert reasons.parse_search_error("duckduckgo: rate_limited: ddgs DDGSException") == {
         "engine": "duckduckgo", "reason": "rate_limited"}
     assert reasons.parse_search_error("serper: Serper error 429: slow down") == {
         "engine": "serper", "reason": "rate_limited"}
@@ -209,11 +209,11 @@ def _search(monkeypatch, report):
 
 def test_search_status_only_for_an_empty_list_after_a_backend_error(monkeypatch):
     err = [{"engine": "duckduckgo", "reason": "rate_limited"}]
-    empty = _search(monkeypatch, {"results": [], "error": "duckduckgo: ddgs error: RatelimitException",
+    empty = _search(monkeypatch, {"results": [], "error": "duckduckgo: rate_limited: ddgs DDGSException",
                                   "backend": None, "errors": err})
     assert empty.json()["status"] == {"reason": "rate_limited", "engine": "duckduckgo"}
     assert empty.headers["x-searchify-status"] == "duckduckgo=rate_limited"
-    assert "Ratelimit" not in empty.headers["x-searchify-status"]
+    assert "DDGS" not in empty.headers["x-searchify-status"]
 
     hit = [{"title": "t", "url": "https://x", "content": "", "engine": "searxng"}]
     fallback = _search(monkeypatch, {"results": hit, "error": None, "backend": "searxng", "errors": err})
@@ -275,3 +275,14 @@ def test_cli_extract_prints_no_ticker_when_piped(monkeypatch):
     result = CliRunner().invoke(cli.app, ["extract", "https://b.com"])
     assert seen["progress"] is None  # CliRunner is no TTY
     assert json.loads(result.stdout)["failed"][0]["reason"] == "rate_limited"
+
+
+def test_leading_code_of_a_ddgs_error_is_read():
+    from searchify.search import error_code
+
+    assert reasons.code_for("rate_limited: ddgs DDGSException", default="unavailable") == "rate_limited"
+    assert reasons.code_for("timeout: ddgs DDGSException", default="unavailable") == "timeout"
+    assert reasons.code_for("error: ddgs DDGSException", default="unavailable") == "unavailable"
+    assert error_code("duckduckgo: rate_limited: ddgs DDGSException") == "rate_limited"
+    assert error_code("duckduckgo: error: ddgs DDGSException") == "error"
+    assert error_code("searxng: SearXNG unreachable: ConnectError") is None

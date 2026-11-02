@@ -87,13 +87,13 @@ def test_search_report_tells_rate_limit_from_no_hits(monkeypatch):
     search_pkg = sys.modules["searchify.search"]
 
     def limited(q, n, **f):
-        raise SearchBackendError("ddgs error: RatelimitException")
+        raise SearchBackendError("rate_limited: ddgs DDGSException")
 
     monkeypatch.setattr(search_pkg, "BACKENDS", {"duckduckgo": limited})
     monkeypatch.setattr(search_pkg, "_chain", lambda: ["duckduckgo"])
     monkeypatch.setattr(search_pkg, "get_settings", lambda: type("S", (), {"tavily_api_key": ""})())
     r = search_report("anything")
-    assert r == {"results": [], "error": "duckduckgo: ddgs error: RatelimitException", "backend": None,
+    assert r == {"results": [], "error": "duckduckgo: rate_limited: ddgs DDGSException", "backend": None,
                  "errors": [{"engine": "duckduckgo", "reason": "rate_limited"}]}
 
     monkeypatch.setattr(search_pkg, "BACKENDS", {"duckduckgo": lambda q, n, **f: []})
@@ -112,9 +112,9 @@ def test_service_search_reports_backend_error(monkeypatch):
 
     from searchify import service
 
-    monkeypatch.setattr(service, "search_report", lambda q, n, backend=None, **f: {"results": [], "error": "duckduckgo: ddgs error: RatelimitException", "backend": None})
+    monkeypatch.setattr(service, "search_report", lambda q, n, backend=None, **f: {"results": [], "error": "duckduckgo: rate_limited: ddgs DDGSException", "backend": None})
     out = TestClient(service.app).post("/search", json={"query": "q"}).json()
-    assert out["results"] == [] and "Ratelimit" in out["error"]
+    assert out["results"] == [] and "rate_limited" in out["error"]
 
 
 def test_cli_search_shows_backend_error(monkeypatch):

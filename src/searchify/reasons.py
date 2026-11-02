@@ -50,10 +50,20 @@ def _status_code(status: int) -> str:
     return "unavailable"
 
 
+def leading_code(text: Optional[str]) -> Optional[str]:
+    """The ``<code>:`` a backend puts in front of its message (``rate_limited: ddgs ...``),
+    any word before the first colon; None when the text has none."""
+    head, sep, _ = (text or "").strip().partition(":")
+    return head if sep and re.fullmatch(r"[a-z_]+", head) else None
+
+
 def code_for(text: Optional[str], default: str = "extract_failed") -> str:
     """The reason code for a failure text from the fetcher, the page reader or a
-    search backend. Unknown text gives `default`."""
+    search backend. A leading ``<code>:`` from REASONS wins. Unknown text gives `default`."""
     raw = (text or "").strip()
+    lead = leading_code(raw)
+    if lead in REASONS:
+        return lead
     m = _HTTP_RE.match(raw) or _STATUS_RE.search(raw)
     if m:
         return _status_code(int(m.group(1)))

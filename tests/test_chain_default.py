@@ -21,7 +21,7 @@ def _backend(monkeypatch, name, fn):
 
 
 def _limited(q, n, **f):
-    raise SearchBackendError("rate_limited: ddgs RatelimitException")
+    raise SearchBackendError("rate_limited: ddgs DDGSException")
 
 
 def test_country_reaches_searxng_without_typeerror(monkeypatch):
@@ -44,7 +44,7 @@ def test_zero_hits_without_searxng_url_is_not_an_error(monkeypatch):
 def test_rate_limit_stays_visible_without_searxng_url(monkeypatch):
     _backend(monkeypatch, "duckduckgo", _limited)
     r = search_report("q")
-    assert r["error"] == "duckduckgo: rate_limited: ddgs RatelimitException"
+    assert r["error"] == "duckduckgo: rate_limited: ddgs DDGSException"
     assert search_pkg.error_code(r["error"]) == "rate_limited"
     assert r["errors"] == [{"engine": "duckduckgo", "reason": "rate_limited"}]
 
