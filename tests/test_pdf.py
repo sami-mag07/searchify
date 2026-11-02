@@ -1,4 +1,5 @@
 """PDF reading: no network except a local fake server. Needs the extra `pdf`."""
+import json
 import os
 import sys
 import threading
@@ -118,8 +119,63 @@ def _crashing_child(conn, data, max_pages, max_chars):
 
 def _chatty_child(conn, data, max_pages, max_chars):
     # far more than a pipe buffer holds: only works if the parent reads before it joins
-    conn.send(("ok", {"title": "T", "page_count": 1, "content": "x" * 600_000, "truncated": False}))
+    pdf_mod._answer(conn, "ok", {"title": "T", "page_count": 1, "content": "x" * 600_000, "truncated": False})
     conn.close()
+
+
+def _huge_child(conn, data, max_pages, max_chars):
+    # a child gone wrong: an answer far above anything the real worker sends
+    try:
+        pdf_mod._answer(conn, "ok", {"title": "T", "page_count": 1, "content": "x" * 3_000_000,
+                                     "truncated": False})
+    except OSError:
+        pass  # the parent refused it and closed the pipe
+
+
+UNPICKLED = []  # filled in the PARENT if it ever unpickles what a child sent
+
+
+def _mark_unpickled():
+    UNPICKLED.append(1)
+    return ("ok", {"title": "T", "page_count": 1, "content": "taken over", "truncated": False})
+
+
+class _Evil:
+    def __reduce__(self):
+        return (_mark_unpickled, ())
+
+
+def _pickling_child(conn, data, max_pages, max_chars):
+    # a child taken over by a crafted PDF: its answer runs code in whoever unpickles it
+    conn.send(_Evil())
+    conn.close()
+
+
+def _env_probe_child(conn, data, max_pages, max_chars):
+    # the real worker, with a spy on what pdfium's caller sees of the environment
+    import pypdfium2  # noqa: PLC0415
+
+    out = os.environ["SEARCHIFY_PROBE_FILE"]
+    seen = []
+    real = pypdfium2.PdfDocument
+
+    def spy(*args, **kwargs):
+        seen.append(sorted(k for k in os.environ if k.startswith("SEARCHIFY_PROBE")))
+        return real(*args, **kwargs)
+
+    pypdfium2.PdfDocument = spy
+    pdf_mod._worker(conn, data, max_pages, max_chars)
+    with open(out, "w") as f:
+        json.dump(seen, f)
+
+
+def _greedy_child(conn, data, max_pages, max_chars):
+    # stands for pdfium inflating a crafted stream: grows by 16 MB every 20 ms (640 MB at most)
+    hoard = []
+    for _ in range(40):
+        hoard.append(b"x" * (16 << 20))
+        time.sleep(0.02)
+    time.sleep(60)
 
 
 # ---------------------------------------------------------------- tests
@@ -277,6 +333,89 @@ def test_result_larger_than_a_pipe_is_read_before_the_join(site, monkeypatch):
     ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
     docs, failed = pages_mod.read_pages([site + "/a.pdf"])
     assert failed == [] and len(docs[0]["content"]) == 600_000
+
+
+def test_title_and_author_are_capped(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    # make_pdf writes << /Title (...) >>: the ") /Author (" smuggles in a second entry
+    ROUTES["/meta.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"],
+                                                       title="T" * 50_000 + ") /Author (" + "A" * 50_000))
+    docs, failed = pages_mod.read_pages([site + "/meta.pdf"])
+    assert failed == []
+    assert docs[0]["title"] == "T" * 300
+    assert docs[0]["author"] == "A" * 300
+
+
+def test_cache_size_counts_title_author_and_description():
+    doc = {"content": "x", "title": "T" * 1000, "author": "A" * 10, "description": "D" * 100,
+           "published": "2026-11-03", "links": [{"text": "a", "url": "https://a.example/"}]}
+    assert h.PageCache._size(doc) == 1 + 1000 + 10 + 100 + 120
+
+
+def test_an_oversized_answer_from_the_child_is_refused(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    monkeypatch.setattr(pdf_mod, "_TARGET", _huge_child)
+    monkeypatch.setattr(pdf_mod, "EXTRACT_TIMEOUT_S", 10)
+    ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
+    docs, failed = pages_mod.read_pages([site + "/a.pdf"])
+    assert docs == [] and failed[0]["error"] == "extract_failed"
+
+
+@pytest.mark.skipif(not (sys.platform == "darwin" or sys.platform.startswith("linux")),
+                    reason="the RSS watch reads libproc or /proc")
+def test_a_child_growing_past_the_memory_cap_is_killed(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    monkeypatch.setattr(pdf_mod, "_TARGET", _greedy_child)
+    monkeypatch.setattr(pdf_mod, "MAX_CHILD_RSS", 256 << 20, raising=False)
+    monkeypatch.setattr(pdf_mod, "EXTRACT_TIMEOUT_S", 5)
+    ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
+    t = time.monotonic()
+    docs, failed = pages_mod.read_pages([site + "/a.pdf"], timeout=10, deadline_s=20)
+    assert docs == [] and failed[0]["error"] == "pdf_too_large"
+    assert time.monotonic() - t < 5  # killed while growing, not after the extract timeout
+
+
+def test_the_parent_never_unpickles_the_childs_answer(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    UNPICKLED.clear()
+    monkeypatch.setattr(pdf_mod, "_TARGET", _pickling_child)
+    monkeypatch.setattr(pdf_mod, "EXTRACT_TIMEOUT_S", 10)
+    ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
+    docs, failed = pages_mod.read_pages([site + "/a.pdf"])
+    assert UNPICKLED == []
+    assert docs == [] and failed[0]["error"] == "extract_failed"
+
+
+def test_pdfium_runs_without_the_parents_environment(site, monkeypatch, tmp_path):
+    _fresh_cache(monkeypatch)
+    probe = tmp_path / "seen.json"
+    monkeypatch.setenv("SEARCHIFY_PROBE_SECRET", "sk-test-not-a-real-key")
+    monkeypatch.setenv("SEARCHIFY_PROBE_FILE", str(probe))
+    monkeypatch.setattr(pdf_mod, "_TARGET", _env_probe_child)
+    monkeypatch.setattr(pdf_mod, "EXTRACT_TIMEOUT_S", 10)
+    ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
+    docs, failed = pages_mod.read_pages([site + "/a.pdf"])
+    assert failed == [] and "Etwas Text" in docs[0]["content"]
+    assert json.loads(probe.read_text()) == [[]]  # pdfium was called once, with no probe variable left
+
+
+@pytest.mark.parametrize("raw", [b"", b"not json", b"[1, 2, 3]", b'["err", ["x"]]', b'["err", "rm -rf"]',
+                                 b'["ok", {"content": 5, "page_count": 1}]',
+                                 b'["ok", {"content": "x", "page_count": true}]', b'{"ok": 1, "x": 2}'])
+def test_a_malformed_answer_is_extract_failed(raw):
+    assert pdf_mod._read_answer(raw) == (None, "extract_failed")
+
+
+def test_a_wellformed_answer_is_read_field_by_field():
+    raw = b'["ok", {"content": "Text \\ud800", "page_count": 3, "title": 7, "truncated": "yes", "x": 1}]'
+    assert pdf_mod._read_answer(raw) == ({"content": "Text \ud800", "page_count": 3, "title": "",
+                                          "author": None, "truncated": False}, None)
+
+
+def test_rss_of_a_live_and_a_gone_process():
+    if sys.platform == "darwin" or sys.platform.startswith("linux"):
+        assert pdf_mod._rss_bytes(os.getpid()) > 5 << 20
+    assert pdf_mod._rss_bytes(2**22 + 12345) is None  # no such pid
 
 
 def test_at_most_two_pdfs_at_once(site, monkeypatch):

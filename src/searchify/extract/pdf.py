@@ -4,7 +4,8 @@ Without the extra nothing here does anything and a PDF URL fails exactly as befo
 ("not HTML: application/pdf"). With it, ``read_if_pdf`` is called from the page
 reader once the normal fetch has refused a document, and:
 
-* downloads the bytes through the same pinned httpx client and SSRF hook as every
+* downloads the bytes uncompressed (Accept-Encoding: identity, any other encoding is
+  refused) through the same pinned httpx client and SSRF hook as every
   HTML page (``htmltext._client()``), streaming with a byte counter. More than
   ``MAX_BYTES`` ends with ``pdf_too_large``; nothing is silently cut off.
 * has its own download budget (``DOWNLOAD_TIMEOUT_S``, not FETCH_TIMEOUT).
@@ -14,6 +15,10 @@ reader once the normal fetch has refused a document, and:
   that writes more than 64 KB blocks until somebody reads, so joining first would
   report a timeout for every larger document. A crash or a hang only costs that one
   PDF, never the HTML worker pool or another PDF. No thread fallback.
+  The child is crash isolation, not a sandbox: it drops the environment variables
+  it inherited (API keys) before loading pdfium and answers in plain JSON, never
+  pickle, so a child taken over by a crafted PDF cannot run code in the parent
+  through its answer.
 * returns at most ``MAX_PAGES`` pages and ``MAX_CHARS`` characters, with ``[Seite N]``
   markers and ``page_count`` (the real page count of the file).
 
@@ -24,8 +29,10 @@ extract_failed, network error and address blocked, as for HTML.
 from __future__ import annotations
 
 import importlib.util
+import json
 import logging
 import multiprocessing
+import os
 import re
 import sys
 import threading
@@ -46,6 +53,10 @@ MAX_PARALLEL = 2
 MAX_PAGES = 50
 MAX_CHARS = 60_000
 MIN_TEXT_CHARS = 10  # less than this on all read pages = a scan without a text layer
+MAX_META_CHARS = 300  # title and author; an 8 MB /Title used to arrive whole
+# Largest answer the parent accepts from a child: MAX_CHARS of text at up to 6 bytes
+# per character (JSON escapes) plus title and author fit many times over.
+MAX_REPLY_BYTES = 1 << 20
 _SNIFF = 1024  # the PDF header may follow a few junk bytes, the spec allows 1024
 
 _SLOTS = threading.BoundedSemaphore(MAX_PARALLEL)
@@ -105,9 +116,15 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
     Else (bytes, None) or (None, reason)."""
     deadline = time.monotonic() + DOWNLOAD_TIMEOUT_S
     try:
-        with htmltext._client().stream("GET", url, timeout=DOWNLOAD_TIMEOUT_S) as resp:
+        # identity only: a compressed PDF gains nothing, and httpx would decode it
+        # without an output cap (compression bomb, Security-Review 03.11.2026)
+        with htmltext.overall_deadline(DOWNLOAD_TIMEOUT_S), \
+                htmltext._client().stream("GET", url, timeout=DOWNLOAD_TIMEOUT_S,
+                                          headers={"Accept-Encoding": "identity"}) as resp:
             if resp.status_code >= 400:
                 return None
+            if htmltext.content_encodings(resp):
+                return None, "network error (unsupported content encoding)"
             ctype = resp.headers.get("content-type", "").lower()
             declared = resp.headers.get("content-length", "")
             # only a declared PDF is refused by length; anything else must show %PDF- first
@@ -115,7 +132,7 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
                 return None, "pdf_too_large"
             body = bytearray()
             sniffed = "application/pdf" in ctype
-            for part in resp.iter_bytes():
+            for part in resp.iter_raw():  # never decoded: the check above refused any encoding
                 body.extend(part)
                 if not sniffed and len(body) >= 5:  # first bytes before the size verdict
                     if b"%PDF-" not in bytes(body[:_SNIFF]):
@@ -137,25 +154,34 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
 # ---------------------------------------------------------------- Extraction
 
 
+def _answer(conn, kind: str, payload) -> None:
+    """The child's one answer: JSON ["ok", {...}] or ["err", code]. ASCII escapes keep
+    lone surrogates from a broken text layer intact, as pickle did."""
+    conn.send_bytes(json.dumps([kind, payload]).encode("ascii"))
+
+
 def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
-    """Runs in its own process. Sends exactly one tuple, ("ok", dict) or ("err", code)."""
+    """Runs in its own process. Sends exactly one answer (see _answer)."""
     try:
+        # API keys and tokens have no business in a process parsing hostile input:
+        # gone before pypdfium2 is even imported (Security-Review 03.11.2026)
+        os.environ.clear()
         try:
             import resource  # noqa: PLC0415 - Unix only
 
             resource.setrlimit(resource.RLIMIT_CPU, (30, 30))
-            if sys.platform.startswith("linux"):
-                resource.setrlimit(resource.RLIMIT_AS, (3 << 30, 3 << 30))
         except Exception:  # noqa: BLE001 - limits are a bonus
             pass
         import pypdfium2 as pdfium  # noqa: PLC0415
+
+        _limit_address_space()
 
         try:
             doc = pdfium.PdfDocument(data)
         except pdfium.PdfiumError as exc:
             # FPDF_ERR_PASSWORD = 4: encrypted and not openable without a password
             code = "pdf_encrypted" if getattr(exc, "err_code", None) == 4 else "extract_failed"
-            conn.send(("err", code))
+            _answer(conn, "err", code)
             return
         total = len(doc)
         parts = []
@@ -188,27 +214,91 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
             pass
         doc.close()
         if letters < MIN_TEXT_CHARS:
-            conn.send(("err", "pdf_no_text"))
+            _answer(conn, "err", "pdf_no_text")
             return
-        conn.send(("ok", {
-            "title": (meta.get("Title") or "").strip(),
-            "author": (meta.get("Author") or "").strip() or None,
+        _answer(conn, "ok", {
+            "title": (meta.get("Title") or "").strip()[:MAX_META_CHARS],
+            "author": (meta.get("Author") or "").strip()[:MAX_META_CHARS] or None,
             "page_count": total,
             "content": "\n\n".join(parts),
             "truncated": truncated,
-        }))
+        })
     except MemoryError:
-        conn.send(("err", "pdf_too_large"))
+        _answer(conn, "err", "pdf_too_large")
     except Exception:  # noqa: BLE001 - whatever pdfium throws, the parent just needs a code
         try:
-            conn.send(("err", "extract_failed"))
+            _answer(conn, "err", "extract_failed")
         except Exception:  # noqa: BLE001
             pass
     finally:
         conn.close()
 
 
+def _limit_address_space() -> None:
+    """Linux: at most MAX_CHILD_RSS more address space than after loading pdfium (an
+    absolute cap would also count what pdfium reserves at start). macOS refuses
+    RLIMIT_AS with ValueError; there only the parent's RSS watch below holds."""
+    try:
+        import resource  # noqa: PLC0415 - Unix only
+
+        with open("/proc/self/statm") as f:
+            now = int(f.read().split()[0]) * os.sysconf("SC_PAGE_SIZE")
+        resource.setrlimit(resource.RLIMIT_AS, (now + MAX_CHILD_RSS, now + MAX_CHILD_RSS))
+    except Exception:  # noqa: BLE001 - no /proc or no RLIMIT_AS: the watch still applies
+        pass
+
+
 _TARGET = _worker  # tests swap this for a slow or crashing child
+
+# Memory watch on the child (Security-Review 03.11.2026): a 522 KB PDF drove a child
+# to 1081 MB RSS, and macOS has no working RLIMIT_AS. The parent reads the child's
+# resident size while it waits and kills it above MAX_CHILD_RSS ("pdf_too_large").
+MAX_CHILD_RSS = 1 << 30
+_WATCH_EVERY_S = 0.05
+_LIBPROC = None
+
+
+def _rss_bytes(pid: int) -> Optional[int]:
+    """Resident size of `pid` in bytes; None when unknown (process gone, other OS).
+    macOS: proc_pidinfo(PROC_PIDTASKINFO), Linux: /proc/<pid>/statm. No subprocess."""
+    global _LIBPROC
+    try:
+        if sys.platform == "darwin":
+            import ctypes  # noqa: PLC0415
+            import struct  # noqa: PLC0415
+
+            if _LIBPROC is None:
+                lib = ctypes.CDLL("/usr/lib/libproc.dylib")
+                lib.proc_pidinfo.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_uint64,
+                                             ctypes.c_void_p, ctypes.c_int]
+                lib.proc_pidinfo.restype = ctypes.c_int
+                _LIBPROC = lib
+            buf = ctypes.create_string_buffer(96)  # struct proc_taskinfo
+            if _LIBPROC.proc_pidinfo(pid, 4, 0, buf, 96) != 96:  # 4 = PROC_PIDTASKINFO
+                return None
+            return struct.unpack_from("=Q", buf, 8)[0]  # pti_resident_size
+        with open(f"/proc/{pid}/statm") as f:
+            return int(f.read().split()[1]) * os.sysconf("SC_PAGE_SIZE")
+    except (OSError, ValueError, IndexError, AttributeError):
+        return None
+
+
+def _wait_for_answer(recv_end, proc) -> Optional[str]:
+    """Waits until the child answers or dies (None), up to EXTRACT_TIMEOUT_S ("timeout").
+    Reads the child's RSS between polls and kills it above MAX_CHILD_RSS ("pdf_too_large").
+    The poll returns as soon as the answer is there, so a normal PDF waits no longer."""
+    deadline = time.monotonic() + EXTRACT_TIMEOUT_S
+    while True:
+        left = deadline - time.monotonic()
+        if left <= 0:
+            return "timeout"
+        if recv_end.poll(min(_WATCH_EVERY_S, left)):
+            return None
+        rss = _rss_bytes(proc.pid)
+        if rss is not None and rss > MAX_CHILD_RSS:
+            proc.kill()  # at once: every further poll lets it grow
+            log.warning("pdf child killed at %d MB resident", rss >> 20)
+            return "pdf_too_large"
 
 
 def _extract(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
@@ -224,7 +314,7 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
     ctx = multiprocessing.get_context("spawn")
     recv_end, send_end = ctx.Pipe(duplex=False)
     proc = ctx.Process(target=_TARGET, args=(send_end, data, MAX_PAGES, MAX_CHARS), daemon=True)
-    result = None
+    raw = b""
     try:
         try:
             proc.start()
@@ -234,12 +324,14 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
         send_end.close()  # parent keeps only the read end, so a dead child gives EOF
         # Poll and read FIRST. Joining a child that is blocked writing >64 KB would
         # deadlock until the timeout and wrongly report every large PDF as too slow.
-        if not recv_end.poll(EXTRACT_TIMEOUT_S):
-            return None, "timeout"
+        failure = _wait_for_answer(recv_end, proc)
+        if failure:
+            return None, failure
         try:
-            result = recv_end.recv()
+            # bounded: a child gone wrong cannot hand the parent an answer of any size
+            raw = recv_end.recv_bytes(maxlength=MAX_REPLY_BYTES)
         except (EOFError, OSError):
-            return None, "extract_failed"  # child died without an answer
+            return None, "extract_failed"  # child died without an answer, or one too large
     finally:
         recv_end.close()
         if proc.pid is not None:
@@ -247,15 +339,43 @@ def _run_child(url: str, data: bytes) -> Tuple[Optional[Dict], Optional[str]]:
             if proc.is_alive():
                 proc.kill()
                 proc.join(2)
-    kind, payload = result
+    info, err = _read_answer(raw)
+    if err:
+        return None, err
+    return _document(url, info), None
+
+
+_CHILD_CODES = {"pdf_encrypted", "pdf_no_text", "pdf_too_large", "extract_failed"}
+
+
+def _read_answer(raw: bytes) -> Tuple[Optional[Dict], Optional[str]]:
+    """The child's JSON answer, checked field by field: anything unexpected is
+    extract_failed, never an exception in the parent."""
+    try:
+        kind, payload = json.loads(raw)
+    except (ValueError, TypeError):
+        return None, "extract_failed"
     if kind == "err":
-        return None, payload
-    return _document(url, payload), None
+        return None, payload if isinstance(payload, str) and payload in _CHILD_CODES else "extract_failed"
+    if kind != "ok" or not isinstance(payload, dict):
+        return None, "extract_failed"
+    content, pages = payload.get("content"), payload.get("page_count")
+    if not isinstance(content, str) or type(pages) is not int:
+        return None, "extract_failed"
+    title, author = payload.get("title"), payload.get("author")
+    return {
+        "content": content,
+        "page_count": pages,
+        "title": title if isinstance(title, str) else "",
+        "author": author if isinstance(author, str) else None,
+        "truncated": payload.get("truncated") is True,
+    }, None
 
 
 def _document(url: str, info: Dict) -> Dict:
-    title = info.get("title") or _title_from_url(url)
-    doc = htmltext._doc(url, {"title": title, "author": info.get("author")}, info["content"], [])
+    title = (info.get("title") or "")[:MAX_META_CHARS] or _title_from_url(url)
+    author = (info.get("author") or "")[:MAX_META_CHARS] or None
+    doc = htmltext._doc(url, {"title": title, "author": author}, info["content"], [])
     doc["page_count"] = info["page_count"]
     doc["stage"] = "static"
     if info.get("truncated"):
