@@ -1,0 +1,23 @@
+{
+  "note": "Rerankers to compare. Revisions are pinned. remote_code models run Python from their Hugging Face repo, only from these publishers. eligible=false: licence does not allow it as searchify's default.",
+  "models": [
+    {"slug": "mminilm", "name": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+     "revision": "1427fd652930e4ba29e8149678df786c240d8825", "license": "apache-2.0",
+     "remote_code": false, "eligible": true, "current_default": true},
+    {"slug": "msmarco-l6", "name": "cross-encoder/ms-marco-MiniLM-L6-v2",
+     "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a", "license": "apache-2.0",
+     "remote_code": false, "eligible": true},
+    {"slug": "mxbai-xsmall", "name": "mixedbread-ai/mxbai-rerank-xsmall-v1",
+     "revision": "b5c6e9da73abc3711f593f705371cdbe9e0fe422", "license": "apache-2.0",
+     "remote_code": false, "eligible": true},
+    {"slug": "gte-multi", "name": "Alibaba-NLP/gte-multilingual-reranker-base",
+     "revision": "8215cf04918ba6f7b6a62bb44238ce2953d8831c", "license": "apache-2.0",
+     "remote_code": true, "eligible": true},
+    {"slug": "bge-m3", "name": "BAAI/bge-reranker-v2-m3",
+     "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e", "license": "apache-2.0",
+     "remote_code": false, "eligible": true},
+    {"slug": "jina-v2", "name": "jinaai/jina-reranker-v2-base-multilingual",
+     "revision": "9cfeff2df7d40d1b78e75e5e9cebec92a99813c9", "license": "cc-by-nc-4.0",
+     "remote_code": true, "eligible": false}
+  ]
+}
