@@ -6,158 +6,89 @@
 </p>
 
 **Web search for AI agents, running on your own machine.** Ask a question and get back the
-passages that answer it, with their sources. Search, clean page extraction and a fast
-reranker in one small Python package. No API key needed: search runs over DuckDuckGo or
-your own SearXNG instance, paid providers are an optional fallback.
+passages that answer it, with their sources. Free, no API key, no account.
 
-```
-$ python examples/answer.py "How much does the NVIDIA DGX Spark cost and how much memory does it have?"
-1. How much does the NVIDIA DGX Spark cost? The Founders Edition launched at $3,999 in
-   October 2025 and now lists for $4,699 on NVIDIA's marketplace after a ...
-   gpusmith.com
-2. The NVIDIA DGX Spark is a compact desktop AI computer (150mm x 150mm, 1.2kg) powered by
-   the NVIDIA GB10 Grace Blackwell Superchip. It delivers 1 petaFLOP of ...
-   www.aitooldiscovery.com
-3. The NVIDIA DGX Spark is a palm-sized desktop AI computer built on the GB10 Grace Blackwell
-   Superchip, with 128 GB of unified memory, 273 GB/s of bandwidth, and ...
-   millionminer.com
+**For AI agents:** install steps, commands and the full API start at
+[For agents and developers](#for-agents-and-developers). Read from there.
 
-searched and read 5 pages in 5.8 s, ranked 254 passages in 1.3 s
-```
+## What it does
 
-A price that changed after launch is exactly what a language model gets wrong from memory.
-Searchify reads the live pages, ranks every paragraph against the question and returns the
-best one per source. The core of [`examples/answer.py`](examples/answer.py):
+A language model gets prices, dates and new releases wrong from memory. searchify searches the
+web, reads the pages and hands the model only the paragraphs that answer the question, best
+first, each with its source.
 
-```python
-from searchify import search, extract, rerank
+Asked *"How much does the NVIDIA DGX Spark cost and how much memory does it have?"*, it searched
+and read 5 pages in 5.8 s, ranked 254 paragraphs in 1.3 s and returned, among others:
 
-hits = search(question, max_results=8)                    # keyless web search
-pages = extract([h["url"] for h in hits[:5]])             # clean text of the top pages
-passages = [{"content": p, "url": page["url"]}            # one item per paragraph
-            for page in pages for p in page["content"].split("\n")
-            if len(p.split()) >= 12]
-ranked = rerank(question, passages)                       # best paragraphs first
-```
+1. "The Founders Edition launched at $3,999 in October 2025 and now lists for $4,699 on
+   NVIDIA's marketplace ..." (gpusmith.com)
+2. "... built on the GB10 Grace Blackwell Superchip, with 128 GB of unified memory, 273 GB/s
+   of bandwidth ..." (millionminer.com)
 
-Run it once and the reranker model (about 470 MB) downloads; after that it is cached.
+- **Passages, not whole pages.** A model reads about 4,800 characters instead of 30,000.
+- **Reads what others skip.** PDFs, shop prices from the page data, and more bot-protected
+  pages than the other open-source tools tested below.
+- **Local and private.** Searches through DuckDuckGo or your own SearXNG. Paid services are
+  only used if you add their key.
+- **Says why a page failed.** Blocked, not found, timeout or not a web page, each with a fixed
+  reason instead of an empty result.
+- **Works where your agent works.** As an MCP server for Claude, Cursor and OpenCode, on the
+  command line, in Python and as an HTTP service. On PyPI as `searchify`.
 
-## Install
+## Benchmarks
 
-```bash
-pip install "searchify[rerank]"
-```
+### 0.3.0 against 0.2.0
 
-| Extra | Adds |
-|---|---|
-| (none) | search and extraction |
-| `rerank` | the cross-encoder reranker (`sentence-transformers`) |
-| `api` | the HTTP service (`fastapi`, `uvicorn`) |
-| `browser` | the browser stages for JavaScript and bot-protected pages (`playwright`) |
-| `stealth` | the optional Camoufox stage |
-| `mcp` | the MCP server for Claude Code, Claude Desktop, Cursor and other hosts (`mcp`, Python 3.10+) |
-| `pdf` | reading PDFs (`pypdfium2`): text with `[Seite N]` page marks, up to 50 pages and 60,000 characters |
+The same fixed test lists, run once with 0.2.0 and once with 0.3.0:
 
-Then set nothing and search works. Copy `.env.example` to `.env` only if you want a SearXNG
-instance or a cloud fallback.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-dark.svg">
+  <img alt="0.2.0 against 0.3.0: normal pages 14/15 to 15/15, failed pages with a reason 0/29 to 23/29, PDFs read 0/20 to 20/20, shop prices 0/29 to 25/29, regional questions 20/40 to 27/40" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-light.svg">
+</picture>
 
-## What you get
+Normal pages are as fast as before: median 0.131 s with 0.2.0 and 0.128 s with 0.3.0 over five
+alternating runs.
 
-| Call | What it does |
-|---|---|
-| `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
-| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Compared with 0.2.0 a normal page only gains the small field `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags stay opt-in: they come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. |
-| `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and always `status` (`read`, `failed`, `thin`, `reasons`; after a clean run `failed` and `thin` are 0 and `reasons` is empty). |
-| `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
-| `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
-| `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
-| `searchify-mcp` | The same as tools for any MCP host, see below. |
+**What a model gets to read.** 123 questions in German, English, Spanish and French. Every
+version gets the same full question and the same recorded search hits, so only the processing
+differs. Scores are on the 73 test questions held out while tuning.
 
-## Command line
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-dark.svg">
+  <img alt="Answer in the first 4,800 characters and MRR: 0.2.0 snippets 95% and 0.80, 0.2.0 whole pages 92% and 0.75, 0.3.0 reranked snippets 95% and 0.91, 0.3.0 passages 100% and 0.92" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-light.svg">
+</picture>
 
-```bash
-searchify search "Where is the Eiffel Tower?"
-searchify extract "https://en.wikipedia.org/wiki/Eiffel_Tower"
-searchify passages "How tall is the Eiffel Tower?" -k 3 --per-site 1
-```
+MRR is 1 when the first passage holds the answer and 0.5 when the second does. Reranking alone
+lifts the snippets from 0.80 to 0.91; passages read from the pages also find the answer for every
+question, where snippets miss about one in twenty.
 
-Output is JSON by default (`{"results": [...]}`, errors as `{"error": ...}` with exit code 1),
-so agents and scripts can parse it. A search that found nothing because every backend failed
-(a DuckDuckGo rate limit, an unreachable SearXNG) reports that error instead of an empty list. Add `--no-json` for a readable view. `search` takes
-`-n`, `--backend`, `--language`, `--country` (with `--language nl` DuckDuckGo gets `nl-nl`, with `--country BE` `be-nl`; no language means worldwide, `any` too), `--time-range`, `--include-domain` and `--exclude-domain`;
-`extract` takes `--format text|markdown` and several URLs. `passages` takes the search options
-plus `-k` (passages to return), `--per-site`, `--max-chars` and `--rerank/--no-rerank`; it
-reranks by default when the `rerank` extra is installed.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-dark.svg">
+  <img alt="Twenty random draws of the questions per version: the 0.2.0 clouds sit between 0.71 and 0.86 on the held-out questions, the 0.3.0 clouds between 0.89 and 0.97" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-light.svg">
+</picture>
 
-A full question in the user's words finds more than keywords: the query goes to the search
-engine as written and then ranks the paragraphs. Each command line call loads the reranker
-again, so for many questions in a row the HTTP service or the MCP server is faster.
+Each small dot is one random draw of the questions with replacement, the large dot the score over
+all of them. The 0.2.0 and 0.3.0 clouds do not overlap, so the gain is not luck of the question
+set. A full question beats keywords in all four languages, and a tuning loop over 1.7 million
+settings found nothing that beats the defaults on the held-out questions.
 
-### Why a page failed
+### Against a paid service
 
-Every failed page keeps its human `error` text and gets one `reason`: `blocked` (401/403/451),
-`rate_limited` (429), `not_found` (404/410), `unavailable`, `timeout`, `not_html`, `too_large`,
-`address_blocked` (a private or internal address, refused before any connection),
-`no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
-`pdf_too_large`. The command line and `extract_report` always put `reason` on each failed page.
-The HTTP `/extract` lists failed pages with `url` and `error` only and adds `reason` to each of
-them with `detail: true` in the request body; it repeats the counts in `status` and in the
-`X-Searchify-Status` header, built from these codes only. On full success `/extract` adds neither
-`status` nor the header.
+The same fixed lists on 3 Nov 2026: searchify 0.3.0 without any paid fallback against Tavily's
+extract and search.
 
-## MCP server
+| Test | searchify | Tavily |
+|---|---:|---:|
+| Shop price read correctly (29 shop pages) | **24** | 8 |
+| Median time per shop page | **0.6 s** | 2.3 s |
+| Answer found in the PDF (20 PDFs) | 19 | **20** |
+| Regional question answered in the top 5 hits (40 questions, Dutch, German, French, Spanish) | 38 | **40** |
 
-`searchify-mcp` offers three tools to any MCP host: `passages` (start here for questions),
-`search` and `extract`. All of them only read from the web. The time filter offers models
-only `month` and `year`: with `day` or `week` they hide the answer to questions about past
-events.
+searchify reads the price as a field from the page data; for Tavily it counts when the right
+price appears in the returned text. searchify costs nothing per page or search; Tavily charges
+credits for both.
 
-```bash
-claude mcp add searchify -- uvx --from "searchify[mcp,rerank]" searchify-mcp
-```
-
-Claude Desktop (`claude_desktop_config.json`) and Cursor (`.cursor/mcp.json`) take the same
-command through [uv](https://docs.astral.sh/uv/), with settings in `env`:
-
-```json
-{
-  "mcpServers": {
-    "searchify": {
-      "command": "uvx",
-      "args": ["--from", "searchify[mcp,rerank]", "searchify-mcp"],
-      "env": {"SEARXNG_URL": "http://localhost:8080"}
-    }
-  }
-}
-```
-
-Without uv: `pip install "searchify[mcp,rerank]"` and give the full path from
-`which searchify-mcp` as `command`.
-
-## How the research agent works
-
-The package finds and reads pages. [`skill/`](skill/) turns it into a research agent: drop the
-folder into Claude Code (or any agent with skills) and it researches the way a careful analyst
-does.
-
-1. **Every claim needs a checked source.** Each statement in the answer gets a source number
-   and a verbatim quote, and `sources.py quote` only accepts the quote if it really appears in
-   the page text. Before the answer counts as done, `sources.py verify` fails if any claim has
-   no checked quote, and with `--numbers` also if a number in a sentence is not in its quotes.
-   An invented fact or a changed figure stops the answer instead of reaching you.
-2. **Sources are kept, not thrown away.** URLs and quotes stay in a ledger file, and every hit
-   goes into a shared found-list (`--seen`). You can come back later, re-check every quote
-   live (`verify --check-urls`) and continue the research where it stopped.
-3. **Not just your words as typed.** The agent searches the question several ways: other
-   languages, synonyms, the provider's and the participant's point of view, a broad and a
-   niche term, filters like `site:` or the year. Duplicates are merged, and hits that several
-   engines found rank higher. In our own test (9 research tasks, October 2026), three extra niche
-   queries raised the share of known good sources in the top 30 from 18% to 23%.
-
-The skill's own web search (`skill/references/search.py`) uses Tavily, Exa, Serper and Jina,
-each only if you set its key (all have free tiers). Setup: [`skill/README.md`](skill/README.md).
-
-## Benchmark
+### Against open-source scrapers
 
 Run `final_2031`, 15 Oct 2026, 146 fresh pages (Wikipedia, GitHub, Hacker News, news,
 bot-protected) against the top open-source scrapers on GitHub. Fresh means no page was seen
@@ -221,44 +152,8 @@ Cloudflare challenge to resolve. That affects about 4% of pages and is a deliber
 the challenge only clears after roughly 5 seconds.
 
 Rules kept during tuning: no captcha solving, no result gaming (never remove real text just to
-raise a number), the safety limits never weakened. The run measured the default ladder below;
-the optional Camoufox stage (`READER_STEALTH=1`) was not part of it.
-
-### 0.3.0 against 0.2.0
-
-The same fixed test lists, run once with 0.2.0 and once with this version (`bench/feature_bench.py`):
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-dark.svg">
-  <img alt="0.2.0 against 0.3.0: normal pages 14/15 to 15/15, failed pages with a reason 0/29 to 23/29, PDFs read 0/20 to 20/20, shop prices 0/29 to 25/29, regional questions 20/40 to 27/40" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-light.svg">
-</picture>
-
-Normal pages are as fast as before: median 0.131 s with 0.2.0 and 0.128 s with 0.3.0 over five
-alternating runs.
-
-**What a model gets to read.** 123 questions in German, English, Spanish and French. Every
-version gets the same full question and the same recorded search hits, so only the processing
-differs. Scores are on the 73 test questions held out while tuning (`bench/record.py`,
-`bench/loop.py`, `bench/viz.py`, charts from `bench/charts.py`).
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-dark.svg">
-  <img alt="Answer in the first 4,800 characters and MRR: 0.2.0 snippets 95% and 0.80, 0.2.0 whole pages 92% and 0.75, 0.3.0 reranked snippets 95% and 0.91, 0.3.0 passages 100% and 0.92" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-light.svg">
-</picture>
-
-MRR is 1 when the first passage holds the answer and 0.5 when the second does. Reranking alone
-lifts the snippets from 0.80 to 0.91; passages read from the pages also find the answer for every
-question, where snippets miss about one in twenty.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-dark.svg">
-  <img alt="Twenty random draws of the questions per version: the 0.2.0 clouds sit between 0.71 and 0.86 on the held-out questions, the 0.3.0 clouds between 0.89 and 0.97" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-light.svg">
-</picture>
-
-Each small dot is one random draw of the questions with replacement, the large dot the score over
-all of them. The 0.2.0 and 0.3.0 clouds do not overlap, so the gain is not luck of the question
-set. A full question beats keywords in all four languages, and a tuning loop over 1.7 million
-settings found nothing that beats the defaults on the held-out questions.
+raise a number), the safety limits never weakened. The run measured the default setup; the
+optional Camoufox stage was not part of it.
 
 ## How it works
 
@@ -277,7 +172,161 @@ Every stage only runs when the previous one was not enough: most pages never ope
 browser, and the browser stages only ever connect to public addresses on the normal web
 ports. Details: [`docs/architecture.md`](docs/architecture.md).
 
-## Search backends
+## The research agent
+
+The package finds and reads pages. The [`skill/`](skill/) folder turns it into a research agent
+for Claude Code and other agents with skills, and it works the way a careful analyst does:
+
+1. **Every claim needs a checked source.** Each statement gets a source and a verbatim quote,
+   and the quote has to really appear in the page. An invented fact or a changed figure stops
+   the answer instead of reaching you.
+2. **Sources are kept.** URLs and quotes stay in a ledger, so you can re-check them later and
+   continue where the research stopped.
+3. **Not just your words as typed.** It searches the question several ways: other languages,
+   synonyms, both sides of a market, broad and niche terms. In our own test (9 research tasks,
+   October 2026) three extra niche queries raised the share of known good sources in the top 30
+   from 18% to 23%.
+
+## Limits
+
+- No own web index. Breadth depends on DuckDuckGo or the engines behind your SearXNG.
+- DuckDuckGo rate-limits heavy use. For more than a few queries a minute, run SearXNG.
+- Bot-protected pages: 31% get through. There is no captcha solving.
+- The first reranking loads a model of about 470 MB, which takes a few seconds once.
+
+## For agents and developers
+
+Everything below is the reference: how to install searchify, call it and configure it.
+
+### Install
+
+```bash
+pip install "searchify[rerank]"
+```
+
+| Extra | Adds |
+|---|---|
+| (none) | search and extraction |
+| `rerank` | the cross-encoder reranker (`sentence-transformers`) |
+| `api` | the HTTP service (`fastapi`, `uvicorn`) |
+| `browser` | the browser stages for JavaScript and bot-protected pages (`playwright`) |
+| `stealth` | the optional Camoufox stage |
+| `mcp` | the MCP server for Claude Code, Claude Desktop, Cursor and other hosts (`mcp`, Python 3.10+) |
+| `pdf` | reading PDFs (`pypdfium2`): text with `[Seite N]` page marks, up to 50 pages and 60,000 characters |
+
+Then set nothing and search works. Copy `.env.example` to `.env` only if you want a SearXNG
+instance or a cloud fallback.
+
+### Python API
+
+| Call | What it does |
+|---|---|
+| `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
+| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Compared with 0.2.0 a normal page only gains the small field `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags stay opt-in: they come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. |
+| `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and always `status` (`read`, `failed`, `thin`, `reasons`; after a clean run `failed` and `thin` are 0 and `reasons` is empty). |
+| `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
+| `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
+| `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
+| `searchify-mcp` | The same as tools for any MCP host, see below. |
+
+A question answered by hand with the three basic calls, the core of [`examples/answer.py`](examples/answer.py):
+
+```python
+from searchify import search, extract, rerank
+
+hits = search(question, max_results=8)                    # keyless web search
+pages = extract([h["url"] for h in hits[:5]])             # clean text of the top pages
+passages = [{"content": p, "url": page["url"]}            # one item per paragraph
+            for page in pages for p in page["content"].split("\n")
+            if len(p.split()) >= 12]
+ranked = rerank(question, passages)                       # best paragraphs first
+```
+
+Run it once and the reranker model (about 470 MB) downloads; after that it is cached.
+
+`passages(question)` does the same in one call.
+
+### Command line
+
+```bash
+searchify search "Where is the Eiffel Tower?"
+searchify extract "https://en.wikipedia.org/wiki/Eiffel_Tower"
+searchify passages "How tall is the Eiffel Tower?" -k 3 --per-site 1
+```
+
+Output is JSON by default (`{"results": [...]}`, errors as `{"error": ...}` with exit code 1),
+so agents and scripts can parse it. A search that found nothing because every backend failed
+(a DuckDuckGo rate limit, an unreachable SearXNG) reports that error instead of an empty list. Add `--no-json` for a readable view. `search` takes
+`-n`, `--backend`, `--language`, `--country` (with `--language nl` DuckDuckGo gets `nl-nl`, with `--country BE` `be-nl`; no language means worldwide, `any` too), `--time-range`, `--include-domain` and `--exclude-domain`;
+`extract` takes `--format text|markdown` and several URLs. `passages` takes the search options
+plus `-k` (passages to return), `--per-site`, `--max-chars` and `--rerank/--no-rerank`; it
+reranks by default when the `rerank` extra is installed.
+
+A full question in the user's words finds more than keywords: the query goes to the search
+engine as written and then ranks the paragraphs. Each command line call loads the reranker
+again, so for many questions in a row the HTTP service or the MCP server is faster.
+
+#### Why a page failed
+
+Every failed page keeps its human `error` text and gets one `reason`: `blocked` (401/403/451),
+`rate_limited` (429), `not_found` (404/410), `unavailable`, `timeout`, `not_html`, `too_large`,
+`address_blocked` (a private or internal address, refused before any connection),
+`no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
+`pdf_too_large`. The command line and `extract_report` always put `reason` on each failed page.
+The HTTP `/extract` lists failed pages with `url` and `error` only and adds `reason` to each of
+them with `detail: true` in the request body; it repeats the counts in `status` and in the
+`X-Searchify-Status` header, built from these codes only. On full success `/extract` adds neither
+`status` nor the header.
+
+### MCP server
+
+`searchify-mcp` offers three tools to any MCP host: `passages` (start here for questions),
+`search` and `extract`. All of them only read from the web. The time filter offers models
+only `month` and `year`: with `day` or `week` they hide the answer to questions about past
+events.
+
+```bash
+claude mcp add searchify -- uvx --from "searchify[mcp,rerank]" searchify-mcp
+```
+
+Claude Desktop (`claude_desktop_config.json`) and Cursor (`.cursor/mcp.json`) take the same
+command through [uv](https://docs.astral.sh/uv/), with settings in `env`:
+
+```json
+{
+  "mcpServers": {
+    "searchify": {
+      "command": "uvx",
+      "args": ["--from", "searchify[mcp,rerank]", "searchify-mcp"],
+      "env": {"SEARXNG_URL": "http://localhost:8080"}
+    }
+  }
+}
+```
+
+Without uv: `pip install "searchify[mcp,rerank]"` and give the full path from
+`which searchify-mcp` as `command`.
+
+### Research skill
+
+1. **Every claim needs a checked source.** Each statement in the answer gets a source number
+   and a verbatim quote, and `sources.py quote` only accepts the quote if it really appears in
+   the page text. Before the answer counts as done, `sources.py verify` fails if any claim has
+   no checked quote, and with `--numbers` also if a number in a sentence is not in its quotes.
+   An invented fact or a changed figure stops the answer instead of reaching you.
+2. **Sources are kept, not thrown away.** URLs and quotes stay in a ledger file, and every hit
+   goes into a shared found-list (`--seen`). You can come back later, re-check every quote
+   live (`verify --check-urls`) and continue the research where it stopped.
+3. **Not just your words as typed.** The agent searches the question several ways: other
+   languages, synonyms, the provider's and the participant's point of view, a broad and a
+   niche term, filters like `site:` or the year. Duplicates are merged, and hits that several
+   engines found rank higher. In our own test (9 research tasks, October 2026), three extra niche
+   queries raised the share of known good sources in the top 30 from 18% to 23%.
+
+The skill's own web search (`skill/references/search.py`) uses Tavily, Exa, Serper and Jina,
+each only if you set its key (all have free tiers). Setup: [`skill/README.md`](skill/README.md).
+
+### Search backends
 
 | Backend | Key needed | Notes |
 |---|---|---|
@@ -306,7 +355,7 @@ hits = search("quarterly earnings tsmc", backend="searxng", time_range="month")
 hits = search("transformer architecture", include_domains=["arxiv.org"])
 ```
 
-## HTTP service
+### HTTP service
 
 Run the service and send it web addresses, one or many at a time:
 
@@ -387,7 +436,7 @@ never the text of the exception.
 The browser stages need `pip install "searchify[browser]"` and
 `playwright install chromium-headless-shell`.
 
-## Limiting the load ladder
+### Limiting the load ladder
 
 By default `extract` goes as far as the environment allows. You can cap that per request:
 
@@ -420,27 +469,24 @@ operator cap. The HTTP service and the MCP server never read the profile. `--reg
 search region, but no search reads it yet; profiles with a region from an older version load as
 before.
 
-## Configuration
+### Configuration
 
 Every setting is optional and read from the environment (see `.env.example`):
 `SEARCH_BACKEND`, `SEARCH_FALLBACK`, `SEARXNG_URL`, `SERPER_API_KEY`, `TAVILY_API_KEY`,
 `RERANKER_MODEL`, `FETCH_TIMEOUT`, `SEARCHIFY_USER_AGENT`. No key is ever read from code.
 
-## Tests
+### Tests
 
 ```bash
 pip install -e ".[dev,api,mcp]"
 pytest
 ```
 
-## Limits
+### Rerunning the benchmarks
 
-- No own web index. Breadth depends on DuckDuckGo or the engines behind your SearXNG.
-- DuckDuckGo rate-limits heavy use. For anything beyond a few queries a minute, run SearXNG.
-- Bot-protected pages: 31% get through (see the benchmark). There is no captcha solving.
-- The first `rerank` call loads the model, which takes a few seconds.
+The scripts and data layout are in [`bench/README.md`](bench/README.md): `bench/feature_bench.py` (0.3.0 against 0.2.0), `bench/record.py`, `bench/scores.py`, `bench/loop.py` and `bench/viz.py` (passages and rerankers), `bench/paid_bench.py` (against Tavily, needs its key in a file you pass with `--keys`) and `bench/charts.py` (the charts in this README).
 
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
-<!-- Stand: 02.11.2026 -->
+<!-- Stand: 03.11.2026 -->
