@@ -4,8 +4,9 @@ Without the extra nothing here does anything and a PDF URL fails exactly as befo
 ("not HTML: application/pdf"). With it, ``read_if_pdf`` is called from the page
 reader once the normal fetch has refused a document, and:
 
-* downloads the bytes uncompressed (Accept-Encoding: identity, any other encoding is
-  refused) through the same pinned httpx client and SSRF hook as every
+* downloads the bytes (asking for Accept-Encoding: identity; a compressed answer is
+  decoded with an output cap, stacked codings are refused) through the same pinned
+  httpx client and SSRF hook as every
   HTML page (``htmltext._client()``), streaming with a byte counter. More than
   ``MAX_BYTES`` ends with ``pdf_too_large``; nothing is silently cut off.
 * has its own download budget (``DOWNLOAD_TIMEOUT_S``, not FETCH_TIMEOUT).
@@ -115,15 +116,14 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
     Else (bytes, None) or (None, reason)."""
     deadline = time.monotonic() + DOWNLOAD_TIMEOUT_S
     try:
-        # identity only: a compressed PDF gains nothing, and httpx would decode it
-        # without an output cap (compression bomb, Security-Review 03.11.2026)
+        # identity asked for: a compressed PDF gains nothing. A server that compresses
+        # anyway is decoded with the output cap of iter_decoded, never by httpx
+        # (compression bomb, Security-Review 03.11.2026)
         with htmltext.overall_deadline(DOWNLOAD_TIMEOUT_S), \
                 htmltext._client().stream("GET", url, timeout=DOWNLOAD_TIMEOUT_S,
                                           headers={"Accept-Encoding": "identity"}) as resp:
             if resp.status_code >= 400:
                 return None
-            if htmltext.content_encodings(resp):
-                return None, "network error (unsupported content encoding)"
             ctype = resp.headers.get("content-type", "").lower()
             declared = resp.headers.get("content-length", "")
             # only a declared PDF is refused by length; anything else must show %PDF- first
@@ -131,7 +131,7 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
                 return None, "pdf_too_large"
             body = bytearray()
             sniffed = "application/pdf" in ctype
-            for part in resp.iter_raw():  # never decoded: the check above refused any encoding
+            for part in htmltext.iter_decoded(resp):  # pieces of at most ~256 KB
                 body.extend(part)
                 if not sniffed and len(body) >= 5:  # first bytes before the size verdict
                     if b"%PDF-" not in bytes(body[:_SNIFF]):
@@ -143,6 +143,8 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
                     return None, "timeout"
     except httpx.TimeoutException:
         return None, "timeout"
+    except htmltext._EncodingRefused:
+        return None, "network error (unsupported content encoding)"
     except httpx.HTTPError as exc:
         return None, f"network error ({type(exc).__name__})"
     if not sniffed and b"%PDF-" not in bytes(body[:_SNIFF]):

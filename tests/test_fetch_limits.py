@@ -125,9 +125,16 @@ def test_the_body_of_a_redirect_is_never_decoded(site, bombs):
 
 @pytest.mark.parametrize("enc,pack", [
     ("gzip", lambda b: gzip.compress(b)),
+    ("GZIP", lambda b: gzip.compress(b)),
+    ("x-gzip", lambda b: gzip.compress(b)),  # old alias of gzip
     ("deflate", zlib.compress),
     ("deflate", lambda b: zlib.compress(b)[2:-4]),  # raw deflate without the zlib wrapper
     ("identity", lambda b: b),
+    # no content coding at all: skipped like httpx does, the body is read as it is
+    ("UTF-8", lambda b: b),
+    ("none", lambda b: b),
+    ("binary", lambda b: b),
+    ("gzip, UTF-8", lambda b: gzip.compress(b)),
 ])
 def test_normal_encoded_pages_still_read_whole(site, enc, pack):
     page = b"<html><body>" + b"<p>Ein ganz normaler Absatz.</p>" * 20_000 + b"</body></html>"
@@ -157,6 +164,13 @@ def test_a_large_brotli_page_is_read_whole(site):
     assert got[0] == 200 and got[2] == page
 
 
+@pytest.mark.parametrize("enc", ["gzip, br", "deflate, gzip", "zstd", "compress"])
+def test_stacked_or_uncapped_codings_are_refused(site, enc):
+    ROUTES["/p"] = (200, {**HTML, "Content-Encoding": enc}, b"<html><body><p>x</p></body></html>")
+    assert h.fetch_url(site + "/p", 10, 100_000) is None
+    assert h.fetch_failure() == "network error (unsupported content encoding)"
+
+
 def test_a_broken_gzip_stream_is_a_network_error(site):
     ROUTES["/bad"] = (200, {**HTML, "Content-Encoding": "gzip"}, b"\x1f\x8b\x08\x00garbage-not-gzip")
     assert h.fetch_url(site + "/bad", 10, 100_000) is None
@@ -173,14 +187,22 @@ def test_decoder_pieces_stay_small(bombs):
         assert max(map(len, pieces)) <= 2 * h._DECODE_STEP
 
 
-def test_pdf_download_asks_for_identity_and_refuses_encoded_bodies(site):
+def test_pdf_download_asks_for_identity_and_decodes_with_a_cap(site, monkeypatch):
     pdf = b"%PDF-1.4\n" + b"0" * 5000
-    ROUTES["/a.pdf"] = (200, {"Content-Type": "application/pdf", "Content-Encoding": "gzip"},
-                        gzip.compress(pdf))
-    assert pdf_mod._download(site + "/a.pdf") == (None, "network error (unsupported content encoding)")
+    ctype = {"Content-Type": "application/pdf"}
+    ROUTES["/a.pdf"] = (200, {**ctype, "Content-Encoding": "gzip"}, gzip.compress(pdf))
+    assert pdf_mod._download(site + "/a.pdf") == (pdf, None)  # compressed anyway: decoded
     assert SEEN["/a.pdf"]["Accept-Encoding"] == "identity"
-    ROUTES["/b.pdf"] = (200, {"Content-Type": "application/pdf"}, pdf)
+    ROUTES["/b.pdf"] = (200, {**ctype, "Content-Encoding": "UTF-8"}, pdf)
     assert pdf_mod._download(site + "/b.pdf") == (pdf, None)
+    ROUTES["/c.pdf"] = (200, {**ctype, "Content-Encoding": "gzip, gzip"}, gzip.compress(gzip.compress(pdf)))
+    assert pdf_mod._download(site + "/c.pdf") == (None, "network error (unsupported content encoding)")
+    # a bomb behind a PDF type stops at MAX_BYTES with little memory
+    monkeypatch.setattr(pdf_mod, "MAX_BYTES", 1_000_000)
+    bomb = gzip.compress(b"%PDF-1.4\n" + b"0" * (BOMB_MB << 20), 9)
+    ROUTES["/bomb.pdf"] = (200, {**ctype, "Content-Encoding": "gzip"}, bomb)
+    got, peak = _peak_mb(lambda: pdf_mod._download(site + "/bomb.pdf"))
+    assert got == (None, "pdf_too_large") and peak < 8
 
 
 def test_the_browser_proxy_caps_a_bomb_too(site, bombs, monkeypatch):

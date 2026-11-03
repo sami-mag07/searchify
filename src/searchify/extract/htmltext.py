@@ -371,20 +371,27 @@ class _Brotli:
         return self.feed(b"")
 
 
+# Real content codings (RFC 9110, with the old x- aliases). Anything else in the header
+# ("UTF-8", "none", "binary" on an uncompressed body) is skipped, as httpx does.
+_CODINGS = {"gzip": "gzip", "x-gzip": "gzip", "deflate": "deflate", "br": "br",
+            "zstd": "zstd", "compress": "compress", "x-compress": "compress"}
+
+
 def content_encodings(resp: httpx.Response) -> List[str]:
-    """The Content-Encoding layers of `resp`, without "identity"."""
+    """The known content codings of `resp`, in header order (aliases normalised)."""
     values = resp.headers.get_list("content-encoding", split_commas=True)
-    return [v for v in (x.strip().lower() for x in values) if v and v != "identity"]
+    return [_CODINGS[v] for v in (x.strip().lower() for x in values) if v in _CODINGS]
 
 
 class _EncodingRefused(httpx.DecodingError):
-    """More than one encoding layer, or one we cannot decode with an output cap."""
+    """More than one coding layer, or one we cannot decode with an output cap."""
 
 
 def iter_decoded(resp: httpx.Response) -> Iterator[bytes]:
     """The body of a streamed `resp`, decoded in pieces of at most about _DECODE_STEP
     bytes, so a compression bomb never lands in memory in one go. Raises
-    _EncodingRefused for stacked or unknown encodings, httpx.DecodingError for a broken stream."""
+    _EncodingRefused for stacked codings or one without an output cap (zstd, compress,
+    br without a capping Brotli module), httpx.DecodingError for a broken stream."""
     layers = content_encodings(resp)
     if len(layers) > 1 or (layers and layers[0] not in ("gzip", "deflate", "br")) \
             or (layers == ["br"] and _BROTLI is None):
