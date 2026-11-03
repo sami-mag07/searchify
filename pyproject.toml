@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "searchify"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local-first web search, clean content extraction and fast reranking. No API key required."
 readme = "README.md"
 requires-python = ">=3.9"

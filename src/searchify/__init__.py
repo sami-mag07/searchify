@@ -25,5 +25,5 @@ __all__ = [
     "search", "extract", "rerank", "passages", "score", "read_pages",
     "extract_report", "extract_document", "extract_main_text", "extract_page", "SearchBackendError",
 ]
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 # Stand: 02.11.2026
