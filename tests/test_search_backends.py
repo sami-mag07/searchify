@@ -58,3 +58,15 @@ def test_site_scoped():
 def test_unknown_backend_returns_empty():
     assert search("anything", backend="does-not-exist") == []
 # Stand: 24.10.2026
+
+
+def test_google_ad_clicks_are_dropped_on_country_domains_too():
+    hits = [
+        {"url": "https://www.google.de/aclk?sa=l&ai=x"},
+        {"url": "https://www.google.co.uk/aclk?sa=l"},
+        {"url": "https://google.fr/aclk"},
+        {"url": "https://www.google.de/search?q=raspberry"},  # not an ad: kept
+        {"url": "https://notgoogle.de/aclk"},                 # another host: kept
+    ]
+    out = dedupe_and_filter(hits, exclude_domains=[], limit=5)
+    assert [h["url"] for h in out] == ["https://www.google.de/search?q=raspberry", "https://notgoogle.de/aclk"]

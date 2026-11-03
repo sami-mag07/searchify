@@ -24,8 +24,8 @@ AD_HOSTS = ["googleadservices.com", "doubleclick.net"]  # with every subdomain
 AD_PATHS = {  # host without "www." -> paths (trailing slash ignored)
     "bing.com": ("/aclick",),
     "duckduckgo.com": ("/y.js", "/l"),
-    "google.com": ("/aclk",),
 }
+GOOGLE_AD_PATH = "/aclk"  # on google.com and every country domain (google.de, google.co.uk, ...)
 
 
 def is_ad_url(link: str) -> bool:
@@ -36,7 +36,10 @@ def is_ad_url(link: str) -> bool:
     parsed = urlparse(link)
     host = (parsed.hostname or "").lower()
     host = host[4:] if host.startswith("www.") else host
-    return (parsed.path.rstrip("/") or "/") in AD_PATHS.get(host, ())
+    path = parsed.path.rstrip("/") or "/"
+    if host.startswith("google.") and path == GOOGLE_AD_PATH:
+        return True
+    return path in AD_PATHS.get(host, ())
 
 
 def dedupe_and_filter(
