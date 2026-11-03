@@ -18,6 +18,14 @@
 - MCP server `searchify-mcp` with the tools `passages`, `search` and `extract` (extra `mcp`).
 - Splitting pages into ranked passages and asking for full questions instead of keywords follow [langchain-searchify](https://github.com/felixvew/langchain-searchify) by Félix Fautsch.
 
+### Changed
+
+Behaviour that differs from 0.2.0:
+
+- `searchify search` ends with exit code 1 and reports the error when every backend failed (0.2.0 printed `[]` with exit code 0).
+- Backend error texts now name the backend and a fixed code, e.g. `duckduckgo: rate_limited: …` instead of `ddgs error: …`.
+- Every extracted page carries `stage`.
+
 ### Fixed
 
 - Wikipedia and other Wikimedia pages load again: the default User-Agent names the project and its URL, as Wikimedia's policy asks; set `SEARCHIFY_USER_AGENT` to use your own.
