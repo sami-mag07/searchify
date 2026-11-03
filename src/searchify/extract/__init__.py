@@ -37,8 +37,8 @@ def extract_report(
 
     ``results`` are the clean pages, exactly as `extract` returns them. ``failed``
     lists ``{url, error, reason}`` per page that could not be read: ``error`` is the
-    human text, ``reason`` a fixed code (blocked, rate_limited, unavailable, timeout,
-    not_html, too_large, address_blocked, no_main_text, extract_failed). ``status`` is
+    human text, ``reason`` a fixed code (blocked, rate_limited, not_found, unavailable,
+    timeout, not_html, too_large, address_blocked, no_main_text, extract_failed). ``status`` is
     ``{read, failed, thin, reasons: {code: n}}``; ``thin`` counts delivered pages that
     carry little text (thin_content or challenge) and is part of ``read``.
 

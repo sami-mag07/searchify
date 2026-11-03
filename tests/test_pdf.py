@@ -406,6 +406,30 @@ def test_a_malformed_answer_is_extract_failed(raw):
     assert pdf_mod._read_answer(raw) == (None, "extract_failed")
 
 
+def test_a_deeply_nested_answer_is_extract_failed():
+    raw = b"[" * 200_000 + b"]" * 200_000  # json.loads hits the recursion limit
+    assert pdf_mod._read_answer(raw) == (None, "extract_failed")
+
+
+def test_the_largest_real_answer_fits_the_reply_cap():
+    # astral characters need 12 bytes each as JSON escapes (a surrogate pair)
+    worst = {"title": "\U0001F600" * pdf_mod.MAX_META_CHARS, "author": "\U0001F600" * pdf_mod.MAX_META_CHARS,
+             "page_count": 10**9, "content": "\U0001F600" * pdf_mod.MAX_CHARS, "truncated": True}
+    assert len(json.dumps(["ok", worst]).encode("ascii")) <= pdf_mod.MAX_REPLY_BYTES
+
+
+def test_cache_put_measures_outside_the_lock(monkeypatch):
+    cache = h.PageCache(10, 60)
+
+    def size(value):
+        assert not cache._lock.locked(), "json.dumps of large blocks ran under the cache lock"
+        return 1
+
+    monkeypatch.setattr(cache, "_size", size)
+    cache.put("u", {"content": "x", "structured": {"json_ld": [{"a": 1}]}})
+    assert cache.get("u")
+
+
 def test_a_wellformed_answer_is_read_field_by_field():
     raw = b'["ok", {"content": "Text \\ud800", "page_count": 3, "title": 7, "truncated": "yes", "x": 1}]'
     assert pdf_mod._read_answer(raw) == ({"content": "Text \ud800", "page_count": 3, "title": "",

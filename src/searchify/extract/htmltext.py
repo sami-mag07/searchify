@@ -502,11 +502,12 @@ class PageCache:
     def put(self, url: str, text: str) -> None:
         if self.ttl_s <= 0:
             return
+        size = self._size(text)  # json.dumps of structured blocks: not under the lock
         with self._lock:
             self._drop(url)
             self._data[url] = (time.monotonic(), text)
-            self._sizes[url] = self._size(text)
-            self._total += self._sizes[url]
+            self._sizes[url] = size
+            self._total += size
             # Grenze nach Anzahl UND Groesse: Reader-Dokumente (ganze Seiten, viele
             # Links) wuerden sonst bei 5000 Eintraegen mehrere GB belegen.
             while self._data and (

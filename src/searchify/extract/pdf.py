@@ -58,9 +58,10 @@ MAX_PAGES = 50
 MAX_CHARS = 60_000
 MIN_TEXT_CHARS = 10  # less than this on all read pages = a scan without a text layer
 MAX_META_CHARS = 300  # title and author; an 8 MB /Title used to arrive whole
-# Largest answer the parent accepts from a child: MAX_CHARS of text at up to 6 bytes
-# per character (JSON escapes) plus title and author fit many times over.
-MAX_REPLY_BYTES = 1 << 20
+# Largest answer the parent accepts from a child: every character of text, title and
+# author as an astral one (12 bytes as a JSON surrogate pair escape), plus room for
+# the page markers' separators and the other fields.
+MAX_REPLY_BYTES = 12 * (MAX_CHARS + 2 * MAX_META_CHARS) + 4096
 _SNIFF = 1024  # the PDF header may follow a few junk bytes, the spec allows 1024
 
 _SLOTS = threading.BoundedSemaphore(MAX_PARALLEL)
@@ -358,7 +359,7 @@ def _read_answer(raw: bytes) -> Tuple[Optional[Dict], Optional[str]]:
     extract_failed, never an exception in the parent."""
     try:
         kind, payload = json.loads(raw)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, RecursionError):  # RecursionError: [[[[...]]]] nested deep
         return None, "extract_failed"
     if kind == "err":
         return None, payload if isinstance(payload, str) and payload in _CHILD_CODES else "extract_failed"
