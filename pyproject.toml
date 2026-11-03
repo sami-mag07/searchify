@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "searchify"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local-first web search, clean content extraction and fast reranking. No API key required."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,17 +30,20 @@ dependencies = [
 
 [project.scripts]
 searchify = "searchify.cli:main"
+searchify-mcp = "searchify.cli:mcp_main"
 
 [project.optional-dependencies]
 rerank = ["sentence-transformers>=3.0"]
 browser = ["playwright>=1.44"]
 stealth = ["camoufox>=0.4"]
 api = ["fastapi>=0.110", "uvicorn>=0.29", "pydantic>=2.6"]
+pdf = ["pypdfium2>=5.14,<6"]
+mcp = ["mcp>=2.3,<3; python_version >= '3.10'"]
 dev = ["pytest>=8.0"]
 
 [project.urls]
-Homepage = "https://github.com/sami-mag07/searchify-l"
-Issues = "https://github.com/sami-mag07/searchify-l/issues"
+Homepage = "https://github.com/sami-mag07/searchify"
+Issues = "https://github.com/sami-mag07/searchify/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -48,4 +51,4 @@ include = ["searchify*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Stand: 24.10.2026
+# Stand: 02.11.2026

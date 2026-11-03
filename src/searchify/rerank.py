@@ -40,7 +40,9 @@ def score(query: str, texts: Sequence[str]) -> List[float]:
     if not texts:
         return []
     model = _load()
-    return [float(s) for s in model.predict([(query, t or "") for t in texts])]
+    # no progress bar: in pipes and agents it would only be noise on stderr
+    pairs = [(query, t or "") for t in texts]
+    return [float(s) for s in model.predict(pairs, show_progress_bar=False)]
 
 
 def rerank(query: str, items: List[Dict], *, key: str = "content",

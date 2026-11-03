@@ -10,7 +10,9 @@ Schwer-Abhaengigkeit importierbar bleibt (Tests/Dry-Run).
 
 from __future__ import annotations
 
+import dataclasses
 import ipaddress
+import json
 import logging
 import multiprocessing
 import os
@@ -22,6 +24,7 @@ from collections import OrderedDict
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from concurrent.futures import TimeoutError as FuturesTimeout
 from concurrent.futures.process import BrokenProcessPool
+from itertools import zip_longest
 from typing import Dict, Iterator, List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 
@@ -29,8 +32,27 @@ import httpcore
 import httpx
 
 from .config import get_settings
+from .netlimits import (
+    _REDIRECTS,
+    ACCEPT_ENCODING,
+    _DeadlineStream,
+    _EncodingRefused,
+    _RedirectBodyGuard,
+    _time_left,
+    iter_decoded,
+    overall_deadline,
+)
 
 log = logging.getLogger("rag-search")
+
+
+def strip_line_ends(text: str) -> str:
+    """Spaces and tabs before each line break removed, in linear time.
+
+    Same result as re.sub(r"[ \t]+\n", "\n", text), which backtracks quadratically on
+    a long run of spaces without a line break (40,000 spaces took 2 s)."""
+    lines = text.split("\n")
+    return "\n".join([line.rstrip(" \t") for line in lines[:-1]] + lines[-1:])
 
 
 def chunk_text(text: str, chunk_size: int = 350, overlap: int = 60) -> List[str]:
@@ -277,11 +299,20 @@ def extract_page(html: str, url: str = "") -> Tuple[Optional[str], List[Dict[str
     return text, links, _metadata(html, url)
 
 
-_USER_AGENT = "Mozilla/5.0 (compatible; rag-search-bot/0.1; +self-hosted-clean-room)"
+# Wikimedia (and others) answer 403 to bots whose User-Agent names no contact, except for
+# pages their edge cache already holds: with the old "rag-search-bot ... clean-room" agent
+# Wikipedia's popular articles loaded and most others never did. Operators can put their
+# own contact here (SEARCHIFY_USER_AGENT), as the Wikimedia policy asks.
+_USER_AGENT = os.environ.get("SEARCHIFY_USER_AGENT") or (
+    "Mozilla/5.0 (compatible; searchify; +https://github.com/sami-mag07/searchify)"
+)
 _MAX_BYTES = 1_000_000  # groessere Seiten werden abgeschnitten, nicht komplett geladen
 
 _CLIENT: Optional[httpx.Client] = None
 _POOL: Optional[ThreadPoolExecutor] = None
+
+
+_SIZED_FIELDS = ("content", "title", "author", "description")
 
 
 class PageCache:
@@ -301,11 +332,16 @@ class PageCache:
 
     @staticmethod
     def _size(value) -> int:
-        """Grobe Groesse in Zeichen: Text bzw. content + Links eines Dokuments."""
+        """Grobe Groesse in Zeichen: Text bzw. content, Titel, Autor, Beschreibung und
+        Links eines Dokuments (ein 8-MB-PDF-Titel zaehlte vorher 0, Security-Review 03.11.2026)."""
         if isinstance(value, str):
             return len(value)
         if isinstance(value, dict):
-            return len(value.get("content") or "") + 120 * len(value.get("links") or [])
+            text = sum(len(v) for v in (value.get(k) for k in _SIZED_FIELDS) if isinstance(v, str))
+            # JSON-LD and meta blocks can be as large as the page itself
+            blocks = sum(len(json.dumps(value[k], default=str)) for k in ("structured", "product")
+                         if value.get(k))
+            return text + blocks + 120 * len(value.get("links") or [])
         if isinstance(value, list):
             return 120 * len(value)
         return 0
@@ -331,11 +367,12 @@ class PageCache:
     def put(self, url: str, text: str) -> None:
         if self.ttl_s <= 0:
             return
+        size = self._size(text)  # json.dumps of structured blocks: not under the lock
         with self._lock:
             self._drop(url)
             self._data[url] = (time.monotonic(), text)
-            self._sizes[url] = self._size(text)
-            self._total += self._sizes[url]
+            self._sizes[url] = size
+            self._total += size
             # Grenze nach Anzahl UND Groesse: Reader-Dokumente (ganze Seiten, viele
             # Links) wuerden sonst bei 5000 Eintraegen mehrere GB belegen.
             while self._data and (
@@ -406,6 +443,19 @@ def _host_is_public(host: str) -> bool:
     return bool(_public_ips(host))
 
 
+_MAX_CONNECT_IPS = 4  # addresses tried per host, each with its own connect timeout
+
+
+def _interleave_families(ips: List[str]) -> List[str]:
+    """IPv6 and IPv4 alternating, starting with the family of the first (preferred)
+    address, as in Happy Eyeballs (RFC 8305, 4). getaddrinfo sorts by RFC 6724, so a
+    dual-stack host with four AAAA records lists all of them before any A record."""
+    first = ":" in ips[0]
+    same = [ip for ip in ips if (":" in ip) == first]
+    other = [ip for ip in ips if (":" in ip) != first]
+    return [ip for pair in zip_longest(same, other) for ip in pair if ip is not None]
+
+
 class _PinnedBackend(httpcore.SyncBackend):
     """Verbindet nur zu geprueften, oeffentlichen IPs (Schutz gegen DNS-Rebinding).
 
@@ -419,25 +469,33 @@ class _PinnedBackend(httpcore.SyncBackend):
         ips = _public_ips(host)
         if not ips:
             raise httpcore.ConnectError(f"Interne oder unaufloesbare Adresse blockiert: {host}")
-        # Wie socket.create_connection: alle gepruefte Adressen der Reihe nach,
-        # damit ein toter erster A-Record (oder IPv6 ohne Route) den Host nicht kippt.
+        # Wie socket.create_connection: gepruefte Adressen der Reihe nach, damit ein
+        # toter erster A-Record (oder IPv6 ohne Route) den Host nicht kippt. Hoechstens
+        # _MAX_CONNECT_IPS, sonst kosten 50 tote Records 50 Connect-Timeouts; die
+        # Familien abwechselnd, sonst erreichte ein Host mit 4 AAAA nie seine IPv4.
         last_error: Optional[Exception] = None
-        for ip in ips:
+        for ip in _interleave_families(ips)[:_MAX_CONNECT_IPS]:
             try:
-                return super().connect_tcp(
-                    ip, port, timeout=timeout, local_address=local_address,
-                    socket_options=socket_options,
+                stream = super().connect_tcp(
+                    ip, port, timeout=_time_left(timeout, httpcore.ConnectTimeout),
+                    local_address=local_address, socket_options=socket_options,
                 )
             except (httpcore.ConnectError, httpcore.ConnectTimeout) as exc:
                 last_error = exc
+                continue
+            return _DeadlineStream(stream)
         raise last_error  # type: ignore[misc]
+
+
+class _BlockedAddress(httpx.RequestError):
+    """The request goes to an internal or invalid address (reported as "address not allowed")."""
 
 
 def _block_internal(request: httpx.Request) -> None:
     """SSRF protection: applies to the first request AND every redirect, so a
     page cannot redirect to a private or link-local address (e.g. 169.254.x)."""
     if request.url.scheme not in ("http", "https") or not _host_is_public(request.url.host):
-        raise httpx.RequestError("Interne oder ungueltige Adresse blockiert", request=request)
+        raise _BlockedAddress("Interne oder ungueltige Adresse blockiert", request=request)
 
 
 def _client() -> httpx.Client:
@@ -456,9 +514,10 @@ def _client() -> httpx.Client:
                 transport._pool._network_backend = _PinnedBackend()
                 _CLIENT = httpx.Client(
                     follow_redirects=True,
-                    headers={"User-Agent": _USER_AGENT},
+                    # only what iter_decoded can decode with an output cap
+                    headers={"User-Agent": _USER_AGENT, "Accept-Encoding": ACCEPT_ENCODING},
                     event_hooks={"request": [_block_internal]},
-                    transport=transport,
+                    transport=_RedirectBodyGuard(transport),
                 )
     return _CLIENT
 
@@ -481,7 +540,20 @@ def _pool() -> ThreadPoolExecutor:
 
 
 _TLS = threading.local()
-_REDIRECTS = {301, 302, 303, 307, 308}
+
+
+# Why the last fetch on this thread failed, so callers can report a reason
+# ("HTTP 403", "not HTML: application/pdf", ...) instead of a generic message.
+def _note_failure(reason: str) -> None:
+    _TLS.failure = reason
+
+
+def _reset_failure() -> None:
+    _TLS.failure = None
+
+
+def fetch_failure() -> Optional[str]:
+    return getattr(_TLS, "failure", None)
 _BLOCKED = {403, 429, 503}  # typische Antworten von Bot-Schutz
 
 
@@ -491,7 +563,9 @@ def _curl_session():
     if sess is None:
         from curl_cffi import requests as curl_requests  # noqa: PLC0415 (optional)
 
-        sess = curl_requests.Session(impersonate="chrome")
+        # trust_env=False: a proxy from the environment would resolve the host itself
+        # and see the request before the connected-IP check (blind SSRF).
+        sess = curl_requests.Session(impersonate="chrome", trust_env=False)
         _TLS.curl = sess
     return sess
 
@@ -507,7 +581,11 @@ def _plain_url(url: str) -> bool:
         parts.port  # noqa: B018 - wirft bei ungueltigem Port
     except ValueError:
         return False
-    return parts.scheme in ("http", "https") and bool(parts.hostname) and "@" not in parts.netloc
+    # Kein % und nur ASCII im Host: curl dekodiert %-Folgen und wandelt Unicode nach
+    # IDNA2008 ("faß" -> xn--fa-hia), Python prueft dagegen den Rohtext bzw. IDNA2003
+    # ("fass"). Dann loeste curl einen ungeprueften Host selbst auf.
+    netloc_ok = parts.netloc.isascii() and "%" not in parts.netloc and "@" not in parts.netloc
+    return parts.scheme in ("http", "https") and bool(parts.hostname) and netloc_ok
 
 
 def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Optional[str]:
@@ -520,34 +598,41 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
     try:
         for _ in range(5):
             if not _plain_url(url):
+                _note_failure("address not allowed")
                 return None
             parts = urlparse(url)
             ips = _public_ips(parts.hostname or "")
             if not ips:
+                _note_failure("address not public or not resolvable")
                 return None
             # Geprueften Host auf die gepruefte IP festnageln (CURLOPT_RESOLVE), damit
             # curl nicht selbst neu aufloest (DNS-Rebinding). Session ist je Thread.
             port = parts.port or (443 if parts.scheme == "https" else 80)
             sess = _curl_session()
             pinned = ",".join(f"[{ip}]" if ":" in ip else ip for ip in ips)
-            # CONNECT_TO ohne Host/Port gilt fuer jede Verbindung: selbst wenn curl die URL
-            # anders liest als urlparse, verbindet es nur zur geprueften IP.
-            first = f"[{ips[0]}]" if ":" in ips[0] else ips[0]
-            sess.curl_options = {
-                CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"],
-                CurlOpt.CONNECT_TO: [f"::{first}:{port}"],
-            }
+            # RESOLVE nagelt den geprueften Host auf die geprueften IPs fest. CONNECT_TO
+            # (eine Liste) nimmt curl_cffi nicht an: es warf TypeError, der still None
+            # ergab, darum lief dieser Rueckfall nie. Stattdessen wird unten die IP geprueft,
+            # mit der curl tatsaechlich verbunden ist, bevor ein Byte gelesen wird.
+            sess.curl_options = {CurlOpt.RESOLVE: [f"{parts.hostname}:{port}:{pinned}"],
+                                 CurlOpt.PROXY: ""}
             resp = sess.get(
                 url, timeout=max(0.1, deadline - time.monotonic()), allow_redirects=False, stream=True
             )
             try:
+                if _connected_ip(resp) not in {str(ipaddress.ip_address(ip)) for ip in ips}:
+                    log.warning("curl fallback connected to an unchecked address, dropped: %s", url)
+                    _note_failure("address not public or not resolvable")
+                    return None
                 if resp.status_code in _REDIRECTS and resp.headers.get("location"):
                     url = urljoin(url, resp.headers["location"])
                     continue
                 if resp.status_code >= 400:
+                    _note_failure(f"HTTP {resp.status_code}")
                     return None
                 ctype = resp.headers.get("content-type", "")
                 if ctype and "html" not in ctype and "text" not in ctype:
+                    _note_failure(f"not HTML: {ctype.split(';')[0].strip()}")
                     return None
                 body = bytearray()
                 for part in resp.iter_content():
@@ -555,26 +640,45 @@ def _fetch_url_curl(url: str, timeout: float, max_bytes: int = _MAX_BYTES) -> Op
                     if len(body) >= max_bytes:
                         break
                     if time.monotonic() > deadline:
+                        _note_failure("timeout")
                         return None
                 return body.decode(resp.encoding or "utf-8", errors="replace")
             finally:
                 resp.close()
-    except Exception:  # noqa: BLE001 - curl_cffi wirft eigene Fehlertypen
+    except Exception as exc:  # noqa: BLE001 - curl_cffi wirft eigene Fehlertypen
+        log.debug("curl fallback failed for %s: %r", url, exc)
+        _note_failure(f"network error ({type(exc).__name__})")
         return None
+    _note_failure("too many redirects")
     return None
 
 
+def _connected_ip(resp) -> str:
+    """The address curl really connected to, in ipaddress's normal form ("" if unreadable)."""
+    raw = (getattr(resp, "primary_ip", "") or "").strip("[]").split("%")[0]
+    try:
+        return str(ipaddress.ip_address(raw))
+    except ValueError:
+        return ""
+
+
 def fetch_url(
-    url: str, timeout: Optional[float] = None, max_bytes: Optional[int] = None
+    url: str, timeout: Optional[float] = None, max_bytes: Optional[int] = None,
+    *, plain: bool = False,
 ) -> Optional[str]:
     """Fetch a URL and return its HTML text (or None on failure).
 
-    `timeout` applies to the whole download: httpx only counts per read step, so
-    a slow-dripping server could otherwise hold a worker indefinitely.
+    `timeout` applies to the whole download, headers included (overall_deadline):
+    httpx only counts per read step, so a slow-dripping server could otherwise hold
+    a worker indefinitely. `plain` forces httpx and switches the Chrome-TLS fallback off, whatever FETCH_CLIENT
+    and FETCH_FALLBACK say (the ladder cap ``plain``); the search path never sets it.
     """
     settings = get_settings()
+    if plain:
+        settings = dataclasses.replace(settings, fetch_client="httpx", fetch_fallback=False)
     timeout = timeout or settings.fetch_timeout
     limit = max_bytes or _MAX_BYTES
+    _reset_failure()
     return _fetch_live(url, timeout, limit, settings)
 
 
@@ -583,29 +687,54 @@ def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]
         return _fetch_url_curl(url, timeout, limit)
     deadline = time.monotonic() + timeout
     try:
-        with _client().stream("GET", url, timeout=timeout) as resp:
+        with overall_deadline(timeout), _client().stream("GET", url, timeout=timeout) as resp:
             blocked = resp.status_code in _BLOCKED and settings.fetch_fallback
             if not blocked:
-                resp.raise_for_status()
+                if not resp.is_success:
+                    _note_failure(f"HTTP {resp.status_code}")
+                    return None
                 ctype = resp.headers.get("content-type", "")
                 if ctype and "html" not in ctype and "text" not in ctype:
+                    _note_failure(f"not HTML: {ctype.split(';')[0].strip()}")
                     return None
                 body = bytearray()
-                for part in resp.iter_bytes():
+                for part in iter_decoded(resp):  # pieces of at most _DECODE_STEP bytes
                     body.extend(part)
                     if len(body) >= limit:
-                        break
+                        break  # the last piece stays whole, as before: at most limit + one piece
                     if time.monotonic() > deadline:
+                        _note_failure("timeout")
                         return None
                 return body.decode(resp.encoding or "utf-8", errors="replace")
-    except httpx.HTTPError:
+            _note_failure(f"HTTP {resp.status_code}")
+    except httpx.TimeoutException:
+        _note_failure("timeout")
+        return None
+    except _EncodingRefused:
+        _note_failure("network error (unsupported content encoding)")
+        return None
+    except _BlockedAddress:
+        _note_failure("address not allowed")
+        return None
+    except httpx.HTTPError as exc:
+        _note_failure(f"network error ({type(exc).__name__})")
         return None
     # Bot-Schutz antwortet dem ehrlichen Bot-UA oft mit 403/429/503: einmal mit
     # Chrome-TLS-Profil nachladen (gemessen 14.10.: +4,7 % der Trefferseiten lesbar).
     remaining = deadline - time.monotonic()
     if remaining < 0.3:
-        return None
-    return _fetch_url_curl(url, remaining, limit)
+        return None  # no time for the retry: the block status noted above stays
+    blocked_status = fetch_failure()
+    html = _fetch_url_curl(url, remaining, limit)
+    if html is None and blocked_status:
+        retry = fetch_failure()
+        blocked_again = (retry or "").startswith("HTTP ") and (retry or "")[5:8].isdigit() \
+            and int(retry[5:8]) in _BLOCKED
+        if blocked_again:
+            _note_failure(f"{blocked_status}, also after retry")
+        elif retry and retry != blocked_status:
+            _note_failure(f"{blocked_status}, retry: {retry}")
+    return html
 
 
 _EXTRACT_POOL: Optional[ProcessPoolExecutor] = None
@@ -647,8 +776,16 @@ def warm_up() -> None:
         fut.result()
 
 
-def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], Dict]:
+def discard_extract_pool(pool: ProcessPoolExecutor) -> None:
+    """Einen abgestuerzten Pool verwerfen, damit der naechste Aufruf einen neuen
+    anlegt. Nur genau diesen Pool: ein schon neu angelegter bleibt."""
     global _EXTRACT_POOL
+    with _INIT_LOCK:
+        if _EXTRACT_POOL is pool:
+            _EXTRACT_POOL = None
+
+
+def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], Dict]:
     if _CLOSED:
         return None, [], {}
     pool = _extract_pool()
@@ -658,9 +795,7 @@ def _extract(html: str, url: str) -> Tuple[Optional[str], List[Dict[str, str]], 
         return None, [], {}  # pathologische Seite: nicht noch einmal im Thread rechnen
     except BrokenProcessPool:
         log.warning("Extraktions-Pool kaputt, wird neu angelegt")
-        with _INIT_LOCK:
-            if _EXTRACT_POOL is pool:  # nur den kaputten Pool verwerfen, nicht einen neuen
-                _EXTRACT_POOL = None
+        discard_extract_pool(pool)
         return extract_page(html, url)
     except RuntimeError:  # Pool nicht verfuegbar (z. B. beim Herunterfahren)
         return extract_page(html, url)

@@ -44,6 +44,7 @@ from typing import Dict, Optional, Tuple
 from urllib.parse import urlparse
 
 from . import htmltext as extract_mod
+from . import netlimits
 
 SLOTS = max(1, int(os.environ.get("RENDER_SLOTS", "3")))  # Stufe 2 gleichzeitig (ein Browser)
 DIRECT_SLOTS = max(1, int(os.environ.get("RENDER_DIRECT_SLOTS", "2")))  # Stufe 3 gleichzeitig
@@ -98,13 +99,18 @@ def _fetch(method: str, url: str, headers: Dict[str, str], body: Optional[bytes]
     ohne Redirects zu folgen. None = blockiert oder Netzfehler."""
     if not url_allowed(url):
         return None
+    # only encodings iter_decoded can decode with an output cap (compression bomb)
+    headers = {k: v for k, v in headers.items() if k.lower() != "accept-encoding"}
+    headers["accept-encoding"] = netlimits.ACCEPT_ENCODING
     try:
-        with extract_mod._client().stream(method, url, headers=headers, content=body,
-                                          follow_redirects=False, timeout=8.0) as resp:
+        with netlimits.overall_deadline(8.0), \
+                extract_mod._client().stream(method, url, headers=headers, content=body,
+                                             follow_redirects=False, timeout=8.0) as resp:
             data = bytearray()
-            for part in resp.iter_bytes():
+            for part in netlimits.iter_decoded(resp):
                 data.extend(part)
                 if len(data) >= _MAX_BODY:
+                    del data[_MAX_BODY:]
                     break
             return resp.status_code, dict(resp.headers), bytes(data)
     except Exception:  # noqa: BLE001 - blockiert (intern) oder Netzfehler

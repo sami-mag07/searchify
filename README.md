@@ -47,7 +47,7 @@ Run it once and the reranker model (about 470 MB) downloads; after that it is ca
 Not on PyPI yet, so install from GitHub:
 
 ```bash
-pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify-l"
+pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify"
 ```
 
 | Extra | Adds |
@@ -57,6 +57,8 @@ pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify-l"
 | `api` | the HTTP service (`fastapi`, `uvicorn`) |
 | `browser` | the browser stages for JavaScript and bot-protected pages (`playwright`) |
 | `stealth` | the optional Camoufox stage |
+| `mcp` | the MCP server for Claude Code, Claude Desktop, Cursor and other hosts (`mcp`, Python 3.10+) |
+| `pdf` | reading PDFs (`pypdfium2`): text with `[Seite N]` page marks, up to 50 pages and 60,000 characters |
 
 Then set nothing and search works. Copy `.env.example` to `.env` only if you want a SearXNG
 instance or a cloud fallback.
@@ -66,21 +68,71 @@ instance or a cloud fallback.
 | Call | What it does |
 |---|---|
 | `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
-| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. |
+| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Compared with 0.2.0 a normal page only gains the small field `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags stay opt-in: they come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. |
+| `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and always `status` (`read`, `failed`, `thin`, `reasons`; after a clean run `failed` and `thin` are 0 and `reasons` is empty). |
 | `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
-| `POST /search`, `POST /extract` | The same as an HTTP service, see below. |
+| `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
+| `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
+| `searchify-mcp` | The same as tools for any MCP host, see below. |
 
 ## Command line
 
 ```bash
 searchify search "Where is the Eiffel Tower?"
 searchify extract "https://en.wikipedia.org/wiki/Eiffel_Tower"
+searchify passages "How tall is the Eiffel Tower?" -k 3 --per-site 1
 ```
 
 Output is JSON by default (`{"results": [...]}`, errors as `{"error": ...}` with exit code 1),
-so agents and scripts can parse it. Add `--no-json` for a readable view. `search` takes
-`-n`, `--backend`, `--language`, `--time-range`, `--include-domain` and `--exclude-domain`;
-`extract` takes `--format text|markdown` and several URLs.
+so agents and scripts can parse it. A search that found nothing because every backend failed
+(a DuckDuckGo rate limit, an unreachable SearXNG) reports that error instead of an empty list. Add `--no-json` for a readable view. `search` takes
+`-n`, `--backend`, `--language`, `--country` (with `--language nl` DuckDuckGo gets `nl-nl`, with `--country BE` `be-nl`; no language means worldwide, `any` too), `--time-range`, `--include-domain` and `--exclude-domain`;
+`extract` takes `--format text|markdown` and several URLs. `passages` takes the search options
+plus `-k` (passages to return), `--per-site`, `--max-chars` and `--rerank/--no-rerank`; it
+reranks by default when the `rerank` extra is installed.
+
+A full question in the user's words finds more than keywords: the query goes to the search
+engine as written and then ranks the paragraphs. Each command line call loads the reranker
+again, so for many questions in a row the HTTP service or the MCP server is faster.
+
+### Why a page failed
+
+Every failed page keeps its human `error` text and gets one `reason`: `blocked` (401/403/451),
+`rate_limited` (429), `not_found` (404/410), `unavailable`, `timeout`, `not_html`, `too_large`,
+`address_blocked` (a private or internal address, refused before any connection),
+`no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
+`pdf_too_large`. The command line and `extract_report` always put `reason` on each failed page.
+The HTTP `/extract` lists failed pages with `url` and `error` only and adds `reason` to each of
+them with `detail: true` in the request body; it repeats the counts in `status` and in the
+`X-Searchify-Status` header, built from these codes only. On full success `/extract` adds neither
+`status` nor the header.
+
+## MCP server
+
+`searchify-mcp` offers three tools to any MCP host: `passages` (start here for questions),
+`search` and `extract`. All of them only read from the web. The time filter offers models
+only `month` and `year`: with `day` or `week` they hide the answer to questions about past
+events.
+
+```bash
+pip install "searchify[mcp,rerank] @ git+https://github.com/sami-mag07/searchify"
+claude mcp add searchify -- searchify-mcp
+```
+
+Claude Desktop (`claude_desktop_config.json`) and Cursor (`.cursor/mcp.json`) take the same
+command. They start it with their own environment, so give the full path from
+`which searchify-mcp` and put settings in `env`:
+
+```json
+{
+  "mcpServers": {
+    "searchify": {
+      "command": "/full/path/to/searchify-mcp",
+      "env": {"SEARXNG_URL": "http://localhost:8080"}
+    }
+  }
+}
+```
 
 ## How the research agent works
 
@@ -172,6 +224,42 @@ Rules kept during tuning: no captcha solving, no result gaming (never remove rea
 raise a number), the safety limits never weakened. The run measured the default ladder below;
 the optional Camoufox stage (`READER_STEALTH=1`) was not part of it.
 
+### 0.3.0 against 0.2.0
+
+The same fixed test lists, run once with 0.2.0 and once with this version (`bench/feature_bench.py`):
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-dark.svg">
+  <img alt="0.2.0 against 0.3.0: normal pages 14/15 to 15/15, failed pages with a reason 0/29 to 23/29, PDFs read 0/20 to 20/20, shop prices 0/29 to 25/29, regional questions 20/40 to 27/40" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-light.svg">
+</picture>
+
+Normal pages are as fast as before: median 0.131 s with 0.2.0 and 0.128 s with 0.3.0 over five
+alternating runs.
+
+**What a model gets to read.** 123 questions in German, English, Spanish and French. Every
+version gets the same full question and the same recorded search hits, so only the processing
+differs. Scores are on the 73 test questions held out while tuning (`bench/record.py`,
+`bench/loop.py`, `bench/viz.py`, charts from `bench/charts.py`).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-dark.svg">
+  <img alt="Answer in the first 4,800 characters and MRR: 0.2.0 snippets 95% and 0.80, 0.2.0 whole pages 92% and 0.75, 0.3.0 reranked snippets 95% and 0.91, 0.3.0 passages 100% and 0.92" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-light.svg">
+</picture>
+
+MRR is 1 when the first passage holds the answer and 0.5 when the second does. Reranking alone
+lifts the snippets from 0.80 to 0.91; passages read from the pages also find the answer for every
+question, where snippets miss about one in twenty.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-dark.svg">
+  <img alt="Twenty random draws of the questions per version: the 0.2.0 clouds sit between 0.71 and 0.86 on the held-out questions, the 0.3.0 clouds between 0.89 and 0.97" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-light.svg">
+</picture>
+
+Each small dot is one random draw of the questions with replacement, the large dot the score over
+all of them. The 0.2.0 and 0.3.0 clouds do not overlap, so the gain is not luck of the question
+set. A full question beats keywords in all four languages, and a tuning loop over 1.7 million
+settings found nothing that beats the defaults on the held-out questions.
+
 ## How it works
 
 ```mermaid
@@ -228,7 +316,14 @@ curl -s http://localhost:8000/search  -H 'content-type: application/json' -d '{"
 curl -s http://localhost:8000/extract -H 'content-type: application/json' \
   -d '{"urls": ["https://en.wikipedia.org/wiki/Web_scraping",
                 "https://en.wikipedia.org/wiki/Data_scraping"]}'
+curl -s http://localhost:8000/passages -H 'content-type: application/json' \
+  -d '{"query": "How tall is the Eiffel Tower?", "top_k": 3}'
 ```
+
+The service has no login of its own, so keep it on localhost (uvicorn's default `127.0.0.1`) or
+put it behind your own authentication. Anyone who can reach it can use the Tavily and Serper keys
+set in its environment and choose the search backend. `SEARCHIFY_MAX_STAGE` caps the load ladder
+for every request, whatever the request asks for.
 
 In Python:
 
@@ -241,6 +336,32 @@ answer = requests.post(
 )
 print(answer.json())   # the clean text for each address
 ```
+
+`/extract` takes at most 50 addresses per request; a longer list is refused with status 422.
+It answers `{"results": [...], "failed": [...]}`. Each result has `url`, `title`,
+`published`, `author`, `description`, `content`, `links` and `stage`, plus `structured` only when
+the request asks for it with `"structured": true`:
+
+- `structured.json_ld` (only with `"structured": true`) is the list of the page's JSON-LD objects as they are, so a shop page's
+  `Product` with `offers.price`, `priceCurrency`, `availability` and `gtin13` comes out without
+  any model reading the text; `structured.meta` holds the namespaced meta tags (`og:title`,
+  `product:price:amount`, ...).
+- `product` appears only on product pages: `name`, `price`, `priceCurrency`, `availability`, `gtin` (list), `sku`, `brand`, taken from the page's JSON-LD (also inside `@graph`, with offers as list or `AggregateOffer`). `structured` is left out when the page has no JSON-LD and no namespaced meta.
+- `stage` says which rung read the page: `static`, `browser`, `browser-direct`, `stealth` or
+  `tavily`.
+- `failed` lists each page that could not be read with its `error` text: `HTTP 403, also after retry`,
+  `not HTML: application/pdf`, `timeout`, `address not public or not resolvable`, and so on. The
+  fixed `reason` code per entry comes with `"detail": true`.
+
+`/search` answers `{"results": [...], "error": ..., "backend": ...}`: `backend` is the one that
+answered, and `error` is the first backend error (null when a query simply has no hits). In
+Python, `search_report()['error']` is the same first backend error.
+
+`/search` and `/passages` take a `query` of at most 2,000 characters and at most 100 entries in
+each of `include_domains` and `exclude_domains`; more is refused with status 422. When
+`/passages` fails it answers `{"error": code, "results": []}` with a fixed code (`rate_limited`,
+`timeout`, `unavailable`, ..., or `rerank_unavailable` for `"rerank": true` without the extra),
+never the text of the exception.
 
 **How it decides how hard to try (the load ladder, `read_pages`):**
 
@@ -266,16 +387,49 @@ print(answer.json())   # the clean text for each address
 The browser stages need `pip install "searchify[browser]"` and
 `playwright install chromium-headless-shell`.
 
+## Limiting the load ladder
+
+By default `extract` goes as far as the environment allows. You can cap that per request:
+
+- `max_stage`: `plain` (httpx only, no Chrome-TLS fallback), `tls` (plus the Chrome-TLS fallback),
+  `browser` (plus the shared and the direct browser), `stealth` (plus Camoufox).
+- `budget`: `low` (each page cut to 4,000 characters, `truncated: true` on a cut page, timeouts
+  at 60 %), `normal` (exactly as before), `high` (timeouts doubled). The cache always holds the
+  full text; the cut happens after it.
+- `cloud_fallback`: `false` never asks Tavily (it costs credits). Default as before: on if
+  `TAVILY_API_KEY` is set.
+
+The effective stage is the lowest of what is installed and switched on (`READER_RENDER`,
+`READER_STEALTH`, ...), the operator cap `SEARCHIFY_MAX_STAGE` and the wish of the request. So
+`READER_STEALTH=1` cannot override a request for `plain`. A value in `SEARCHIFY_MAX_STAGE` that is
+not a stage counts as `plain`.
+
+Where to set it: the HTTP `/extract` body (`max_stage`, `budget`, `cloud_fallback`), the MCP
+`extract` tool (`max_stage`, `budget`), `searchify extract --max-stage tls --budget low --no-cloud`,
+and `extract_report(urls, max_stage=..., budget=..., cloud_fallback=...)`.
+
+**Your profile** (command line and `extract_report` only): the first time you run
+`searchify search`, `extract` or `passages` at a terminal, two questions ask for your default
+stage and budget. Enter keeps today's behaviour, `later` asks again next time, and nothing is
+asked in pipes, with the output going to a file, in CI, agents or with `--no-input`. Answers go to a JSON file in your config folder (macOS
+`~/Library/Application Support/searchify`, Linux `$XDG_CONFIG_HOME` or `~/.config/searchify`,
+Windows `%APPDATA%\searchify`; `SEARCHIFY_CONFIG_DIR` overrides it). `searchify config` asks again,
+`searchify config --show` prints each value and where it comes from, and `--max-stage` and
+`--budget` set a value directly. Order: request, then profile, then default, all below the
+operator cap. The HTTP service and the MCP server never read the profile. `--region` stores a
+search region, but no search reads it yet; profiles with a region from an older version load as
+before.
+
 ## Configuration
 
 Every setting is optional and read from the environment (see `.env.example`):
 `SEARCH_BACKEND`, `SEARCH_FALLBACK`, `SEARXNG_URL`, `SERPER_API_KEY`, `TAVILY_API_KEY`,
-`RERANKER_MODEL`, `FETCH_TIMEOUT`. No key is ever read from code.
+`RERANKER_MODEL`, `FETCH_TIMEOUT`, `SEARCHIFY_USER_AGENT`. No key is ever read from code.
 
 ## Tests
 
 ```bash
-pip install -e ".[dev,api]"
+pip install -e ".[dev,api,mcp]"
 pytest
 ```
 
@@ -289,4 +443,4 @@ pytest
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
-<!-- Stand: 24.10.2026 -->
+<!-- Stand: 02.11.2026 -->

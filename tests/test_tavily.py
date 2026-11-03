@@ -61,6 +61,31 @@ def test_tavily_reads_only_failed_pages(monkeypatch):
     assert [f["url"] for f in still] == ["https://gone.com"]
 
 
+def test_tavily_never_gets_addresses_that_were_blocked_as_internal(monkeypatch):
+    monkeypatch.setenv("TAVILY_API_KEY", "test-key")
+    sent = []
+
+    def fake_post(path, body, timeout):
+        sent.extend(body["urls"])
+        return {"results": [{"url": u, "raw_content": "cloud text"} for u in body["urls"]]}
+
+    monkeypatch.setattr(reader, "tavily_post", fake_post)
+    monkeypatch.setattr(reader.pages_mod, "_docs", lambda: type("C", (), {"put": lambda *a: None})())
+    internal = "http://10.0.0.5/admin?session=internal"
+    failed = [
+        {"url": internal, "error": "address not public or not resolvable", "reason": "address_blocked"},
+        {"url": "http://localhost:8080/x", "error": "address not public or not resolvable"},  # code from the text
+        {"url": "https://blocked.com", "error": "HTTP 403", "reason": "blocked"},
+    ]
+    docs, still = reader._tavily_failed([], failed, "text", [f["url"] for f in failed])
+    assert sent == ["https://blocked.com"]
+    assert [d["url"] for d in docs] == ["https://blocked.com"]
+    assert [f["url"] for f in still] == [internal, "http://localhost:8080/x"]
+    sent.clear()
+    docs, still = reader._tavily_failed([], failed[:2], "text", [internal])
+    assert sent == [] and docs == [] and len(still) == 2  # nothing left to ask: no call at all
+
+
 def test_tavily_error_keeps_failures(monkeypatch):
     monkeypatch.setenv("TAVILY_API_KEY", "test-key")
 

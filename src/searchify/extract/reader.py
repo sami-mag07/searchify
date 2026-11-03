@@ -17,13 +17,17 @@ from __future__ import annotations
 
 import re
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 from . import htmltext as extract_mod
 from . import pages as pages_mod
+from . import pdf as pdf_mod
 from . import render as render_mod
 from . import stealth as stealth_mod
+from .. import limits as limits_mod
 from ..config import get_settings
+from ..limits import Limits
+from ..reasons import code_for
 from ..search._common import SearchBackendError
 from ..search.cloud import tavily_post
 
@@ -336,7 +340,6 @@ def reader_links(tree, base_url: str = "", limit: int = MAX_LINKS) -> List[Dict[
     return extract_mod.extract_links(None, base_url, limit=limit, keep_self=True, tree=tree)
 
 
-_TRAIL_WS_RE = re.compile(r"[ \t]+\n")
 _BLANKS_RE = re.compile(r"\n{3,}")
 INLINE_WINDOW = 1500  # Anker-Text hoechstens so weit hinter der letzten Fundstelle suchen
 _ANCHOR_MAX = 200
@@ -430,6 +433,36 @@ def _reader_metadata(html: str, url: str, tree) -> Dict:
         return extract_mod._metadata(html, url, extensive=False)
 
 
+_STRUCTURED_META_RE = re.compile(r"^(og|twitter|article|product|fb|al|music|video|book|profile):", re.IGNORECASE)
+
+
+def structured_data(tree) -> Dict:
+    """The machine-readable blocks a page carries, untouched: every JSON-LD block
+    that parses (``json_ld``, a list of the parsed objects) and the namespaced
+    ``<meta>`` tags such as og:title or product:price:amount (``meta``, name to
+    content). Shop and vendor pages carry price, currency, availability and
+    GTIN here, so a caller needs no model to read them. Broken blocks are skipped."""
+    import json  # noqa: PLC0415
+
+    out: Dict = {"json_ld": [], "meta": {}}
+    if tree is None:
+        return out
+    for node in tree.xpath('//script[@type="application/ld+json"]'):
+        raw = (node.text or "").strip().replace("<![CDATA[", "").replace("]]>", "")
+        if not raw:
+            continue
+        try:
+            data = json.loads(raw, parse_constant=lambda _c: None)  # NaN/Infinity -> null
+        except ValueError:
+            continue
+        out["json_ld"].extend(data if isinstance(data, list) else [data])
+    for meta in tree.xpath("//meta[@content]"):
+        key = (meta.get("property") or meta.get("name") or "").strip()
+        if key and _STRUCTURED_META_RE.match(key):
+            out["meta"].setdefault(key.lower(), " ".join((meta.get("content") or "").split()))
+    return out
+
+
 def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
     """Ganze Seite als Dokument (Felder wie app.extract.extract_document).
     Reine Funktion, laeuft im Extraktions-Prozess."""
@@ -450,11 +483,15 @@ def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
             pass
     if content:
         # Leerzeilen-Stapel (leere Formularfelder, Tabellen) wie beim Original auf eine
-        content = _BLANKS_RE.sub("\n\n", _TRAIL_WS_RE.sub("\n", content))
+        content = _BLANKS_RE.sub("\n\n", extract_mod.strip_line_ends(content))
     try:
         links = reader_links(tree, url)
     except Exception:  # noqa: BLE001
         links = []
+    try:
+        structured = structured_data(tree)
+    except Exception:  # noqa: BLE001 - Beiwerk
+        structured = {"json_ld": [], "meta": {}}
     try:
         title = reader_title(tree, None)
     except Exception:  # noqa: BLE001
@@ -464,6 +501,17 @@ def reader_document(html: str, url: str = "", fmt: str = "markdown") -> Dict:
     # htmldate den Baum veraendern darf.
     meta = _reader_metadata(html, url, tree)
     doc = extract_mod._doc(url, meta, content, links)
+    doc["stage"] = "static"  # which rung of the ladder produced the page
+    if structured["json_ld"] or structured["meta"]:  # leere Seiten bleiben so klein wie vorher
+        doc["structured"] = structured
+    try:
+        from .structured import product_from_items  # noqa: PLC0415
+
+        product = product_from_items(structured["json_ld"])  # aus dem schon geparsten JSON-LD
+    except Exception:  # noqa: BLE001 - Beiwerk
+        product = None
+    if product:
+        doc["product"] = product
     if title:
         doc["title"] = title
     return doc
@@ -480,27 +528,76 @@ def forget(urls: List[str], fmt: str) -> None:
     pages_mod.forget(urls, fmt, prefix=_PREFIX)
 
 
-def read_pages(
+def read_pages_ex(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
-) -> Tuple[List[Dict], List[Dict]]:
-    """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB)."""
+    progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
+    *, max_stage: Optional[str] = None, budget: Optional[str] = None,
+    cloud_fallback: Optional[bool] = None, structured: bool = False,
+) -> Tuple[List[Dict], List[Dict], Dict[str, str]]:
+    """Wie `read_pages`, plus ein Wörterbuch {url: grund} der gelieferten Seiten,
+    die nur duennen Text haben ("gelesen, aber duenn": thin_content oder challenge).
+    Das Dokument selbst und der geteilte Cache-Eintrag bleiben unveraendert, der
+    Grund wird neben ihnen mitgefuehrt. Fehlschlaege tragen `reason`.
+
+    `max_stage` (plain, tls, browser, stealth) deckelt die Leiter fuer diese Anfrage,
+    `budget` (low, normal, high) stellt Zeitlimits und Textlaenge, `cloud_fallback`
+    schaltet Tavily. Alles gilt unterhalb der Betreiber-Obergrenze SEARCHIFY_MAX_STAGE
+    und unterhalb dessen, was Umgebung und Installation hergeben (siehe limits.py).
+    Ohne Angaben bleibt alles wie bisher; der Cache haelt immer den vollen Text.
+    Das rohe `structured` (JSON-LD, og:/twitter:-Meta) liefert nur `structured=True`."""
     fmt = "markdown" if fmt == "markdown" else "text"
+    limits = limits_mod.resolve(max_stage, budget, cloud_fallback)
+    scaled = limits.budget != limits_mod.DEFAULT_BUDGET
+    if timeout:
+        timeout = limits.scaled(timeout)
     deadline = time.monotonic() + timeout if timeout else None
+    fetch_timeout = timeout
+    if scaled and not fetch_timeout:
+        fetch_timeout = limits.scaled(float(pages_mod.get_settings().fetch_timeout))
+    extra: Dict = {"plain": True} if not limits.allows("tls") else {}
     docs, failed = pages_mod.read_pages(
-        urls, fmt, timeout, extractor=reader_document, cache_prefix=_PREFIX,
-        max_bytes=READER_MAX_BYTES,
+        urls, fmt, fetch_timeout, extractor=reader_document, cache_prefix=_PREFIX,
+        max_bytes=READER_MAX_BYTES, progress=progress, **extra,
     )
+    thin_map: Dict[str, str] = {}
     if render_mod.enabled() or stealth_mod.enabled():
         # Duenne Ergebnisse (JS-Huelle, "Skip to main content", Challenge-Seite) zaehlen
         # fuer die Stufen wie Fehler; scheitern alle, bleibt der statische Text.
         thin = [d for d in docs if _poor(d.get("content") or "")]
         if thin:
             docs = [d for d in docs if d not in thin]
-            failed = failed + [{"url": d.get("url"), "error": "Zu wenig Text", "static": d} for d in thin]
+            failed = failed + [{"url": d.get("url"), "error": "Zu wenig Text",
+                                "reason": _thin_code(d.get("content") or ""), "static": d}
+                               for d in thin]
         if failed:
-            docs, failed = _render_failed(docs, failed, fmt, urls, deadline)
-    if failed and get_settings().tavily_api_key:
-        docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline)
+            docs, failed = _render_failed(docs, failed, fmt, urls, deadline, thin=thin_map,
+                                          limits=limits)
+    if failed and limits.cloud and get_settings().tavily_api_key:
+        docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline, limits=limits)
+    if limits.max_chars:
+        docs = [_trimmed(d, limits.max_chars) for d in docs]  # a copy: the cache keeps the full text
+    if not structured:  # Kopie ohne den Schluessel, das gecachte Objekt bleibt wie es ist
+        docs = [{k: v for k, v in d.items() if k != "structured"} if "structured" in d else d
+                for d in docs]
+    return docs, failed, thin_map
+
+
+def _trimmed(doc: Dict, max_chars: int) -> Dict:
+    content = doc.get("content") or ""
+    if len(content) <= max_chars:
+        return doc
+    return dict(doc, content=limits_mod.trim_text(content, max_chars), truncated=True)
+
+
+def read_pages(
+    urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
+    *, max_stage: Optional[str] = None, budget: Optional[str] = None,
+    cloud_fallback: Optional[bool] = None, structured: bool = False,
+) -> Tuple[List[Dict], List[Dict]]:
+    """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB).
+    `max_stage`, `budget`, `cloud_fallback` und `structured` wie bei `read_pages_ex`."""
+    docs, failed, _thin = read_pages_ex(urls, fmt, timeout, max_stage=max_stage, budget=budget,
+                                        cloud_fallback=cloud_fallback, structured=structured)
     return docs, failed
 
 
@@ -511,15 +608,21 @@ TAVILY_MAX_URLS = 20  # Tavily Extract nimmt hoechstens 20 Adressen je Aufruf
 
 def _tavily_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
-    deadline: Optional[float] = None,
+    deadline: Optional[float] = None, limits: Optional[Limits] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Letzte Sicherheitsstufe: Seiten, an denen alle eigenen Stufen gescheitert
     sind, liest Tavily Extract. Laeuft nur mit TAVILY_API_KEY; scheitert der
-    Aufruf, bleiben die Fehlschlaege wie sie waren."""
-    rest = TAVILY_TIMEOUT_S if deadline is None else min(TAVILY_TIMEOUT_S, deadline - time.monotonic())
+    Aufruf, bleiben die Fehlschlaege wie sie waren. Adressen mit dem Grund
+    address_blocked (privat oder intern) gehen nie an Tavily: sonst landeten
+    interne URLs samt Token bei einem Dritten."""
+    cap = TAVILY_TIMEOUT_S if limits is None else limits.scaled(TAVILY_TIMEOUT_S)
+    rest = cap if deadline is None else min(cap, deadline - time.monotonic())
     if rest < TAVILY_MIN_REST_S:
         return docs, failed
-    wanted = [f["url"] for f in failed if f.get("url")][:TAVILY_MAX_URLS]
+    wanted = [f["url"] for f in failed if f.get("url")
+              and (f.get("reason") or code_for(f.get("error"))) != "address_blocked"][:TAVILY_MAX_URLS]
+    if not wanted:
+        return docs, failed
     try:
         data = tavily_post("extract", {"urls": wanted, "format": fmt}, rest)
     except SearchBackendError:
@@ -530,6 +633,7 @@ def _tavily_failed(
         if it.get("url") in wanted and content:
             doc = extract_mod._doc(it["url"], {}, content, [])
             doc["source"] = "tavily"
+            doc["stage"] = "tavily"
             got[it["url"]] = doc
     for url, doc in got.items():
         pages_mod._docs().put(f"{_PREFIX}{fmt}|{url}", doc)
@@ -560,9 +664,16 @@ def _poor(content: str) -> bool:
     return n < RENDER_MIN_WORDS or (n < 300 and bool(_CHALLENGE_RE.search(content)))
 
 
+def _thin_code(content: str) -> str:
+    """challenge (Bot-Schutz-Text) oder thin_content (schlicht zu wenig Text)."""
+    n = _words(content)
+    return "challenge" if n < 300 and _CHALLENGE_RE.search(content or "") else "thin_content"
+
+
 def _render_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
-    deadline: Optional[float] = None,
+    deadline: Optional[float] = None, thin: Optional[Dict[str, str]] = None,
+    limits: Optional[Limits] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Reserve-Stufen fuer Fehlschlaege, jede nur, wenn die vorige scheitert:
     Stufe 2 rendert im geteilten Browser (alle Anfragen ueber httpx), Stufe 3 laesst
@@ -570,29 +681,40 @@ def _render_failed(
     Stufe 4 ist Camoufox (stealth.py), hoechstens einmal je Anfrage.
     Bot-Schutz-Seiten (Challenge-Text, kaum Woerter) zaehlen weiter als Fehler.
     Mit `deadline` (monotonic, aus x-timeout) bekommt jede Stufe nur die Restzeit;
-    ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen."""
+    ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen.
+    Behaelt eine Seite nur ihren duennen statischen Text, steht ihr Grund in `thin`.
+    `limits` (limits.py) sperrt Stufen oberhalb der Obergrenze und skaliert die Zeitlimits."""
+    if limits is None:
+        limits = limits_mod.resolve()
     still: List[Dict] = []
     tried = 0  # echte Render-Versuche (Zeitlimit-Fehler und belegter Platz zaehlen nicht)
     stealth_tried = 0
-    busy = not render_mod.enabled()
-    stealth_busy = not stealth_mod.enabled()
+    busy = not (limits.allows("browser") and render_mod.enabled())
+    stealth_busy = not (limits.allows("stealth") and stealth_mod.enabled())
 
     def rest(cap: float) -> float:
+        cap = limits.scaled(cap)
         return cap if deadline is None else min(cap, deadline - time.monotonic())
 
     def give_up(fail: Dict) -> None:
         static = fail.pop("static", None)
         if static and (static.get("content") or "").strip():
             docs.append(static)  # duenner Text ist besser als nichts
+            if thin is not None and fail.get("url"):
+                thin[fail["url"]] = _thin_code(static.get("content") or "")
         else:
             still.append(fail)
 
-    def good(html: Optional[str], url: str) -> Optional[Dict]:
+    def good(html: Optional[str], url: str, stage: str) -> Optional[Dict]:
         doc = reader_document(html, url, fmt) if html else None
-        return doc if doc and not _poor(doc.get("content") or "") else None
+        if doc and not _poor(doc.get("content") or ""):
+            doc["stage"] = stage
+            return doc
+        return None
 
     for fail in failed:
-        if fail.get("error") == "Zeitlimit" or rest(RENDER_TIMEOUT_S) < RENDER_MIN_REST_S:
+        if (fail.get("error") == "Zeitlimit" or pdf_mod.is_pdf_failure(fail)
+                or rest(RENDER_TIMEOUT_S) < RENDER_MIN_REST_S):
             give_up(fail)
             continue
         doc = None
@@ -600,10 +722,10 @@ def _render_failed(
             status, html = render_mod.try_render(fail["url"], timeout=rest(RENDER_TIMEOUT_S))
             if status == "tried":
                 tried += 1
-                doc = good(html, fail["url"])
+                doc = good(html, fail["url"], "browser")
                 if doc is None and rest(DIRECT_TIMEOUT_S) >= DIRECT_MIN_REST_S:
                     status, html = render_mod.try_render_direct(fail["url"], timeout=rest(DIRECT_TIMEOUT_S))
-                    doc = good(html, fail["url"]) if status == "tried" else None
+                    doc = good(html, fail["url"], "browser-direct") if status == "tried" else None
             else:
                 # Platz belegt: die uebrigen nicht auch noch je 1 s warten lassen.
                 busy = status in ("busy", "off")
@@ -612,7 +734,7 @@ def _render_failed(
             status, html = stealth_mod.try_stealth(fail["url"], timeout=rest(STEALTH_TIMEOUT_S))
             if status == "tried":
                 stealth_tried += 1
-                doc = good(html, fail["url"])
+                doc = good(html, fail["url"], "stealth")
             else:
                 stealth_busy = status in ("busy", "off")
         if doc is None:
