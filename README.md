@@ -58,6 +58,7 @@ pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify-l"
 | `browser` | the browser stages for JavaScript and bot-protected pages (`playwright`) |
 | `stealth` | the optional Camoufox stage |
 | `mcp` | the MCP server for Claude Code, Claude Desktop, Cursor and other hosts (`mcp`, Python 3.10+) |
+| `pdf` | reading PDFs (`pypdfium2`): text with `[Seite N]` page marks, up to 50 pages and 60,000 characters |
 
 Then set nothing and search works. Copy `.env.example` to `.env` only if you want a SearXNG
 instance or a cloud fallback.
@@ -67,7 +68,8 @@ instance or a cloud fallback.
 | Call | What it does |
 |---|---|
 | `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
-| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Each page also carries `structured` (the page's JSON-LD blocks and `og:`/`product:` meta tags, untouched) and `stage` (which rung of the ladder read it). |
+| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Each page carries `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. |
+| `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and, only when something went wrong, `status` (`read`, `failed`, `thin`, `reasons`). |
 | `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
 | `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
 | `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
@@ -92,6 +94,15 @@ reranks by default when the `rerank` extra is installed.
 A full question in the user's words finds more than keywords: the query goes to the search
 engine as written and then ranks the paragraphs. Each command line call loads the reranker
 again, so for many questions in a row the HTTP service or the MCP server is faster.
+
+### Why a page failed
+
+Every failed page keeps its human `error` text and gets one `reason`: `blocked` (401/403/451),
+`rate_limited` (429), `not_found` (404/410), `unavailable`, `timeout`, `not_html`, `too_large`,
+`address_blocked` (a private or internal address, refused before any connection),
+`no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
+`pdf_too_large`. The HTTP service repeats the counts in the `X-Searchify-Status` header, built
+from these codes only. On full success the output is byte for byte what it was in 0.2.0.
 
 ## MCP server
 
