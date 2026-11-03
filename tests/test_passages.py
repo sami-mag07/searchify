@@ -24,7 +24,11 @@ PAGES = [
 class FakeModel:
     """Scores a paragraph by how often the query's first word appears in it."""
 
-    def predict(self, pairs):
+    def __init__(self):
+        self.kwargs = {}
+
+    def predict(self, pairs, **kwargs):
+        self.kwargs = kwargs
         return [text.count(query.split()[0]) for query, text in pairs]
 
 
@@ -112,6 +116,11 @@ def test_rerank_default_follows_the_installed_extra(web, monkeypatch):
     assert all("rerank_score" not in p for p in passages("q"))
     monkeypatch.setattr(core, "rerank_available", lambda: True)
     assert all("rerank_score" in p for p in passages("q"))
+
+
+def test_ranking_draws_no_progress_bar_on_stderr(web):
+    passages("alpha")
+    assert rerank_mod._model.kwargs.get("show_progress_bar") is False
 
 
 def test_missing_rerank_extra_warns_once_per_process(web, monkeypatch, caplog):
