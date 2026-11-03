@@ -59,13 +59,17 @@ async def test_search_failure_is_a_tool_error_the_model_can_read(client, monkeyp
 async def test_extract_trims_pages_and_lists_failures(client, monkeypatch):
     doc = {"url": "https://a.com", "title": "T", "published": None, "content": "word " * 300,
            "links": ["dropped"]}
-    monkeypatch.setattr(mcp_server, "read_pages",
-                        lambda urls, fmt: ([doc], [{"url": "https://b.com", "error": "403"}]))
-    result = await client.call_tool("extract", {"urls": ["https://a.com", "https://b.com"],
+    failed = [{"url": "https://b.com", "error": "HTTP 403, also after retry", "reason": "blocked"},
+              {"url": "https://c.com", "error": "Zeitlimit"}]  # no code yet: derived from the text
+    monkeypatch.setattr(mcp_server, "read_pages", lambda urls, fmt: ([doc], failed))
+    result = await client.call_tool("extract", {"urls": ["https://a.com", "https://b.com", "https://c.com"],
                                                 "max_chars": 500})
     out = result.structured_content
     assert len(out["results"][0]["content"]) <= 502 and "links" not in out["results"][0]
-    assert out["failed"] == [{"url": "https://b.com", "error": "403"}]
+    assert out["failed"] == [
+        {"url": "https://b.com", "error": "HTTP 403, also after retry", "reason": "blocked"},
+        {"url": "https://c.com", "error": "Zeitlimit", "reason": "timeout"},
+    ]
 
 
 @pytest.mark.anyio

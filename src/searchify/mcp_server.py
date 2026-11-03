@@ -20,6 +20,7 @@ from pydantic import Field
 from . import __version__
 from .extract import read_pages
 from .passages import passages as best_passages, trim
+from .reasons import code_for
 from .search import SearchBackendError, search as web_search
 
 READS_THE_WEB = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -106,14 +107,16 @@ def extract(
         "for normal.")] = None,
 ) -> dict[str, Any]:
     """Read web pages and return their clean main text. Pages that fail are listed
-    under failed with the reason."""
+    under failed with the error text and the reason (a fixed code such as blocked,
+    rate_limited, not_found or timeout)."""
     limits = {k: v for k, v in {"max_stage": max_stage, "budget": budget}.items() if v}
     docs, failed = read_pages(urls, format, **limits)
     return {
         "results": [{"url": d.get("url"), "title": d.get("title"),
                      "published": d.get("published"),
                      "content": trim(d.get("content") or "", max_chars)} for d in docs],
-        "failed": [{"url": f.get("url"), "error": f.get("error")} for f in failed],
+        "failed": [{"url": f.get("url"), "error": f.get("error"),
+                    "reason": f.get("reason") or code_for(f.get("error"))} for f in failed],
     }
 
 
