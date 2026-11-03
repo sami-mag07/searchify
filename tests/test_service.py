@@ -38,6 +38,13 @@ def test_passages_endpoint_reports_search_failures(monkeypatch):
     assert client.post("/passages", json={"query": "q"}).json() == {"error": "down", "results": []}
 
 
+def test_extract_takes_at_most_50_urls(monkeypatch):
+    monkeypatch.setattr(service, "read_pages_ex", lambda urls, fmt, **kw: ([], [], {}))
+    urls = [f"https://a.example/{i}" for i in range(51)]
+    assert client.post("/extract", json={"urls": urls}).status_code == 422
+    assert client.post("/extract", json={"urls": urls[:50]}).status_code == 200
+
+
 def test_passages_endpoint_validates_limits():
     assert client.post("/passages", json={"query": "q", "top_k": 0}).status_code == 422
 # Stand: 02.11.2026

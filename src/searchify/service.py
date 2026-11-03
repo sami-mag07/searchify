@@ -21,6 +21,8 @@ from .search import SearchBackendError, search_report
 
 app = FastAPI(title="searchify", description="Local-first web search and clean extraction")
 
+MAX_EXTRACT_URLS = 50  # per /extract request; more is a 422
+
 
 class SearchRequest(BaseModel):
     query: str
@@ -34,7 +36,7 @@ class SearchRequest(BaseModel):
 
 
 class ExtractRequest(BaseModel):
-    urls: List[str]
+    urls: List[str] = Field(..., max_length=MAX_EXTRACT_URLS)
     fmt: str = "text"
     detail: bool = False
     # Limits for this request only. They stay below the operator cap SEARCHIFY_MAX_STAGE.

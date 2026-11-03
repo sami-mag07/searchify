@@ -332,7 +332,8 @@ answer = requests.post(
 print(answer.json())   # the clean text for each address
 ```
 
-`/extract` answers `{"results": [...], "failed": [...]}`. Each result has `url`, `title`,
+`/extract` takes at most 50 addresses per request; a longer list is refused with status 422.
+It answers `{"results": [...], "failed": [...]}`. Each result has `url`, `title`,
 `published`, `author`, `description`, `content`, `links` and `stage`, plus `structured` only when
 the request asks for it with `"structured": true`:
 
