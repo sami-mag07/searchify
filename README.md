@@ -102,7 +102,7 @@ Every failed page keeps its human `error` text and gets one `reason`: `blocked` 
 `address_blocked` (a private or internal address, refused before any connection),
 `no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
 `pdf_too_large`. The HTTP service repeats the counts in the `X-Searchify-Status` header, built
-from these codes only. On full success the output is byte for byte what it was in 0.2.0.
+from these codes only. On full success neither `status` nor the header is added.
 
 ## MCP server
 
