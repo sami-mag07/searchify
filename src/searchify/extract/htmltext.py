@@ -363,7 +363,11 @@ class _Brotli:
         # reports pending input, not output still inside the decoder, and the rest of a
         # page behind the last network read was silently lost (887 KB -> 622 KB).
         while out:
-            yield out
+            if len(out) <= _DECODE_STEP:
+                yield out
+            else:  # the buffer may overshoot the limit by one growth step (480 KB for 256 KB)
+                for start in range(0, len(out), _DECODE_STEP):
+                    yield out[start:start + _DECODE_STEP]
             out = self._run(b"", output_buffer_limit=_DECODE_STEP)
 
     def finish(self) -> Iterator[bytes]:
@@ -879,8 +883,7 @@ def _fetch_live(url: str, timeout: float, limit: int, settings) -> Optional[str]
                 for part in iter_decoded(resp):  # pieces of at most _DECODE_STEP bytes
                     body.extend(part)
                     if len(body) >= limit:
-                        del body[limit:]
-                        break
+                        break  # the last piece stays whole, as before: at most limit + one piece
                     if time.monotonic() > deadline:
                         _note_failure("timeout")
                         return None

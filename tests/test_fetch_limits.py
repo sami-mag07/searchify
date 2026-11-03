@@ -92,7 +92,7 @@ def test_stacked_encodings_are_refused(site, bombs):
 def test_a_gzip_bomb_is_cut_at_the_limit_without_inflating_it(site, bombs):
     ROUTES["/bomb"] = (200, {**HTML, "Content-Encoding": "gzip"}, bombs["gzip"])
     html, peak = _peak_mb(lambda: h.fetch_url(site + "/bomb", 10, 100_000))
-    assert len(html) == 100_000 and html.startswith("<html><body>")
+    assert 100_000 <= len(html) <= 100_000 + h._DECODE_STEP and html.startswith("<html><body>")
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
 
 
@@ -102,7 +102,7 @@ def test_a_brotli_bomb_is_cut_or_refused(site, bombs):
     ROUTES["/bomb"] = (200, {**HTML, "Content-Encoding": "br"}, bombs["br"])
     html, peak = _peak_mb(lambda: h.fetch_url(site + "/bomb", 10, 100_000))
     # a Brotli module with an output cap decodes it, an older one is refused
-    assert html is None or len(html) == 100_000
+    assert html is None or 100_000 <= len(html) <= 100_000 + h._DECODE_STEP
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
 
 
@@ -149,6 +149,17 @@ def _word_page(words: int) -> bytes:
     return ("<html><body><p>" + " ".join(rnd.choice(vocab) for _ in range(words)) + "</p></body></html>").encode()
 
 
+@pytest.mark.parametrize("enc,pack", [("identity", lambda b: b), ("gzip", gzip.compress)])
+def test_a_page_over_the_limit_keeps_its_last_piece(site, enc, pack):
+    # as before the bounded decoding: the read stops after the piece that crosses the
+    # limit and keeps it whole (old: 1,048,576 or 1,124,907 chars for a 1 MB limit)
+    page = _word_page(260_000)
+    ROUTES["/big"] = (200, {**HTML, "Content-Encoding": enc}, pack(page))
+    html = h.fetch_url(site + "/big", 10, 1_000_000)
+    assert 1_000_000 < len(html) <= 1_000_000 + h._DECODE_STEP
+    assert page.decode().startswith(html)
+
+
 def test_a_large_brotli_page_is_read_whole(site):
     # Brotli keeps output inside the decoder after the last network read: it must be drained
     if h._BROTLI is None:
@@ -184,7 +195,7 @@ def test_decoder_pieces_stay_small(bombs):
     if h._BROTLI is not None:
         pieces = list(h._Brotli(h._BROTLI).feed(bombs["br"]))
         assert sum(map(len, pieces)) == (BOMB_MB << 20) + len(b"<html><body>")
-        assert max(map(len, pieces)) <= 2 * h._DECODE_STEP
+        assert max(map(len, pieces)) <= h._DECODE_STEP
 
 
 def test_pdf_download_asks_for_identity_and_decodes_with_a_cap(site, monkeypatch):
