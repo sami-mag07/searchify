@@ -86,6 +86,42 @@ def test_plain_flag_through_the_real_pipeline(monkeypatch):
     assert json.loads(result.stdout)["failed"][0]["reason"] == "blocked"
 
 
+def _passages_over_the_pipeline(monkeypatch, calls):
+    install(monkeypatch, browser=True, stealth=True, calls=calls)
+    hits = [{"title": "B", "url": "https://blocked.example/", "content": "snippet", "engine": "x"},
+            {"title": "W", "url": "https://wall.example/", "content": "snippet", "engine": "x"}]
+    monkeypatch.setattr(sys.modules["searchify.passages"], "web_search", lambda *a, **k: hits)
+    return runner.invoke(cli.app, ["passages", "q", "--no-rerank"])
+
+
+def test_passages_keeps_the_profile_limits(monkeypatch):
+    profile.save({"max_stage": "plain"})
+    calls = []
+    result = _passages_over_the_pipeline(monkeypatch, calls)
+    assert result.exit_code == 0
+    assert {c[0] for c in calls} == {"fetch"}  # no browser, no stealth
+    assert all(c[3] is True for c in calls)  # plain: no Chrome-TLS fallback either
+
+
+def test_passages_without_a_profile_reads_as_before(monkeypatch):
+    calls = []
+    assert _passages_over_the_pipeline(monkeypatch, calls).exit_code == 0
+    assert {"render", "stealth"} <= {c[0] for c in calls}
+
+
+def test_passages_api_takes_max_stage_and_budget(monkeypatch):
+    core = sys.modules["searchify.passages"]
+    seen = {}
+
+    def fake_read(urls, fmt="markdown", timeout=None, **kw):
+        seen.update(kw, fmt=fmt)
+        return [], []
+    monkeypatch.setattr(core, "web_search", lambda *a, **k: [{"url": "https://a.example/", "content": "x"}])
+    monkeypatch.setattr(core, "read_pages", fake_read)
+    core.passages("q", rerank=False, max_stage="tls", budget="low")
+    assert seen == {"fmt": "text", "max_stage": "tls", "budget": "low"}
+
+
 # ------------------------------------------------------------ the interview never runs without a terminal
 class _Tty(io.StringIO):
     def isatty(self):

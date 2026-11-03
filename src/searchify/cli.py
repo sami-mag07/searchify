@@ -206,7 +206,13 @@ def passages(
     no_input: bool = NO_INPUT_OPT,
     as_json: bool = JSON_OPT,
 ) -> None:
-    """Search, read the top pages and print their best paragraphs."""
+    """Search, read the top pages and print their best paragraphs.
+
+    The pages are read within your profile's stage and budget (`searchify config`),
+    below the operator cap SEARCHIFY_MAX_STAGE.
+    """
+    from . import limits as limits_mod
+    from . import profile as profile_mod
     from .interview import first_run
     from .passages import passages as best_passages
     from .search import BACKENDS, SearchBackendError
@@ -214,6 +220,7 @@ def passages(
     first_run(no_input)
     if backend is not None and backend not in BACKENDS:
         _fail(f"unknown backend {backend!r}, use {', '.join(BACKENDS)}", as_json, results=[])
+    wanted = limits_mod.explicit(profile=profile_mod.load())  # stage and budget, if saved
     filters = {
         "language": language,
         "time_range": time_range,
@@ -223,7 +230,8 @@ def passages(
     filters = {k: v for k, v in filters.items() if v is not None}
     try:
         found = best_passages(query, max_results, top_k=top_k, per_site=per_site,
-                              max_chars=max_chars, rerank=rerank, backend=backend, **filters)
+                              max_chars=max_chars, rerank=rerank, backend=backend,
+                              **wanted, **filters)
     except (SearchBackendError, ImportError) as exc:
         _fail(str(exc), as_json, results=[])
     if as_json:

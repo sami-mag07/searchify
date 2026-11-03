@@ -18,7 +18,8 @@ import importlib.util
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
-from .extract import extract as extract_urls
+from . import limits as limits_mod
+from .extract import extract as extract_urls, read_pages
 from .rerank import rerank as rerank_items
 from .search import search as web_search
 
@@ -90,9 +91,18 @@ def _pick(items: List[Dict], top_k: int, per_site: Optional[int]) -> List[Dict]:
     return picked
 
 
+def _read(urls: List[str], limits: Dict[str, str]) -> List[Dict]:
+    """The clean pages. Without limits this is the plain `extract` call as before."""
+    if not limits:
+        return extract_urls(urls)
+    docs, _failed = read_pages(urls, "text", **limits)
+    return docs
+
+
 def passages(query: str, max_results: int = 5, *, top_k: int = 8, min_words: int = 12,
              max_chars: int = 600, per_site: Optional[int] = None,
              rerank: Optional[bool] = None, backend: Optional[str] = None,
+             max_stage: Optional[str] = None, budget: Optional[str] = None,
              **filters) -> List[Dict]:
     """Search, read the top `max_results` pages and return their best paragraphs.
 
@@ -102,14 +112,19 @@ def passages(query: str, max_results: int = 5, *, top_k: int = 8, min_words: int
     `[rerank]` extra is installed, `True` raises ImportError if it is not.
     `per_site` caps passages from one site, so the answer draws on several
     sources. If none of the pages can be read, the search snippets come back
-    instead. `filters` are the same as for `search`. Raises SearchBackendError
-    like `search` does.
+    instead. `max_stage` (plain, tls, browser, stealth) and `budget` (low, normal,
+    high) limit how the pages are read, as for `extract_report`, always below the
+    operator cap SEARCHIFY_MAX_STAGE; this function never reads the user profile.
+    `filters` are the same as for `search`. Raises SearchBackendError like `search`
+    does, and ValueError for an unknown stage or budget.
     """
     use_rerank = _use_rerank(rerank)
+    limits_mod.resolve(max_stage, budget)  # an unknown stage or budget fails before searching
     hits = web_search(query, max_results, backend=backend, **filters)
     if not hits:
         return []
-    items = split_paragraphs(extract_urls([h["url"] for h in hits]), min_words)
+    limits = {k: v for k, v in (("max_stage", max_stage), ("budget", budget)) if v is not None}
+    items = split_paragraphs(_read([h["url"] for h in hits], limits), min_words)
     if not items:  # no page could be read: fall back to what the search engine said
         items = [{"title": h.get("title") or "", "url": h["url"], "content": h["content"]}
                  for h in hits if h.get("content")]
