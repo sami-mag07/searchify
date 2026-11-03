@@ -12,7 +12,11 @@ from typing import Dict, List, Optional
 from ._common import SearchBackendError, dedupe_and_filter, site_scoped
 from .regions import ddg_region
 
-RETRY_AFTER_ERROR_S = 1.0  # a general DDGSException: one more try after this pause
+# At most one more try per search, after a pause: for a general DDGSException, or
+# for an empty answer, which DuckDuckGo often gives during a hiccup (more so with a
+# region). Measured: a second try found 6 of 7 regional questions that came back empty.
+RETRY_AFTER_ERROR_S = 1.0
+RETRY_AFTER_EMPTY_S = 1.5
 _sleep = time.sleep  # tests replace it
 
 
@@ -46,8 +50,9 @@ def ddgs_search(
 ) -> List[Dict[str, str]]:
     """Return search hits as a list of dicts: {title, url, content, engine}.
 
-    A general ddgs error (not a rate limit, not a timeout) is tried once more after
-    about a second."""
+    One more try per search at most: after about a second for a general ddgs error
+    (not a rate limit, not a timeout), after about 1.5 s for an empty answer. Only
+    when the second answer is empty too there are no hits."""
     try:
         from ddgs import DDGS
     except ImportError as exc:  # pragma: no cover - optional dependency
@@ -64,14 +69,16 @@ def ddgs_search(
             raw = list(run(query, region=region, safesearch="moderate",
                            timelimit=timelimit, max_results=max_results) or [])
         except Exception as exc:  # ddgs raises its own exception types
-            if _is_no_results(exc):
-                return []
-            code = _error_code(exc)
-            if code == "error" and attempt == 1:  # often a passing hiccup of one engine
-                _sleep(RETRY_AFTER_ERROR_S)
-                continue
-            raise SearchBackendError(f"{code}: ddgs {type(exc).__name__}") from exc
-        break
+            if not _is_no_results(exc):
+                code = _error_code(exc)
+                if code == "error" and attempt == 1:  # often a passing hiccup of one engine
+                    _sleep(RETRY_AFTER_ERROR_S)
+                    continue
+                raise SearchBackendError(f"{code}: ddgs {type(exc).__name__}") from exc
+            raw = []  # "No results found." is an empty answer
+        if raw or attempt == 2:
+            break
+        _sleep(RETRY_AFTER_EMPTY_S)
 
     hits = [
         {

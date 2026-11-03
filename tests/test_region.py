@@ -158,3 +158,39 @@ def test_rate_limits_and_timeouts_are_not_retried(monkeypatch, _no_waiting, exc)
     with pytest.raises(SearchBackendError):
         duckduckgo.ddgs_search("q")
     assert len(calls) == 1 and _no_waiting == []
+
+
+def test_an_empty_answer_is_tried_once_more(monkeypatch, _no_waiting):
+    calls = []
+    _flaky_ddgs(monkeypatch, [[], [ROW]], calls)
+    assert [h["url"] for h in duckduckgo.ddgs_search("q", language="es")] == ["https://a.example/"]
+    assert len(calls) == 2 and _no_waiting == [duckduckgo.RETRY_AFTER_EMPTY_S]
+    assert 1 <= duckduckgo.RETRY_AFTER_EMPTY_S <= 2
+
+
+def test_two_empty_answers_mean_no_hits(monkeypatch, _no_waiting):
+    calls = []
+    _flaky_ddgs(monkeypatch, [[], []], calls)
+    assert duckduckgo.ddgs_search("q") == []
+    assert len(calls) == 2
+
+
+def test_no_results_found_counts_as_empty_and_is_tried_once_more(monkeypatch):
+    calls = []
+    _flaky_ddgs(monkeypatch, [DDGSException("No results found."), [ROW]], calls)
+    assert len(duckduckgo.ddgs_search("q")) == 1 and len(calls) == 2
+
+
+@pytest.mark.parametrize("answers, raises", [
+    ([DDGSException("boom"), []], False),       # error, then empty: no third try
+    ([[], DDGSException("boom")], True),        # empty, then error: no third try either
+])
+def test_at_most_one_retry_per_search(monkeypatch, _no_waiting, answers, raises):
+    calls = []
+    _flaky_ddgs(monkeypatch, answers + [[ROW]], calls)
+    if raises:
+        with pytest.raises(SearchBackendError):
+            duckduckgo.ddgs_search("q")
+    else:
+        assert duckduckgo.ddgs_search("q") == []
+    assert len(calls) == 2 and len(_no_waiting) == 1
