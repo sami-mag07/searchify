@@ -25,6 +25,7 @@ from collections import OrderedDict
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from concurrent.futures import TimeoutError as FuturesTimeout
 from concurrent.futures.process import BrokenProcessPool
+from itertools import zip_longest
 from typing import Dict, Iterator, List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 
@@ -638,6 +639,16 @@ class _DeadlineStream(httpcore.NetworkStream):
         return self._inner.get_extra_info(info)
 
 
+def _interleave_families(ips: List[str]) -> List[str]:
+    """IPv6 and IPv4 alternating, starting with the family of the first (preferred)
+    address, as in Happy Eyeballs (RFC 8305, 4). getaddrinfo sorts by RFC 6724, so a
+    dual-stack host with four AAAA records lists all of them before any A record."""
+    first = ":" in ips[0]
+    same = [ip for ip in ips if (":" in ip) == first]
+    other = [ip for ip in ips if (":" in ip) != first]
+    return [ip for pair in zip_longest(same, other) for ip in pair if ip is not None]
+
+
 class _PinnedBackend(httpcore.SyncBackend):
     """Verbindet nur zu geprueften, oeffentlichen IPs (Schutz gegen DNS-Rebinding).
 
@@ -653,9 +664,10 @@ class _PinnedBackend(httpcore.SyncBackend):
             raise httpcore.ConnectError(f"Interne oder unaufloesbare Adresse blockiert: {host}")
         # Wie socket.create_connection: gepruefte Adressen der Reihe nach, damit ein
         # toter erster A-Record (oder IPv6 ohne Route) den Host nicht kippt. Hoechstens
-        # _MAX_CONNECT_IPS, sonst kosten 50 tote Records 50 Connect-Timeouts.
+        # _MAX_CONNECT_IPS, sonst kosten 50 tote Records 50 Connect-Timeouts; die
+        # Familien abwechselnd, sonst erreichte ein Host mit 4 AAAA nie seine IPv4.
         last_error: Optional[Exception] = None
-        for ip in ips[:_MAX_CONNECT_IPS]:
+        for ip in _interleave_families(ips)[:_MAX_CONNECT_IPS]:
             try:
                 stream = super().connect_tcp(
                     ip, port, timeout=_time_left(timeout, httpcore.ConnectTimeout),

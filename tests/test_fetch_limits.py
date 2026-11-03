@@ -310,3 +310,21 @@ def test_at_most_four_addresses_are_tried(monkeypatch):
     with pytest.raises(httpcore.ConnectError):
         h._PinnedBackend().connect_tcp("many.example", 443, timeout=1)
     assert tried == ["203.0.113.1", "203.0.113.2", "203.0.113.3", "203.0.113.4"]
+
+
+def test_the_four_addresses_alternate_between_families(monkeypatch):
+    # RFC 6724 order: all AAAA first. With IPv6 failing fast, IPv4 must still be tried.
+    tried = []
+
+    def refuse(self, host, port, timeout=None, local_address=None, socket_options=None):
+        tried.append(host)
+        raise httpcore.ConnectError("no route")
+
+    v6 = [f"2001:db8::{i}" for i in range(1, 6)]
+    v4 = ["203.0.113.1", "203.0.113.2"]
+    monkeypatch.setattr(httpcore.SyncBackend, "connect_tcp", refuse)
+    monkeypatch.setattr(h, "_public_ips", lambda host: v6 + v4)
+    with pytest.raises(httpcore.ConnectError):
+        h._PinnedBackend().connect_tcp("dual.example", 443, timeout=1)
+    assert tried == ["2001:db8::1", "203.0.113.1", "2001:db8::2", "203.0.113.2"]
+    assert h._interleave_families(v4 + v6[:1]) == ["203.0.113.1", "2001:db8::1", "203.0.113.2"]
