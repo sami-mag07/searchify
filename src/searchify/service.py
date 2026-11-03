@@ -22,17 +22,20 @@ from .search import SearchBackendError, search_report
 app = FastAPI(title="searchify", description="Local-first web search and clean extraction")
 
 MAX_EXTRACT_URLS = 50  # per /extract request; more is a 422
+MAX_QUERY_CHARS = 2000
+MAX_DOMAINS = 100  # per include or exclude list
+RERANK_UNAVAILABLE = "rerank_unavailable"  # /passages with rerank: true but no extra
 
 
 class SearchRequest(BaseModel):
-    query: str
+    query: str = Field(..., max_length=MAX_QUERY_CHARS)
     max_results: int = Field(10, ge=1, le=50)
     backend: Optional[str] = None
     language: Optional[str] = None
     country: Optional[str] = None
     time_range: Optional[str] = None
-    include_domains: Optional[List[str]] = None
-    exclude_domains: Optional[List[str]] = None
+    include_domains: Optional[List[str]] = Field(None, max_length=MAX_DOMAINS)
+    exclude_domains: Optional[List[str]] = Field(None, max_length=MAX_DOMAINS)
 
 
 class ExtractRequest(BaseModel):
@@ -116,13 +119,19 @@ def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
 
 @app.post("/passages")
 def passages_endpoint(req: PassagesRequest) -> dict:
+    """The best passages under ``results``. On failure ``{"error": code, "results": []}``
+    with a fixed code, never the exception text (it may hold paths): a search reason
+    such as rate_limited, timeout or unavailable, or rerank_unavailable when
+    ``rerank: true`` is asked without the extra."""
     filters = req.model_dump(include={"language", "country", "time_range", "include_domains",
                                       "exclude_domains"}, exclude_none=True)
     try:
         found = best_passages(req.query, req.max_results, top_k=req.top_k,
                               per_site=req.per_site, max_chars=req.max_chars,
                               rerank=req.rerank, backend=req.backend, **filters)
-    except (SearchBackendError, ImportError) as exc:
-        return {"error": str(exc), "results": []}
+    except SearchBackendError as exc:
+        return {"error": code_for(str(exc), default="unavailable"), "results": []}
+    except ImportError:
+        return {"error": RERANK_UNAVAILABLE, "results": []}
     return {"results": found}
 # Stand: 02.11.2026

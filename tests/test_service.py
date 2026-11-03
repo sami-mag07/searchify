@@ -31,11 +31,40 @@ def test_passages_endpoint_passes_country_on(monkeypatch):
     assert seen["country"] == "BE" and seen["language"] == "nl"
 
 
-def test_passages_endpoint_reports_search_failures(monkeypatch):
+@pytest.mark.parametrize("exc, code", [
+    (SearchBackendError("down at /home/someone/.config/x"), "unavailable"),
+    (SearchBackendError("rate_limited: ddgs said no (/srv/app/ddgs.py)"), "rate_limited"),
+    (SearchBackendError("timeout: no answer in 10 s"), "timeout"),
+    (ImportError("No module named 'torch' in /opt/venv/lib"), "rerank_unavailable"),
+])
+def test_passages_endpoint_reports_failures_as_a_fixed_code(monkeypatch, exc, code):
     def boom(*a, **k):
-        raise SearchBackendError("down")
+        raise exc
     monkeypatch.setattr(service, "best_passages", boom)
-    assert client.post("/passages", json={"query": "q"}).json() == {"error": "down", "results": []}
+    body = client.post("/passages", json={"query": "q"}).json()
+    assert body == {"error": code, "results": []}  # never the exception text, it may hold paths
+
+
+def _no_search(monkeypatch):
+    monkeypatch.setattr(service, "search_report",
+                        lambda *a, **k: {"results": [], "error": None, "backend": None})
+    monkeypatch.setattr(service, "best_passages", lambda *a, **k: [])
+
+
+@pytest.mark.parametrize("path", ["/search", "/passages"])
+def test_query_is_at_most_2000_characters(monkeypatch, path):
+    _no_search(monkeypatch)
+    assert client.post(path, json={"query": "q" * 2001}).status_code == 422
+    assert client.post(path, json={"query": "q" * 2000}).status_code == 200
+
+
+@pytest.mark.parametrize("path", ["/search", "/passages"])
+@pytest.mark.parametrize("field", ["include_domains", "exclude_domains"])
+def test_domain_lists_take_at_most_100_entries(monkeypatch, path, field):
+    _no_search(monkeypatch)
+    domains = [f"d{i}.example" for i in range(101)]
+    assert client.post(path, json={"query": "q", field: domains}).status_code == 422
+    assert client.post(path, json={"query": "q", field: domains[:100]}).status_code == 200
 
 
 def test_extract_takes_at_most_50_urls(monkeypatch):

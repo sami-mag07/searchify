@@ -352,6 +352,12 @@ the request asks for it with `"structured": true`:
 answered, and `error` is the first backend error (null when a query simply has no hits). In
 Python, `search_report()['error']` is the same first backend error.
 
+`/search` and `/passages` take a `query` of at most 2,000 characters and at most 100 entries in
+each of `include_domains` and `exclude_domains`; more is refused with status 422. When
+`/passages` fails it answers `{"error": code, "results": []}` with a fixed code (`rate_limited`,
+`timeout`, `unavailable`, ..., or `rerank_unavailable` for `"rerank": true` without the extra),
+never the text of the exception.
+
 **How it decides how hard to try (the load ladder, `read_pages`):**
 
 1. **Plain fetch** with httpx, falling back to curl_cffi when the site answers 403/429/503.
