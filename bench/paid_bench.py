@@ -4,8 +4,8 @@
 
 Reads TAVILY_API_KEY and JINA_API_KEY from the given file only, never from the
 environment, and removes both from the environment first, so searchify itself runs
-without its Tavily fallback. A service without a key is left out. Writes
-OUT/paid/<set>.json and prints a summary.
+without its Tavily fallback. TAVILY_API_KEY is required; Jina Reader is left out
+without its key. Writes OUT/paid/<set>.json and prints a summary.
 
 shops   each product page: read? price somewhere in the text? (searchify also: price as field)
 pdfs    each PDF: text read? answer pattern found?
@@ -60,7 +60,7 @@ def read_searchify(url: str):
     from searchify import extract_report
 
     t = time.time()
-    rep = extract_report([url])
+    rep = extract_report([url], use_profile=False)  # measure the default ladder, not a saved profile
     doc = rep["results"][0] if rep["results"] else None
     return (doc or {}).get("content") or "", doc, round(time.time() - t, 2)
 
