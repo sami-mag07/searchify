@@ -46,7 +46,7 @@ from urllib.parse import unquote, urlparse
 
 import httpx
 
-from . import htmltext
+from . import htmltext, netlimits
 
 log = logging.getLogger("rag-search")
 
@@ -123,7 +123,7 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
         # identity asked for: a compressed PDF gains nothing. A server that compresses
         # anyway is decoded with the output cap of iter_decoded, never by httpx
         # (compression bomb, Security-Review 03.11.2026)
-        with htmltext.overall_deadline(DOWNLOAD_TIMEOUT_S), \
+        with netlimits.overall_deadline(DOWNLOAD_TIMEOUT_S), \
                 htmltext._client().stream("GET", url, timeout=DOWNLOAD_TIMEOUT_S,
                                           headers={"Accept-Encoding": "identity"}) as resp:
             if resp.status_code >= 400:
@@ -135,7 +135,7 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
                 return None, "pdf_too_large"
             body = bytearray()
             sniffed = "application/pdf" in ctype
-            for part in htmltext.iter_decoded(resp):  # pieces of at most ~256 KB
+            for part in netlimits.iter_decoded(resp):  # pieces of at most ~256 KB
                 body.extend(part)
                 if not sniffed and len(body) >= 5:  # first bytes before the size verdict
                     if b"%PDF-" not in bytes(body[:_SNIFF]):
@@ -147,7 +147,7 @@ def _download(url: str) -> Optional[Tuple[Optional[bytes], Optional[str]]]:
                     return None, "timeout"
     except httpx.TimeoutException:
         return None, "timeout"
-    except htmltext._EncodingRefused:
+    except netlimits._EncodingRefused:
         return None, "network error (unsupported content encoding)"
     except httpx.HTTPError as exc:
         return None, f"network error ({type(exc).__name__})"

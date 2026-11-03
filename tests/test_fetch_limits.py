@@ -16,6 +16,7 @@ import pytest
 
 from searchify import reasons
 from searchify.extract import htmltext as h
+from searchify.extract import netlimits as nl
 from searchify.extract import pdf as pdf_mod
 
 BOMB_MB = 32
@@ -92,7 +93,7 @@ def test_stacked_encodings_are_refused(site, bombs):
 def test_a_gzip_bomb_is_cut_at_the_limit_without_inflating_it(site, bombs):
     ROUTES["/bomb"] = (200, {**HTML, "Content-Encoding": "gzip"}, bombs["gzip"])
     html, peak = _peak_mb(lambda: h.fetch_url(site + "/bomb", 10, 100_000))
-    assert 100_000 <= len(html) <= 100_000 + h._DECODE_STEP and html.startswith("<html><body>")
+    assert 100_000 <= len(html) <= 100_000 + nl._DECODE_STEP and html.startswith("<html><body>")
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
 
 
@@ -102,9 +103,9 @@ def test_a_brotli_bomb_is_cut_or_refused(site, bombs):
     ROUTES["/bomb"] = (200, {**HTML, "Content-Encoding": "br"}, bombs["br"])
     html, peak = _peak_mb(lambda: h.fetch_url(site + "/bomb", 10, 100_000))
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
-    if h._BROTLI is not None:  # a Brotli module with an output cap must decode it
+    if nl._BROTLI is not None:  # a Brotli module with an output cap must decode it
         assert html is not None, h.fetch_failure()
-        assert 100_000 <= len(html) <= 100_000 + h._DECODE_STEP and html.startswith("<html><body>")
+        assert 100_000 <= len(html) <= 100_000 + nl._DECODE_STEP and html.startswith("<html><body>")
     else:  # an older one is refused, never handed to httpx
         assert html is None and h.fetch_failure() == "network error (unsupported content encoding)"
 
@@ -114,7 +115,7 @@ def test_only_encodings_with_an_output_cap_are_asked_for(site):
     h.fetch_url(site + "/p", 10, 100_000)
     asked = {v.strip() for v in SEEN["/p"]["Accept-Encoding"].split(",")}
     assert asked <= {"gzip", "deflate", "br"}
-    assert ("br" in asked) == (h._BROTLI is not None)
+    assert ("br" in asked) == (nl._BROTLI is not None)
 
 
 def test_the_body_of_a_redirect_is_never_decoded(site, bombs):
@@ -159,19 +160,19 @@ def test_a_page_over_the_limit_keeps_its_last_piece(site, enc, pack):
     page = _word_page(260_000)
     ROUTES["/big"] = (200, {**HTML, "Content-Encoding": enc}, pack(page))
     html = h.fetch_url(site + "/big", 10, 1_000_000)
-    assert 1_000_000 < len(html) <= 1_000_000 + h._DECODE_STEP
+    assert 1_000_000 < len(html) <= 1_000_000 + nl._DECODE_STEP
     assert page.decode().startswith(html)
 
 
 def test_a_large_brotli_page_is_read_whole(site):
     # Brotli keeps output inside the decoder after the last network read: it must be drained
-    if h._BROTLI is None:
+    if nl._BROTLI is None:
         pytest.skip("no Brotli module with an output cap")
     from searchify.extract import render  # noqa: PLC0415
 
     page = _word_page(120_000)
-    assert len(page) > 2 * h._DECODE_STEP
-    ROUTES["/br"] = (200, {**HTML, "Content-Encoding": "br"}, h._BROTLI.compress(page, quality=5))
+    assert len(page) > 2 * nl._DECODE_STEP
+    ROUTES["/br"] = (200, {**HTML, "Content-Encoding": "br"}, nl._BROTLI.compress(page, quality=5))
     assert h.fetch_url(site + "/br", 10, 4_000_000) == page.decode()
     assert h.fetch_failure() is None
     got = render._fetch("GET", site + "/br", {}, None)
@@ -192,13 +193,13 @@ def test_a_broken_gzip_stream_is_a_network_error(site):
 
 
 def test_decoder_pieces_stay_small(bombs):
-    pieces = list(h._Inflate("gzip").feed(bombs["gzip"]))
+    pieces = list(nl._Inflate("gzip").feed(bombs["gzip"]))
     assert sum(map(len, pieces)) == (BOMB_MB << 20) + len(b"<html><body>")
-    assert max(map(len, pieces)) <= h._DECODE_STEP
-    if h._BROTLI is not None:
-        pieces = list(h._Brotli(h._BROTLI).feed(bombs["br"]))
+    assert max(map(len, pieces)) <= nl._DECODE_STEP
+    if nl._BROTLI is not None:
+        pieces = list(nl._Brotli(nl._BROTLI).feed(bombs["br"]))
         assert sum(map(len, pieces)) == (BOMB_MB << 20) + len(b"<html><body>")
-        assert max(map(len, pieces)) <= h._DECODE_STEP
+        assert max(map(len, pieces)) <= nl._DECODE_STEP
 
 
 def test_pdf_download_asks_for_identity_and_decodes_with_a_cap(site, monkeypatch):
@@ -228,7 +229,7 @@ def test_the_browser_proxy_caps_a_bomb_too(site, bombs, monkeypatch):
     got, peak = _peak_mb(lambda: render._fetch("GET", site + "/bomb", browser, None))
     assert got[0] == 200 and len(got[2]) == 100_000
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
-    assert SEEN["/bomb"]["Accept-Encoding"] == h.ACCEPT_ENCODING
+    assert SEEN["/bomb"]["Accept-Encoding"] == nl.ACCEPT_ENCODING
 
 
 # ---------------------------------------------------------------- overall deadline
@@ -290,12 +291,12 @@ def test_dripped_headers_end_the_pdf_download_in_time(dripping, monkeypatch):
 
 
 def test_the_deadline_is_per_thread_and_restored():
-    assert getattr(h._TLS, "deadline", None) is None
-    with h.overall_deadline(5) as outer:
-        with h.overall_deadline(60) as inner:
+    assert getattr(nl._TLS, "deadline", None) is None
+    with nl.overall_deadline(5) as outer:
+        with nl.overall_deadline(60) as inner:
             assert inner == outer  # an inner call never extends the outer budget
-        assert h._TLS.deadline == outer
-    assert h._TLS.deadline is None
+        assert nl._TLS.deadline == outer
+    assert nl._TLS.deadline is None
 
 
 def test_at_most_four_addresses_are_tried(monkeypatch):
