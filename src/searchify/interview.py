@@ -1,8 +1,9 @@
 """The first-run interview of the command line (and ``searchify config``).
 
-It runs only for a person at a terminal: stdin and stderr are both TTYs, no CI
-variable is set and ``--no-input`` was not given. The prompts go to stderr, never
-to stdout, so JSON output stays clean. At most three questions: how far the load
+It runs only for a person at a terminal: stdin, stdout and stderr are all TTYs,
+no CI variable is set and ``--no-input`` was not given. The prompts go to stderr,
+never to stdout, so JSON output stays clean, and ``searchify search q > out.json``
+never stops to wait for an answer. At most three questions: how far the load
 ladder may go, the budget and, when the system locale suggests one, the search
 region. Enter keeps today's behaviour. Answering ``later`` (or closing the input)
 writes nothing, so the question comes back next time.
@@ -42,6 +43,14 @@ def interactive(no_input: bool = False, env: Optional[Mapping[str, str]] = None)
         return False
     try:
         return bool(sys.stdin.isatty() and sys.stderr.isatty())
+    except (AttributeError, ValueError):
+        return False
+
+
+def _stdout_is_tty() -> bool:
+    """False when the output goes to a file or a pipe: then nobody may be watching."""
+    try:
+        return bool(sys.stdout.isatty())
     except (AttributeError, ValueError):
         return False
 
@@ -177,7 +186,7 @@ def first_run(no_input: bool = False) -> None:
     person is at the terminal. A saved profile or ``later`` is never asked about twice
     in one process."""
     global _asked
-    if _asked or profile.exists() or not interactive(no_input):
+    if _asked or profile.exists() or not interactive(no_input) or not _stdout_is_tty():
         return
     _asked = True
     answers = run()

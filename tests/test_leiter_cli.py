@@ -123,6 +123,21 @@ def test_no_command_interviews_without_a_terminal(monkeypatch, seen, command):
     assert not profile.exists()
 
 
+def test_first_run_never_asks_when_stdout_is_redirected(monkeypatch):
+    # `searchify search q > out.json` at a terminal: stdin and stderr are TTYs, stdout a file
+    monkeypatch.setattr(sys, "stdin", _Tty())
+    monkeypatch.setattr(sys, "stderr", _Tty())
+    monkeypatch.setattr(sys, "stdout", io.StringIO())
+    monkeypatch.setattr(interview, "run", lambda *a, **k: pytest.fail("asked although stdout is a file"))
+    interview.first_run()
+    assert not profile.exists()
+    asked = []
+    monkeypatch.setattr(sys, "stdout", _Tty())
+    monkeypatch.setattr(interview, "run", lambda *a, **k: asked.append(1))
+    interview.first_run()
+    assert asked == [1]  # all three at a terminal: the interview runs
+
+
 def test_the_service_and_mcp_modules_do_not_even_import_the_interview():
     import searchify.mcp_server as mcp_mod
     import searchify.service as service_mod
@@ -133,6 +148,7 @@ def test_the_service_and_mcp_modules_do_not_even_import_the_interview():
 
 def _terminal(monkeypatch):
     monkeypatch.setattr(interview, "interactive", lambda no_input=False, env=None: not no_input)
+    monkeypatch.setattr(interview, "_stdout_is_tty", lambda: True)  # CliRunner captures stdout
 
 
 def test_first_run_asks_on_stderr_and_stdout_stays_clean_json(monkeypatch, seen):
