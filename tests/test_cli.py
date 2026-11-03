@@ -71,6 +71,15 @@ def test_passages_json_passes_the_options_through(monkeypatch):
                     "max_chars": 600, "rerank": False, "backend": None, "language": "de"}
 
 
+def test_passages_takes_country_like_search(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(sys.modules["searchify.passages"], "passages",
+                        lambda q, n, **kw: seen.update(kw) or [])
+    result = runner.invoke(cli.app, ["passages", "q", "--language", "nl", "--country", "BE"])
+    assert result.exit_code == 0
+    assert seen["country"] == "BE" and seen["language"] == "nl"
+
+
 def test_passages_rerank_defaults_to_auto(monkeypatch):
     seen = {}
     monkeypatch.setattr(sys.modules["searchify.passages"], "passages",
