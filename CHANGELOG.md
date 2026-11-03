@@ -31,6 +31,7 @@ Behaviour that differs from 0.2.0:
 - Wikipedia and other Wikimedia pages load again: the default User-Agent names the project and its URL, as Wikimedia's policy asks; set `SEARCHIFY_USER_AGENT` to use your own.
 - The Chrome-TLS fallback (curl_cffi) never ran: a swallowed `TypeError` turned every attempt into `None`. It now pins the checked address with `RESOLVE`, drops the answer if the connected IP is not that address, and logs why.
 - Cleaning line ends is linear: a page with 40,000 trailing spaces took 2 s before.
+- Ad clicks and click redirects (`bing.com/aclick`, `duckduckgo.com/y.js` and `/l/?`, `googleadservices.com`, `google.com/aclk`, `doubleclick.net`) are no longer search hits, for every backend. DuckDuckGo often returned them for shopping queries, and `passages` then loaded them, which counted as a paid click for the advertiser. The list just gets shorter, nothing is fetched to fill it.
 
 ### Security
 
