@@ -42,8 +42,8 @@ mcp = ["mcp>=2.3,<3; python_version >= '3.10'"]
 dev = ["pytest>=8.0"]
 
 [project.urls]
-Homepage = "https://github.com/sami-mag07/searchify-l"
-Issues = "https://github.com/sami-mag07/searchify-l/issues"
+Homepage = "https://github.com/sami-mag07/searchify"
+Issues = "https://github.com/sami-mag07/searchify/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

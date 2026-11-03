@@ -47,7 +47,7 @@ Run it once and the reranker model (about 470 MB) downloads; after that it is ca
 Not on PyPI yet, so install from GitHub:
 
 ```bash
-pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify-l"
+pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify"
 ```
 
 | Extra | Adds |
@@ -115,7 +115,7 @@ only `month` and `year`: with `day` or `week` they hide the answer to questions 
 events.
 
 ```bash
-pip install "searchify[mcp,rerank] @ git+https://github.com/sami-mag07/searchify-l"
+pip install "searchify[mcp,rerank] @ git+https://github.com/sami-mag07/searchify"
 claude mcp add searchify -- searchify-mcp
 ```
 

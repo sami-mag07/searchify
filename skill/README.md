@@ -21,7 +21,7 @@ cp references/.env.example references/.env    # then fill in the keys you have
 extraction and reranking, install the engine package:
 
 ```
-pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify-l"
+pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify"
 ```
 
 ## Use
