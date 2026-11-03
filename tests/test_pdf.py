@@ -195,6 +195,26 @@ def test_reads_a_pdf_as_a_normal_document(site, monkeypatch):
     assert time.monotonic() - t < 15
 
 
+def test_soft_hyphens_join_the_word(site, monkeypatch):
+    _fresh_cache(monkeypatch)
+    # pdfium hands back a hyphen it took for a soft one as U+FFFE
+    ROUTES["/h.pdf"] = ("application/pdf", make_pdf(["Die Trans-\nformer Architektur ist gut"]))
+    docs, failed = reader.read_pages([site + "/h.pdf"], "text")
+    assert failed == []
+    assert "Die Transformer Architektur" in docs[0]["content"] and "\ufffe" not in docs[0]["content"]
+
+
+@pytest.mark.parametrize("raw, clean", [
+    ("Trans\ufffe\nformer", "Transformer"),            # at the line end: joined over the break
+    ("Trans\ufffe  \n  former ist", "Transformer ist"),
+    ("Trans\ufffeformer", "Transformer"),               # inside a line: just removed
+    ("ein\ufffe Wort\nund mehr", "ein Wort\nund mehr"),
+    ("ohne Trennung\nZeile", "ohne Trennung\nZeile"),
+])
+def test_soft_hyphen_cleanup(raw, clean):
+    assert pdf_mod.join_soft_hyphens(raw) == clean
+
+
 def test_title_falls_back_to_the_file_name(site, monkeypatch):
     _fresh_cache(monkeypatch)
     ROUTES["/Jahres_bericht-2025.pdf"] = ("application/pdf", make_pdf(["Ein bisschen Text hier"]))

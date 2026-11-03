@@ -69,6 +69,16 @@ _SNIFF = 1024  # the PDF header may follow a few junk bytes, the spec allows 102
 
 _SLOTS = threading.BoundedSemaphore(MAX_PARALLEL)
 _BLANKS = re.compile(r"\n{3,}")
+SOFT_HYPHEN = "\ufffe"  # what pdfium returns for a hyphen it takes for a soft one
+_SOFT_AT_LINE_END = re.compile("\ufffe[ \t]*\n[ \t]*")
+
+
+def join_soft_hyphens(text: str) -> str:
+    """pdfium marks a soft hyphen with U+FFFE. At a line end the word goes on in
+    the next line: join it there without a hyphen. Anywhere else just drop it."""
+    if SOFT_HYPHEN not in text:
+        return text
+    return _SOFT_AT_LINE_END.sub("", text).replace(SOFT_HYPHEN, "")
 
 
 def available() -> bool:
@@ -214,6 +224,7 @@ def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
             page = doc[i]
             textpage = page.get_textpage()
             text = (textpage.get_text_range() or "").replace("\r\n", "\n").replace("\r", "\n")
+            text = join_soft_hyphens(text)
             text = _BLANKS.sub("\n\n", htmltext.strip_line_ends(text)).strip()
             textpage.close()
             page.close()
