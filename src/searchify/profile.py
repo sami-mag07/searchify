@@ -7,11 +7,15 @@ version, not read by any search yet). It is read by the command line and by the 
 they take their limits from the environment and the request only.
 
 The file is written atomically (temporary file, then rename) and read once per
-process. Anything in it that is not a known key with a valid value is ignored.
+process, at most ``MAX_BYTES`` of it. Anything in it that is not a known key with a
+valid value is ignored. A file that cannot be parsed (not JSON, not UTF-8, too large
+or nested too deep) counts as broken: one warning, the defaults apply, and
+``searchify config`` writes a new one over it.
 """
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 import tempfile
@@ -19,6 +23,8 @@ from pathlib import Path
 from typing import Dict, Mapping, Optional
 
 from .limits import BUDGETS, STAGES
+
+log = logging.getLogger(__name__)
 
 FILE_NAME = "profile.json"
 VERSION = 1
@@ -88,9 +94,17 @@ def load(force: bool = False) -> Dict:
     data: Dict = {}
     try:
         path = profile_path()
-        if path.is_file() and path.stat().st_size <= MAX_BYTES:
-            data = clean(json.loads(path.read_text(encoding="utf-8")))
-    except (OSError, ValueError):
+        if path.is_file():
+            with open(path, "rb") as handle:
+                raw = handle.read(MAX_BYTES + 1)  # never more, however large the file is
+            if len(raw) > MAX_BYTES:
+                raise ValueError(f"larger than {MAX_BYTES} bytes")
+            data = clean(json.loads(raw.decode("utf-8")))
+    except OSError:
+        data = {}
+    except (ValueError, RecursionError) as exc:  # bad JSON or UTF-8, too large, too deep
+        log.warning("searchify: the profile file is broken (%s), using the defaults; "
+                    "`searchify config` writes a new one", type(exc).__name__)
         data = {}
     _cache = data
     return dict(data)

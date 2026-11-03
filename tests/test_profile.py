@@ -85,6 +85,36 @@ def test_broken_or_invalid_content_is_ignored_not_fatal(content):
     assert profile.load() == {}
 
 
+@pytest.mark.parametrize("content", [
+    "[" * 30_000 + "]" * 30_000,          # under MAX_BYTES, but deeper than the JSON parser goes
+    '{"a": ' * 20_000 + "1" + "}" * 20_000,
+    "{" + " " * (profile.MAX_BYTES + 10) + "}",  # too large: only MAX_BYTES + 1 are read
+    b"\xff\xfe".decode("latin-1"),         # not UTF-8
+])
+def test_a_deep_huge_or_undecodable_profile_is_broken_not_fatal(content, caplog):
+    path = profile.profile_path()
+    path.parent.mkdir(parents=True)
+    path.write_text(content, encoding="latin-1")
+    with caplog.at_level("WARNING"):
+        assert profile.load() == {}
+    assert any("profile" in r.getMessage() and "default" in r.getMessage() for r in caplog.records)
+
+
+def test_config_replaces_a_profile_too_deep_to_read():
+    from typer.testing import CliRunner
+
+    from searchify import cli
+
+    path = profile.profile_path()
+    path.parent.mkdir(parents=True)
+    path.write_text("[" * 30_000 + "]" * 30_000)
+    runner = CliRunner()
+    shown = runner.invoke(cli.app, ["config", "--show"])
+    assert shown.exit_code == 0 and json.loads(shown.stdout)["values"]["budget"]["source"] == "default"
+    assert runner.invoke(cli.app, ["config", "--budget", "low"]).exit_code == 0
+    assert profile.load(force=True) == {"budget": "low"}
+
+
 def test_unknown_keys_and_bad_values_are_dropped_on_load():
     path = profile.profile_path()
     path.parent.mkdir(parents=True)
