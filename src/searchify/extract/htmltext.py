@@ -347,6 +347,10 @@ class _Inflate:
             if not data and len(out) < _DECODE_STEP:
                 return  # input used up and nothing left inside the decoder
 
+    def finish(self) -> Iterator[bytes]:
+        """Whatever the decoder still holds after the last network read."""
+        return self.feed(b"")
+
 
 class _Brotli:
     def __init__(self, mod) -> None:
@@ -355,13 +359,16 @@ class _Brotli:
 
     def feed(self, data: bytes) -> Iterator[bytes]:
         out = self._run(data, output_buffer_limit=_DECODE_STEP)
-        if out:
+        # Drain until a call gives nothing: in Brotli 1.2 can_accept_more_data() only
+        # reports pending input, not output still inside the decoder, and the rest of a
+        # page behind the last network read was silently lost (887 KB -> 622 KB).
+        while out:
             yield out
-        while not self._obj.can_accept_more_data():
             out = self._run(b"", output_buffer_limit=_DECODE_STEP)
-            if not out:
-                return
-            yield out
+
+    def finish(self) -> Iterator[bytes]:
+        """Whatever the decoder still holds after the last network read."""
+        return self.feed(b"")
 
 
 def content_encodings(resp: httpx.Response) -> List[str]:
@@ -390,6 +397,7 @@ def iter_decoded(resp: httpx.Response) -> Iterator[bytes]:
     try:
         for raw in resp.iter_raw():
             yield from decoder.feed(raw)
+        yield from decoder.finish()
     except errors as exc:
         raise httpx.DecodingError(str(exc), request=resp.request) from exc
 

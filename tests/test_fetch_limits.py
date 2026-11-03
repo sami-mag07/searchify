@@ -3,6 +3,7 @@
 Everything runs against a local server on 127.0.0.1; the SSRF check is patched to
 treat it as public only inside the fixture."""
 import gzip
+import random
 import socket
 import threading
 import time
@@ -132,6 +133,28 @@ def test_normal_encoded_pages_still_read_whole(site, enc, pack):
     page = b"<html><body>" + b"<p>Ein ganz normaler Absatz.</p>" * 20_000 + b"</body></html>"
     ROUTES["/p"] = (200, {**HTML, "Content-Encoding": enc}, pack(page))
     assert h.fetch_url(site + "/p", 10, 2_000_000) == page.decode()
+
+
+def _word_page(words: int) -> bytes:
+    rnd = random.Random(1)
+    vocab = ["".join(rnd.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(rnd.randint(2, 10)))
+             for _ in range(3000)]
+    return ("<html><body><p>" + " ".join(rnd.choice(vocab) for _ in range(words)) + "</p></body></html>").encode()
+
+
+def test_a_large_brotli_page_is_read_whole(site):
+    # Brotli keeps output inside the decoder after the last network read: it must be drained
+    if h._BROTLI is None:
+        pytest.skip("no Brotli module with an output cap")
+    from searchify.extract import render  # noqa: PLC0415
+
+    page = _word_page(120_000)
+    assert len(page) > 2 * h._DECODE_STEP
+    ROUTES["/br"] = (200, {**HTML, "Content-Encoding": "br"}, h._BROTLI.compress(page, quality=5))
+    assert h.fetch_url(site + "/br", 10, 4_000_000) == page.decode()
+    assert h.fetch_failure() is None
+    got = render._fetch("GET", site + "/br", {}, None)
+    assert got[0] == 200 and got[2] == page
 
 
 def test_a_broken_gzip_stream_is_a_network_error(site):
