@@ -4,7 +4,6 @@
 
 - Limit the load ladder per request: `max_stage` (plain, tls, browser, stealth), `budget` (low, normal, high) and `cloud_fallback`, in `read_pages`, `read_pages_ex`, `extract_report`, the HTTP `/extract` body, the MCP `extract` tool and the CLI (`--max-stage`, `--budget`, `--no-cloud`). The effective stage is the lowest of the environment, the operator cap `SEARCHIFY_MAX_STAGE` and the request, so `READER_STEALTH=1` cannot override a request for `plain`. With nothing set the behaviour is unchanged.
 - User profile for the command line and `extract_report` (never the HTTP service or MCP): a first-run interview at a terminal (stage, budget, search region from the system locale as a suggestion), `searchify config` and `searchify config --show`. JSON file in the user config folder, written atomically.
-- Product pages carry a compact `product` (name, price, priceCurrency, availability, gtin list, sku, brand), read from the JSON-LD that is already parsed. Pages without a product get no `product`, and pages without any JSON-LD or namespaced meta no longer get an empty `structured`.
 - Product pages carry a compact `product` (name, price, priceCurrency, availability, gtin list, sku, brand), read from the JSON-LD that is already parsed. Pages without a product get no `product`, and the raw `structured` block is opt-in (see below).
 - Region: `--country` (CLI), `country` (HTTP `/search`, Python filter) next to `language`. With a language, DuckDuckGo gets the matching region (`nl` gives `nl-nl`, `nl` + `BE` gives `be-nl`; table of 64 regions in `search/regions.py`); without one it stays `wt-wt`. `language=any` means no language parameter. SearXNG, Serper and Tavily ignore the new region mapping.
 - DuckDuckGo: a real zero-hit search is an empty list instead of an error; rate limit and timeout errors start with `rate_limited:` or `timeout:` (`searchify.search.error_code()` reads it from `search_report()`).
@@ -18,6 +17,14 @@
 - `passages(query)`: search, read the top pages and return the paragraphs that answer the query, best first, with their source URLs. Also as `searchify passages` on the command line and `POST /passages` in the HTTP service.
 - MCP server `searchify-mcp` with the tools `passages`, `search` and `extract` (extra `mcp`).
 - Splitting pages into ranked passages and asking for full questions instead of keywords follow [langchain-searchify](https://github.com/felixvew/langchain-searchify) by Félix Fautsch.
+
+### Security
+
+- Page and browser-proxy reads ask only for encodings that can be decoded with an output cap (`Accept-Encoding: gzip, deflate`, plus `br` with Brotli 1.2 or newer) and decode them in pieces of at most 256 KB. More than one coding layer, or one without an output cap (zstd, compress), is refused (`network error (unsupported content encoding)`); unknown header values are ignored as before. The body of a followed redirect is never decoded.
+- PDFs are requested uncompressed; a compressed answer is decoded with the same cap and stops at the 20 MB limit (`pdf_too_large`).
+- The fetch timeout is an overall deadline that includes connecting, the TLS handshake and the headers, not only the body: a server dripping its headers no longer holds a worker past the timeout.
+- At most 4 addresses are tried per host, alternating IPv6 and IPv4.
+- The PDF child: title and author capped at 300 characters, answer in JSON instead of pickle with a size cap, killed above 1 GB resident memory, environment emptied before pdfium loads (hygiene, not a sandbox).
 
 ## 0.2.0
 
