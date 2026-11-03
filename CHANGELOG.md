@@ -31,6 +31,7 @@
 - The fetch timeout is an overall deadline that includes connecting, the TLS handshake and the headers, not only the body: a server dripping its headers no longer holds a worker past the timeout.
 - At most 4 addresses are tried per host, alternating IPv6 and IPv4.
 - The Chrome-TLS fallback ignores proxy settings from the environment, so the pinned public address cannot be routed elsewhere.
+- The Tavily fallback for reading never gets a page refused as `address_blocked` (a private or internal address), so internal URLs and the tokens in them do not reach a third party.
 - The PDF child: title and author capped at 300 characters, answer in JSON instead of pickle with a size cap, killed above 1 GB resident memory, environment emptied before pdfium loads (hygiene, not a sandbox).
 
 ## 0.2.0

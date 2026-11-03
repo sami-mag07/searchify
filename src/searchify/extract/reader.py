@@ -27,6 +27,7 @@ from . import stealth as stealth_mod
 from .. import limits as limits_mod
 from ..config import get_settings
 from ..limits import Limits
+from ..reasons import code_for
 from ..search._common import SearchBackendError
 from ..search.cloud import tavily_post
 
@@ -611,12 +612,17 @@ def _tavily_failed(
 ) -> Tuple[List[Dict], List[Dict]]:
     """Letzte Sicherheitsstufe: Seiten, an denen alle eigenen Stufen gescheitert
     sind, liest Tavily Extract. Laeuft nur mit TAVILY_API_KEY; scheitert der
-    Aufruf, bleiben die Fehlschlaege wie sie waren."""
+    Aufruf, bleiben die Fehlschlaege wie sie waren. Adressen mit dem Grund
+    address_blocked (privat oder intern) gehen nie an Tavily: sonst landeten
+    interne URLs samt Token bei einem Dritten."""
     cap = TAVILY_TIMEOUT_S if limits is None else limits.scaled(TAVILY_TIMEOUT_S)
     rest = cap if deadline is None else min(cap, deadline - time.monotonic())
     if rest < TAVILY_MIN_REST_S:
         return docs, failed
-    wanted = [f["url"] for f in failed if f.get("url")][:TAVILY_MAX_URLS]
+    wanted = [f["url"] for f in failed if f.get("url")
+              and (f.get("reason") or code_for(f.get("error"))) != "address_blocked"][:TAVILY_MAX_URLS]
+    if not wanted:
+        return docs, failed
     try:
         data = tavily_post("extract", {"urls": wanted, "format": fmt}, rest)
     except SearchBackendError:
