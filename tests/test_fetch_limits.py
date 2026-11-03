@@ -101,9 +101,12 @@ def test_a_brotli_bomb_is_cut_or_refused(site, bombs):
         pytest.skip("brotli not installed")
     ROUTES["/bomb"] = (200, {**HTML, "Content-Encoding": "br"}, bombs["br"])
     html, peak = _peak_mb(lambda: h.fetch_url(site + "/bomb", 10, 100_000))
-    # a Brotli module with an output cap decodes it, an older one is refused
-    assert html is None or 100_000 <= len(html) <= 100_000 + h._DECODE_STEP
     assert peak < 8, f"{peak:.0f} MB in memory for a 100 KB limit"
+    if h._BROTLI is not None:  # a Brotli module with an output cap must decode it
+        assert html is not None, h.fetch_failure()
+        assert 100_000 <= len(html) <= 100_000 + h._DECODE_STEP and html.startswith("<html><body>")
+    else:  # an older one is refused, never handed to httpx
+        assert html is None and h.fetch_failure() == "network error (unsupported content encoding)"
 
 
 def test_only_encodings_with_an_output_cap_are_asked_for(site):
