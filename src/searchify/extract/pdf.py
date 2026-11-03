@@ -1,8 +1,11 @@
 """PDF reading (optional extra ``pdf``, needs ``pypdfium2``).
 
-Without the extra nothing here does anything and a PDF URL fails exactly as before
-("not HTML: application/pdf"). With it, ``read_if_pdf`` is called from the page
-reader once the normal fetch has refused a document, and:
+Without the extra no PDF is read. A document declared as a PDF (application/pdf,
+application/x-pdf) then fails with reason ``not_html`` and an error text that names
+the extra: ``not HTML: application/pdf (install the extra to read PDFs: pip install
+"searchify[pdf]")``; other refused types keep their plain text. With the extra,
+``read_if_pdf`` is called from the page reader once the normal fetch has refused a
+document, and:
 
 * downloads the bytes (asking for Accept-Encoding: identity; a compressed answer is
   decoded with an output cap, stacked codings are refused) through the same pinned
@@ -82,26 +85,39 @@ def is_pdf_failure(fail: Dict) -> bool:
     return str(fail.get("error") or "").startswith("pdf_") or "page_count" in (fail.get("static") or {})
 
 
-_PDF_TYPES = ("application/pdf", "application/x-pdf", "application/octet-stream",
-              "binary/octet-stream", "application/download", "application/force-download")
+_DECLARED_PDF = ("application/pdf", "application/x-pdf")
+_PDF_TYPES = _DECLARED_PDF + ("application/octet-stream", "binary/octet-stream",
+                              "application/download", "application/force-download")
+EXTRA_HINT = 'install the extra to read PDFs: pip install "searchify[pdf]"'
+
+
+def _refused_type(failure: Optional[str]) -> str:
+    """The type of a "not HTML: <type>" refusal, lower case; "" for any other failure."""
+    text = failure or ""
+    return text[len("not HTML:"):].strip().lower() if text.startswith("not HTML:") else ""
 
 
 def _pdf_like(failure: Optional[str]) -> bool:
     """A "not HTML: <type>" refusal whose type can hide a PDF."""
-    text = failure or ""
-    return text.startswith("not HTML:") and text[len("not HTML:"):].strip().lower() in _PDF_TYPES
+    return _refused_type(failure) in _PDF_TYPES
 
 
 def read_if_pdf(
     url: str, html: Optional[str], failure: Optional[str]
 ) -> Optional[Tuple[Optional[Dict], Optional[str]]]:
     """Called after the normal fetch of `url`. Returns None when this is not a
-    case for the PDF path (extra missing, or the fetch did not hint at a PDF), so
-    the caller carries on as before. Otherwise (document, None) or (None, reason).
+    case for the PDF path (the fetch did not hint at a PDF, or the extra is missing
+    and the type does not say PDF), so the caller carries on as before. Otherwise
+    (document, None) or (None, reason). Without the extra a declared PDF gives
+    (None, the refusal text plus the install hint), still reason not_html.
     A "hint" is a refusal as non-HTML with a PDF-like type or a body that starts
     with %PDF-; png, json, zip and the like cost no second request."""
     hinted = _pdf_like(failure) or (html or "").startswith("%PDF-")
-    if not hinted or not available():
+    if not hinted:
+        return None
+    if not available():
+        if _refused_type(failure) in _DECLARED_PDF:
+            return None, f"{failure} ({EXTRA_HINT})"
         return None
     got = _download(url)
     if got is None:

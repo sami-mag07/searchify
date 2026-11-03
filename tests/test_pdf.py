@@ -488,16 +488,22 @@ def test_pdf_failures_skip_the_browser_stages(monkeypatch):
 # ---------------------------------------------------------------- without the extra
 
 
-def test_without_the_extra_a_pdf_fails_exactly_as_before(site, monkeypatch):
+def test_without_the_extra_a_pdf_names_the_missing_extra(site, monkeypatch):
     _fresh_cache(monkeypatch)
     monkeypatch.setitem(sys.modules, "pypdfium2", None)  # import is impossible
     assert pdf_mod.available() is False
     ROUTES["/a.pdf"] = ("application/pdf", make_pdf(["Etwas Text auf der Seite"]))
-    docs, failed = pages_mod.read_pages([site + "/a.pdf"])
-    # as before the PDF reader existed, plus the additive reason code
-    assert docs == [] and failed == [{"url": site + "/a.pdf", "error": "not HTML: application/pdf",
-                                      "reason": "not_html"}]
-    assert HITS == ["/a.pdf"]  # no second request either
+    ROUTES["/b.bin"] = ("application/octet-stream", make_pdf(["Vielleicht ein PDF"]))
+    docs, failed = pages_mod.read_pages([site + "/a.pdf", site + "/b.bin"])
+    errors = {f["url"]: (f["error"], f["reason"]) for f in failed}
+    assert docs == []
+    # the reason stays not_html, the text says how to read it
+    assert errors[site + "/a.pdf"] == (
+        'not HTML: application/pdf (install the extra to read PDFs: pip install "searchify[pdf]")',
+        "not_html")
+    # an octet-stream may be anything: no guess, the old text
+    assert errors[site + "/b.bin"] == ("not HTML: application/octet-stream", "not_html")
+    assert sorted(HITS) == ["/a.pdf", "/b.bin"]  # no second request either
 
 
 def test_html_pages_never_reach_the_pdf_code(site, monkeypatch):
