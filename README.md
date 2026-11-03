@@ -320,6 +320,11 @@ curl -s http://localhost:8000/passages -H 'content-type: application/json' \
   -d '{"query": "How tall is the Eiffel Tower?", "top_k": 3}'
 ```
 
+The service has no login of its own, so keep it on localhost (uvicorn's default `127.0.0.1`) or
+put it behind your own authentication. Anyone who can reach it can use the Tavily and Serper keys
+set in its environment and choose the search backend. `SEARCHIFY_MAX_STAGE` caps the load ladder
+for every request, whatever the request asks for.
+
 In Python:
 
 ```python
