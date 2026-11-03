@@ -16,10 +16,13 @@ reader once the normal fetch has refused a document, and:
   that writes more than 64 KB blocks until somebody reads, so joining first would
   report a timeout for every larger document. A crash or a hang only costs that one
   PDF, never the HTML worker pool or another PDF. No thread fallback.
-  The child is crash isolation, not a sandbox: it drops the environment variables
-  it inherited (API keys) before loading pdfium and answers in plain JSON, never
-  pickle, so a child taken over by a crafted PDF cannot run code in the parent
-  through its answer.
+  The child is crash isolation, not a sandbox. What protects the parent is the
+  answer format: plain JSON, checked field by field, never pickle, so a child taken
+  over by a crafted PDF cannot run code in the parent through its answer. The child
+  also empties os.environ before loading pdfium; that is hygiene against passing
+  API keys on by accident (to pdfium or anything it starts), not protection: the
+  original environment block stays in the process (ps eww, /proc/self/environ),
+  and the same user can read the parent's.
 * returns at most ``MAX_PAGES`` pages and ``MAX_CHARS`` characters, with ``[Seite N]``
   markers and ``page_count`` (the real page count of the file).
 
@@ -164,8 +167,9 @@ def _answer(conn, kind: str, payload) -> None:
 def _worker(conn, data: bytes, max_pages: int, max_chars: int) -> None:
     """Runs in its own process. Sends exactly one answer (see _answer)."""
     try:
-        # API keys and tokens have no business in a process parsing hostile input:
-        # gone before pypdfium2 is even imported (Security-Review 03.11.2026)
+        # Hygiene, not a sandbox: os.environ (API keys) is empty before pypdfium2 loads,
+        # so nothing passes it on by accident. The original env block stays readable
+        # in this process (ps eww, /proc/self/environ); see the module docstring.
         os.environ.clear()
         try:
             import resource  # noqa: PLC0415 - Unix only
