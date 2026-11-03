@@ -69,7 +69,7 @@ instance or a cloud fallback.
 |---|---|
 | `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
 | `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Compared with 0.2.0 a normal page only gains the small field `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags stay opt-in: they come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. |
-| `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and, only when something went wrong, `status` (`read`, `failed`, `thin`, `reasons`). |
+| `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and always `status` (`read`, `failed`, `thin`, `reasons`; after a clean run `failed` and `thin` are 0 and `reasons` is empty). |
 | `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
 | `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
 | `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
@@ -101,8 +101,11 @@ Every failed page keeps its human `error` text and gets one `reason`: `blocked` 
 `rate_limited` (429), `not_found` (404/410), `unavailable`, `timeout`, `not_html`, `too_large`,
 `address_blocked` (a private or internal address, refused before any connection),
 `no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
-`pdf_too_large`. The HTTP service repeats the counts in the `X-Searchify-Status` header, built
-from these codes only. On full success neither `status` nor the header is added.
+`pdf_too_large`. The command line and `extract_report` always put `reason` on each failed page.
+The HTTP `/extract` lists failed pages with `url` and `error` only and adds `reason` to each of
+them with `detail: true` in the request body; it repeats the counts in `status` and in the
+`X-Searchify-Status` header, built from these codes only. On full success `/extract` adds neither
+`status` nor the header.
 
 ## MCP server
 
@@ -330,20 +333,23 @@ print(answer.json())   # the clean text for each address
 ```
 
 `/extract` answers `{"results": [...], "failed": [...]}`. Each result has `url`, `title`,
-`published`, `author`, `description`, `content`, `links`, `structured` and `stage`:
+`published`, `author`, `description`, `content`, `links` and `stage`, plus `structured` only when
+the request asks for it with `"structured": true`:
 
-- `structured.json_ld` is the list of the page's JSON-LD objects as they are, so a shop page's
+- `structured.json_ld` (only with `"structured": true`) is the list of the page's JSON-LD objects as they are, so a shop page's
   `Product` with `offers.price`, `priceCurrency`, `availability` and `gtin13` comes out without
   any model reading the text; `structured.meta` holds the namespaced meta tags (`og:title`,
   `product:price:amount`, ...).
 - `product` appears only on product pages: `name`, `price`, `priceCurrency`, `availability`, `gtin` (list), `sku`, `brand`, taken from the page's JSON-LD (also inside `@graph`, with offers as list or `AggregateOffer`). `structured` is left out when the page has no JSON-LD and no namespaced meta.
 - `stage` says which rung read the page: `static`, `browser`, `browser-direct`, `stealth` or
   `tavily`.
-- `failed` lists each page that could not be read with a reason: `HTTP 403, also after retry`,
-  `not HTML: application/pdf`, `timeout`, `address not public or not resolvable`, and so on.
+- `failed` lists each page that could not be read with its `error` text: `HTTP 403, also after retry`,
+  `not HTML: application/pdf`, `timeout`, `address not public or not resolvable`, and so on. The
+  fixed `reason` code per entry comes with `"detail": true`.
 
 `/search` answers `{"results": [...], "error": ..., "backend": ...}`: `backend` is the one that
-answered, and `error` is the last backend error (null when a query simply has no hits).
+answered, and `error` is the first backend error (null when a query simply has no hits). In
+Python, `search_report()['error']` is the same first backend error.
 
 **How it decides how hard to try (the load ladder, `read_pages`):**
 
