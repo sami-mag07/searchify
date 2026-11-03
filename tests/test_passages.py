@@ -114,6 +114,19 @@ def test_rerank_default_follows_the_installed_extra(web, monkeypatch):
     assert all("rerank_score" in p for p in passages("q"))
 
 
+def test_missing_rerank_extra_warns_once_per_process(web, monkeypatch, caplog):
+    monkeypatch.setattr(core, "rerank_available", lambda: False)
+    monkeypatch.setattr(core, "_warned_no_rerank", False)
+    with caplog.at_level("WARNING", logger="searchify"):
+        passages("q")
+        passages("q")
+        passages("q", rerank=False)  # asked for page order: nothing to warn about
+    warnings = [r for r in caplog.records if r.name == "searchify"]
+    assert len(warnings) == 1
+    assert "searchify[rerank]" in warnings[0].getMessage()
+    assert "page order" in warnings[0].getMessage()
+
+
 def test_forced_rerank_without_the_extra_fails_before_searching(web, monkeypatch):
     monkeypatch.setattr(core, "rerank_available", lambda: False)
     with pytest.raises(ImportError, match="searchify\\[rerank\\]"):

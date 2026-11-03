@@ -15,6 +15,7 @@ query goes to the search engine as written and is then used to rank paragraphs.
 from __future__ import annotations
 
 import importlib.util
+import logging
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
@@ -24,6 +25,10 @@ from .rerank import rerank as rerank_items
 from .search import search as web_search
 
 RERANK_HINT = 'reranking needs the extra: pip install "searchify[rerank]", or pass rerank=False'
+NO_RERANK_WARNING = ('passages come in page order, not ranked by relevance: install the extra '
+                     'with pip install "searchify[rerank]", or pass rerank=False to silence this')
+log = logging.getLogger("searchify")
+_warned_no_rerank = False  # the warning comes at most once per process
 MAX_PER_PAGE = 60  # paragraphs scored per page, so long pages cannot stall the reranker
 
 
@@ -33,9 +38,15 @@ def rerank_available() -> bool:
 
 
 def _use_rerank(setting: Optional[bool]) -> bool:
-    """None reranks when possible; True fails loudly when the extra is missing."""
+    """None reranks when possible (and warns once per process when it cannot); True
+    fails loudly when the extra is missing."""
+    global _warned_no_rerank
     if setting is None:
-        return rerank_available()
+        available = rerank_available()
+        if not available and not _warned_no_rerank:
+            _warned_no_rerank = True
+            log.warning(NO_RERANK_WARNING)
+        return available
     if setting and not rerank_available():
         raise ImportError(RERANK_HINT)
     return setting
@@ -109,7 +120,8 @@ def passages(query: str, max_results: int = 5, *, top_k: int = 8, min_words: int
     Each passage is a dict with title, url and content; with reranking on it
     also has a `rerank_score` and the list is ordered best first. Without
     reranking the passages keep page order. `rerank=None` reranks if the
-    `[rerank]` extra is installed, `True` raises ImportError if it is not.
+    `[rerank]` extra is installed and otherwise logs one warning per process (logger
+    "searchify"); `True` raises ImportError if it is not.
     `per_site` caps passages from one site, so the answer draws on several
     sources. If none of the pages can be read, the search snippets come back
     instead. `max_stage` (plain, tls, browser, stealth) and `budget` (low, normal,
