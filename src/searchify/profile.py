@@ -1,7 +1,8 @@
 """The user profile: a small JSON file in the user's config directory.
 
-It holds the answers of the first-run interview (``max_stage``, ``budget``,
-``region``) and is read by the command line and by the Python API
+It holds the answers of the first-run interview (``max_stage``, ``budget``) and
+an optional ``region`` (set with ``searchify config --region`` or by an older
+version, not read by any search yet). It is read by the command line and by the Python API
 (`searchify.extract_report`). The HTTP service and the MCP server never read it:
 they take their limits from the environment and the request only.
 

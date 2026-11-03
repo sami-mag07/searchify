@@ -3,24 +3,21 @@
 It runs only for a person at a terminal: stdin, stdout and stderr are all TTYs,
 no CI variable is set and ``--no-input`` was not given. The prompts go to stderr,
 never to stdout, so JSON output stays clean, and ``searchify search q > out.json``
-never stops to wait for an answer. At most three questions: how far the load
-ladder may go, the budget and, when the system locale suggests one, the search
-region. Enter keeps today's behaviour. Answering ``later`` (or closing the input)
-writes nothing, so the question comes back next time.
+never stops to wait for an answer. Two questions: how far the load ladder may go
+and the budget. Enter keeps today's behaviour. Answering ``later`` (or closing the
+input) writes nothing, so the question comes back next time. A search region saved
+by an older version (or with ``searchify config --region``) is kept as it is.
 
 Agents, scripts, pipes, the HTTP service and the MCP server never get here.
 """
 from __future__ import annotations
 
-import locale
 import os
-import re
 import sys
 from typing import Callable, Dict, Mapping, Optional, TextIO, Tuple
 
 from . import profile
 from .limits import BUDGETS, STAGES
-from .search.regions import DDG_REGIONS, ddg_region
 
 CI_VARS = ("CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "JENKINS_URL", "TF_BUILD")
 LATER = {"later", "spaeter", "später"}
@@ -53,30 +50,6 @@ def _stdout_is_tty() -> bool:
         return bool(sys.stdout.isatty())
     except (AttributeError, ValueError):
         return False
-
-
-_LOCALE_RE = re.compile(r"^([a-z]{2,3})(?:[_-]([A-Za-z]{2}))?(?:[.@].*)?$")
-
-
-def detect_region(env: Optional[Mapping[str, str]] = None) -> Optional[str]:
-    """The DuckDuckGo region the system locale points to (``de_DE.UTF-8`` gives
-    ``de-de``), or None if the locale says nothing useful. Only ever a suggestion."""
-    env = os.environ if env is None else env
-    raw = ""
-    for name in ("LC_ALL", "LC_MESSAGES", "LANG"):
-        raw = (env.get(name) or "").strip()
-        if raw:
-            break
-    if not raw and env is os.environ:
-        try:
-            raw = locale.getlocale()[0] or ""
-        except (ValueError, TypeError):
-            raw = ""
-    match = _LOCALE_RE.match(raw)
-    if not match or raw.upper() in ("C", "POSIX"):
-        return None
-    code = ddg_region(match.group(1), match.group(2))
-    return code if code != "wt-wt" else None
 
 
 def _read(stdin: TextIO) -> Optional[str]:
@@ -123,19 +96,6 @@ def _choice(allowed: Tuple[str, ...], current: Optional[str]) -> Callable[[str],
     return parse
 
 
-def _yes_no(code: str, current: Optional[str]) -> Callable[[str], object]:
-    def parse(answer: str) -> object:
-        word = answer.lower()
-        if word == "":
-            return _KEEP if current else None
-        if word in ("y", "yes", "j", "ja"):
-            return code
-        if word in ("n", "no", "nein") or word in RESET:
-            return None
-        raise ValueError("please answer y or n")
-    return parse
-
-
 def _enter(current: Optional[str], fallback: str) -> str:
     return f"Enter = keep {current}" if current else f"Enter = {fallback}"
 
@@ -145,33 +105,26 @@ def run(
     stdin: Optional[TextIO] = None, stderr: Optional[TextIO] = None,
     env: Optional[Mapping[str, str]] = None,
 ) -> Optional[Dict]:
-    """Ask the questions. Returns the new profile values (only what was chosen), or
-    None if the person answered ``later``."""
+    """Ask the questions. Returns the new profile values (only what was chosen, plus
+    whatever `current` holds besides, such as an old search region), or None if the
+    person answered ``later``. `env` is no longer used and only kept for callers."""
     stdin = stdin or sys.stdin
     err = stderr or sys.stderr
     have = dict(current or {})
     answers: Dict[str, object] = dict(have)
-    err.write("searchify: three quick questions, you can change them later with `searchify config`.\n"
+    err.write("searchify: two quick questions, you can change them later with `searchify config`.\n"
               "Type 'later' at any question to be asked again next time.\n\n")
     try:
-        err.write("1/3 How far may searchify go to load a page?\n" + _STAGE_HELP)
+        err.write("1/2 How far may searchify go to load a page?\n" + _STAGE_HELP)
         stage = _ask(f"    {_enter(have.get('max_stage'), 'no limit')} > ",  # type: ignore[arg-type]
                      _choice(STAGES, have.get("max_stage")), stdin, err)  # type: ignore[arg-type]
-        err.write("\n2/3 Budget: low (short waits, short pages), normal, high (long waits).\n")
+        err.write("\n2/2 Budget: low (short waits, short pages), normal, high (long waits).\n")
         budget = _ask(f"    {_enter(have.get('budget'), 'normal')} > ",  # type: ignore[arg-type]
                       _choice(BUDGETS, have.get("budget")), stdin, err)  # type: ignore[arg-type]
-        region = None
-        guess = detect_region(env)
-        if have.get("region") or guess:
-            code = str(have.get("region") or guess)
-            name = DDG_REGIONS.get(code, code)
-            err.write(f"\n3/3 Your system suggests the search region {name} ({code}).\n")
-            region = _ask(f"    Use it for searches? [y/N]{'' if not have.get('region') else ', Enter = keep'} > ",
-                          _yes_no(code, have.get("region")), stdin, err)  # type: ignore[arg-type]
     except _Later:
         err.write("\nOk, nothing saved. You will be asked again next time.\n")
         return None
-    for key, value in (("max_stage", stage), ("budget", budget), ("region", region)):
+    for key, value in (("max_stage", stage), ("budget", budget)):
         if value is _KEEP:
             continue
         if value is None:

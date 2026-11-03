@@ -189,21 +189,19 @@ def _terminal(monkeypatch):
 
 def test_first_run_asks_on_stderr_and_stdout_stays_clean_json(monkeypatch, seen):
     _terminal(monkeypatch)
-    monkeypatch.setattr(interview, "detect_region", lambda env=None: "de-de")
-    result = runner.invoke(cli.app, ["extract", "https://a.example/"], input="plain\nlow\ny\n")
+    result = runner.invoke(cli.app, ["extract", "https://a.example/"], input="plain\nlow\n")
     assert result.exit_code == 0
     json.loads(result.stdout)  # nothing but the JSON on stdout
-    assert "How far may searchify go" in result.stderr and "Germany (de-de)" in result.stderr
-    assert profile.load(force=True) == {"max_stage": "plain", "budget": "low", "region": "de-de"}
+    assert "How far may searchify go" in result.stderr
+    assert profile.load(force=True) == {"max_stage": "plain", "budget": "low"}
     assert seen == {"max_stage": "plain", "budget": "low"}  # the answers apply to this very call
 
 
 def test_enter_everywhere_means_todays_behaviour_and_is_not_asked_again(monkeypatch, seen):
     _terminal(monkeypatch)
-    monkeypatch.setattr(interview, "detect_region", lambda env=None: "de-de")
-    result = runner.invoke(cli.app, ["extract", "https://a.example/"], input="\n\n\n")
+    result = runner.invoke(cli.app, ["extract", "https://a.example/"], input="\n\n")
     assert result.exit_code == 0 and seen == {}
-    assert profile.exists() and profile.load(force=True) == {}  # a region is never a silent default
+    assert profile.exists() and profile.load(force=True) == {}
     monkeypatch.setattr(interview, "_asked", False)
     monkeypatch.setattr(interview, "run", lambda *a, **k: pytest.fail("asked a second time"))
     runner.invoke(cli.app, ["extract", "https://a.example/"])
@@ -215,7 +213,7 @@ def test_later_writes_nothing_and_asks_again_next_time(monkeypatch, seen):
     assert result.exit_code == 0
     assert not profile.exists() and not profile.config_dir().exists()
     monkeypatch.setattr(interview, "_asked", False)
-    result = runner.invoke(cli.app, ["extract", "https://a.example/"], input="tls\n\n\n")
+    result = runner.invoke(cli.app, ["extract", "https://a.example/"], input="tls\n\n")
     assert profile.load(force=True) == {"max_stage": "tls"}
 
 
@@ -239,16 +237,23 @@ def test_an_existing_profile_is_never_replaced_by_an_interview(monkeypatch, seen
     assert seen == {"max_stage": "browser"}
 
 
-def test_at_most_three_questions_and_the_region_one_only_with_a_suggestion(monkeypatch):
+def test_two_questions_and_no_region_question(monkeypatch):
     out = io.StringIO()
-    monkeypatch.setattr(interview, "detect_region", lambda env=None: None)
+    monkeypatch.setenv("LANG", "de_DE.UTF-8")  # a locale used to suggest a region
     answers = interview.run(stdin=io.StringIO("plain\nlow\n"), stderr=out)
     assert answers == {"max_stage": "plain", "budget": "low"}
-    assert "3/3" not in out.getvalue()
-    out = io.StringIO()
-    monkeypatch.setattr(interview, "detect_region", lambda env=None: "fr-fr")
-    interview.run(stdin=io.StringIO("\n\nn\n"), stderr=out)
-    assert out.getvalue().count("/3 ") == 3
+    assert out.getvalue().count("/2 ") == 2
+    assert "region" not in out.getvalue().lower()
+
+
+def test_an_old_profile_with_a_region_still_loads_and_keeps_it(monkeypatch):
+    path = profile.profile_path()
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"version": 1, "max_stage": "tls", "region": "de-de"}))
+    assert profile.load(force=True) == {"max_stage": "tls", "region": "de-de"}
+    answers = interview.run(current=profile.load(force=True), stdin=io.StringIO("\nlow\n"),
+                            stderr=io.StringIO())
+    assert answers == {"max_stage": "tls", "budget": "low", "region": "de-de"}
 
 
 def test_invalid_answers_are_asked_again_then_fall_back_to_enter():
@@ -258,21 +263,6 @@ def test_invalid_answers_are_asked_again_then_fall_back_to_enter():
     out = io.StringIO()
     answers = interview.run(stdin=io.StringIO("x\nx\nx\n\n"), stderr=out, env={})
     assert "max_stage" not in answers  # three misses: Enter's meaning, no limit
-
-
-@pytest.mark.parametrize("env, expected", [
-    ({"LANG": "de_DE.UTF-8"}, "de-de"),
-    ({"LC_ALL": "nl_BE.UTF-8", "LANG": "en_US.UTF-8"}, "be-nl"),
-    ({"LANG": "fr_FR@euro"}, "fr-fr"),
-    ({"LANG": "de"}, "de-de"),
-    ({"LANG": "C"}, None),
-    ({"LANG": "POSIX"}, None),
-    ({"LANG": "C.UTF-8"}, None),
-    ({"LANG": "xx_YY"}, None),
-    ({}, None),
-])
-def test_region_suggestion_from_the_system_locale(env, expected):
-    assert interview.detect_region(env) == expected
 
 
 # ------------------------------------------------------------ searchify config
@@ -324,7 +314,6 @@ def test_bare_config_needs_a_terminal():
 
 def test_bare_config_at_a_terminal_keeps_current_answers_on_enter(monkeypatch):
     _terminal(monkeypatch)
-    monkeypatch.setattr(interview, "detect_region", lambda env=None: None)
     profile.save({"max_stage": "plain", "budget": "high"})
     result = _config(input="\nlow\n")
     assert result.exit_code == 0

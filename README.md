@@ -391,16 +391,16 @@ Where to set it: the HTTP `/extract` body (`max_stage`, `budget`, `cloud_fallbac
 and `extract_report(urls, max_stage=..., budget=..., cloud_fallback=...)`.
 
 **Your profile** (command line and `extract_report` only): the first time you run
-`searchify search`, `extract` or `passages` at a terminal, three questions ask for your default
-stage, budget and, if your system locale suggests one, a search region. Enter keeps today's
-behaviour, `later` asks again next time, and nothing is asked in pipes, CI, agents or with
-`--no-input`. Answers go to a JSON file in your config folder (macOS
+`searchify search`, `extract` or `passages` at a terminal, two questions ask for your default
+stage and budget. Enter keeps today's behaviour, `later` asks again next time, and nothing is
+asked in pipes, with the output going to a file, in CI, agents or with `--no-input`. Answers go to a JSON file in your config folder (macOS
 `~/Library/Application Support/searchify`, Linux `$XDG_CONFIG_HOME` or `~/.config/searchify`,
 Windows `%APPDATA%\searchify`; `SEARCHIFY_CONFIG_DIR` overrides it). `searchify config` asks again,
-`searchify config --show` prints each value and where it comes from, and `--max-stage`, `--budget`
-and `--region` set a value directly. Order: request, then profile, then default, all below the
-operator cap. The HTTP service and the MCP server never read the profile. The saved search region
-is stored but not applied to searches yet.
+`searchify config --show` prints each value and where it comes from, and `--max-stage` and
+`--budget` set a value directly. Order: request, then profile, then default, all below the
+operator cap. The HTTP service and the MCP server never read the profile. `--region` stores a
+search region, but no search reads it yet; profiles with a region from an older version load as
+before.
 
 ## Configuration
 

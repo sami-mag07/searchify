@@ -259,7 +259,7 @@ def config(
 ) -> None:
     """Show or change your profile (how far searchify may go, budget, search region).
 
-    Without options, at a terminal, the three questions are asked again with your
+    Without options, at a terminal, the two questions are asked again with your
     current answers. With options, the values are saved directly. The profile is a
     JSON file in your user config folder; the HTTP service and the MCP server never read it.
     """
