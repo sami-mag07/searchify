@@ -44,10 +44,8 @@ Run it once and the reranker model (about 470 MB) downloads; after that it is ca
 
 ## Install
 
-Not on PyPI yet, so install from GitHub:
-
 ```bash
-pip install "searchify[rerank] @ git+https://github.com/sami-mag07/searchify"
+pip install "searchify[rerank]"
 ```
 
 | Extra | Adds |
@@ -115,24 +113,26 @@ only `month` and `year`: with `day` or `week` they hide the answer to questions 
 events.
 
 ```bash
-pip install "searchify[mcp,rerank] @ git+https://github.com/sami-mag07/searchify"
-claude mcp add searchify -- searchify-mcp
+claude mcp add searchify -- uvx --from "searchify[mcp,rerank]" searchify-mcp
 ```
 
 Claude Desktop (`claude_desktop_config.json`) and Cursor (`.cursor/mcp.json`) take the same
-command. They start it with their own environment, so give the full path from
-`which searchify-mcp` and put settings in `env`:
+command through [uv](https://docs.astral.sh/uv/), with settings in `env`:
 
 ```json
 {
   "mcpServers": {
     "searchify": {
-      "command": "/full/path/to/searchify-mcp",
+      "command": "uvx",
+      "args": ["--from", "searchify[mcp,rerank]", "searchify-mcp"],
       "env": {"SEARXNG_URL": "http://localhost:8080"}
     }
   }
 }
 ```
+
+Without uv: `pip install "searchify[mcp,rerank]"` and give the full path from
+`which searchify-mcp` as `command`.
 
 ## How the research agent works
 
