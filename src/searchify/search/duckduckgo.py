@@ -6,10 +6,14 @@ so it is the convenient baseline rather than the fastest option.
 """
 from __future__ import annotations
 
+import time
 from typing import Dict, List, Optional
 
 from ._common import SearchBackendError, dedupe_and_filter, site_scoped
 from .regions import ddg_region
+
+RETRY_AFTER_ERROR_S = 1.0  # a general DDGSException: one more try after this pause
+_sleep = time.sleep  # tests replace it
 
 
 def _is_no_results(exc: Exception) -> bool:
@@ -40,7 +44,10 @@ def ddgs_search(
     exclude_domains: Optional[List[str]] = None,
     **_: object,
 ) -> List[Dict[str, str]]:
-    """Return search hits as a list of dicts: {title, url, content, engine}."""
+    """Return search hits as a list of dicts: {title, url, content, engine}.
+
+    A general ddgs error (not a rate limit, not a timeout) is tried once more after
+    about a second."""
     try:
         from ddgs import DDGS
     except ImportError as exc:  # pragma: no cover - optional dependency
@@ -49,14 +56,22 @@ def ddgs_search(
     region = ddg_region(language, country)
     timelimit = {"day": "d", "week": "w", "month": "m", "year": "y"}.get(time_range or "")
     query = site_scoped(query, include_domains)
-    run = DDGS().news if topic == "news" else DDGS().text
-    try:
-        raw = run(query, region=region, safesearch="moderate",
-                  timelimit=timelimit, max_results=max_results)
-    except Exception as exc:  # ddgs raises its own exception types
-        if _is_no_results(exc):
-            return []
-        raise SearchBackendError(f"{_error_code(exc)}: ddgs {type(exc).__name__}") from exc
+    raw: list = []
+    for attempt in (1, 2):
+        client = DDGS()
+        run = client.news if topic == "news" else client.text
+        try:
+            raw = list(run(query, region=region, safesearch="moderate",
+                           timelimit=timelimit, max_results=max_results) or [])
+        except Exception as exc:  # ddgs raises its own exception types
+            if _is_no_results(exc):
+                return []
+            code = _error_code(exc)
+            if code == "error" and attempt == 1:  # often a passing hiccup of one engine
+                _sleep(RETRY_AFTER_ERROR_S)
+                continue
+            raise SearchBackendError(f"{code}: ddgs {type(exc).__name__}") from exc
+        break
 
     hits = [
         {

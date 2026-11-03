@@ -9,6 +9,14 @@ from searchify.search import duckduckgo
 from searchify.search.regions import DDG_REGIONS, LANGUAGE_REGION, ddg_region, is_region
 
 
+@pytest.fixture(autouse=True)
+def _no_waiting(monkeypatch):
+    """The DuckDuckGo retry waits about a second; the tests record the wait instead."""
+    waits = []
+    monkeypatch.setattr(duckduckgo, "_sleep", waits.append, raising=False)
+    return waits
+
+
 def test_table_is_complete_and_well_formed():
     assert len(DDG_REGIONS) == 64
     assert "wt-wt" in DDG_REGIONS and "be-nl" in DDG_REGIONS and "ct-ca" in DDG_REGIONS
@@ -109,3 +117,44 @@ def test_any_language_is_dropped_centrally(monkeypatch):
     monkeypatch.setitem(sys.modules["searchify.search"].BACKENDS, "duckduckgo", lambda q, n, **f: got.update(f) or [])
     search_report("q", backend="duckduckgo", language="any", country="NL")
     assert "language" not in got and got["country"] == "NL"
+
+
+ROW = {"title": "t", "href": "https://a.example/", "body": "b"}
+
+
+def _flaky_ddgs(monkeypatch, answers, calls):
+    """A DDGS whose text() gives the next answer each call: rows, or an exception to raise."""
+    class DDGS:
+        def text(self, q, **kw):
+            calls.append(q)
+            answer = answers.pop(0)
+            if isinstance(answer, Exception):
+                raise answer
+            return answer
+    monkeypatch.setitem(sys.modules, "ddgs", types.SimpleNamespace(DDGS=DDGS))
+
+
+def test_a_general_ddgs_error_is_retried_once(monkeypatch, _no_waiting):
+    calls = []
+    _flaky_ddgs(monkeypatch, [DDGSException("boom"), [ROW]], calls)
+    assert [h["url"] for h in duckduckgo.ddgs_search("q")] == ["https://a.example/"]
+    assert len(calls) == 2 and _no_waiting == [duckduckgo.RETRY_AFTER_ERROR_S]
+    assert 0.5 <= duckduckgo.RETRY_AFTER_ERROR_S <= 2
+
+
+def test_a_general_ddgs_error_twice_is_an_error(monkeypatch):
+    calls = []
+    _flaky_ddgs(monkeypatch, [DDGSException("boom"), DDGSException("boom")], calls)
+    with pytest.raises(SearchBackendError, match="^error:"):
+        duckduckgo.ddgs_search("q")
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("exc", [RatelimitException("x"), TimeoutException("x"),
+                                 DDGSException("HTTP 429 too many")])
+def test_rate_limits_and_timeouts_are_not_retried(monkeypatch, _no_waiting, exc):
+    calls = []
+    _flaky_ddgs(monkeypatch, [exc, [ROW]], calls)
+    with pytest.raises(SearchBackendError):
+        duckduckgo.ddgs_search("q")
+    assert len(calls) == 1 and _no_waiting == []
