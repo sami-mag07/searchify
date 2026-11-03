@@ -221,6 +221,42 @@ Rules kept during tuning: no captcha solving, no result gaming (never remove rea
 raise a number), the safety limits never weakened. The run measured the default ladder below;
 the optional Camoufox stage (`READER_STEALTH=1`) was not part of it.
 
+### 0.3.0 against 0.2.0
+
+The same fixed test lists, run once with 0.2.0 and once with this version (`bench/feature_bench.py`):
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-dark.svg">
+  <img alt="0.2.0 against 0.3.0: normal pages 14/15 to 15/15, failed pages with a reason 0/29 to 23/29, PDFs read 0/20 to 20/20, shop prices 0/29 to 25/29, regional questions 20/40 to 27/40" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/features-light.svg">
+</picture>
+
+Normal pages are as fast as before: median 0.131 s with 0.2.0 and 0.128 s with 0.3.0 over five
+alternating runs.
+
+**What a model gets to read.** 123 questions in German, English, Spanish and French. Every
+version gets the same full question and the same recorded search hits, so only the processing
+differs. Scores are on the 73 test questions held out while tuning (`bench/record.py`,
+`bench/loop.py`, `bench/viz.py`, charts from `bench/charts.py`).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-dark.svg">
+  <img alt="Answer in the first 4,800 characters and MRR: 0.2.0 snippets 95% and 0.80, 0.2.0 whole pages 92% and 0.75, 0.3.0 reranked snippets 95% and 0.91, 0.3.0 passages 100% and 0.92" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/answers-light.svg">
+</picture>
+
+MRR is 1 when the first passage holds the answer and 0.5 when the second does. Reranking alone
+lifts the snippets from 0.80 to 0.91; passages read from the pages also find the answer for every
+question, where snippets miss about one in twenty.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-dark.svg">
+  <img alt="Twenty random draws of the questions per version: the 0.2.0 clouds sit between 0.71 and 0.86 on the held-out questions, the 0.3.0 clouds between 0.89 and 0.97" src="https://raw.githubusercontent.com/sami-mag07/searchify/main/docs/bench/draws-light.svg">
+</picture>
+
+Each small dot is one random draw of the questions with replacement, the large dot the score over
+all of them. The 0.2.0 and 0.3.0 clouds do not overlap, so the gain is not luck of the question
+set. A full question beats keywords in all four languages, and a tuning loop over 1.7 million
+settings found nothing that beats the defaults on the held-out questions.
+
 ## How it works
 
 ```mermaid
