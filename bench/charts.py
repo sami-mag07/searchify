@@ -20,9 +20,9 @@ from common import OUT
 FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 THEMES = {
     "light": {"fg": "#1f2328", "muted": "#59636e", "grid": "#d8dee4", "old": "#a99a9a", "old2": "#6f6262",
-              "new": "#1e8f6b", "new2": "#59c79d", "halo": "#ffffff", "bg": "none"},
+              "new": "#1e8f6b", "new2": "#59c79d", "halo": "#ffffff", "bg": "#ffffff"},
     "dark": {"fg": "#e6edf3", "muted": "#9198a1", "grid": "#30363d", "old": "#7d6f6f", "old2": "#b3a5a5",
-             "new": "#7ee2b8", "new2": "#2fa57c", "halo": "#0d1117", "bg": "none"},
+             "new": "#7ee2b8", "new2": "#2fa57c", "halo": "#0d1117", "bg": "#0d1117"},
 }
 VERSIONS = [  # key in viz.json answers, label, colour slot
     ("alt_snippets", "0.2.0 · search snippets", "old"),
@@ -39,8 +39,11 @@ def _text(x, y, s, t, *, size=13, anchor="start", fill="fg", weight=400):
 
 
 def _svg(w, h, body, t, label):
-    bg = "" if t["bg"] == "none" else f'<rect width="{w}" height="{h}" fill="{t["bg"]}"/>'
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" '
+    # an own background keeps the labels readable when the viewer's theme picks the other file
+    pad = 0 if t["bg"] == "none" else 16
+    bg = "" if not pad else f'<rect x="{-pad}" y="{-pad}" width="{w + 2 * pad}" height="{h + 2 * pad}" rx="10" fill="{t["bg"]}"/>'
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w + 2 * pad}" height="{h + 2 * pad}" '
+            f'viewBox="{-pad} {-pad} {w + 2 * pad} {h + 2 * pad}" '
             f'role="img" aria-label="{escape(label)}" font-family="{escape(FONT)}">{bg}{body}</svg>\n')
 
 
