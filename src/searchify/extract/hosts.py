@@ -177,9 +177,9 @@ class Memory:
                     " streak = CASE WHEN excluded.ok = 1 THEN 0 ELSE streak + 1 END,"
                     " reason = excluded.reason, seen = excluded.seen",
                     (host, rung, int(ok), int(not ok), 0 if ok else 1, None if ok else outcome, now))
-                con.execute(
-                    "INSERT INTO host (host, visits, probed, seen) VALUES (?, 0, NULL, ?)"
-                    " ON CONFLICT(host) DO UPDATE SET seen = excluded.seen", (host, now))
+                con.execute(  # a host's first lessons come from a call that skipped nothing
+                    "INSERT INTO host (host, visits, probed, seen) VALUES (?, 0, ?, ?)"
+                    " ON CONFLICT(host) DO UPDATE SET seen = excluded.seen", (host, now, now))
             self._prune(con, now)
 
     @staticmethod

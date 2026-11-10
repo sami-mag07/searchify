@@ -60,9 +60,8 @@ def test_every_tenth_visit_and_a_week_later_the_whole_ladder_is_climbed_again(me
     url, t = "https://wall.example/", 1000.0
     _fail(memory, url, now=t)
     skips = [_plan(memory, url, now=t) for _ in range(1, 21)]  # visits 1 .. 20
-    assert skips[0] == set()  # the first visit after learning climbs the whole ladder once
     assert skips[10 - 1] == set() and skips[20 - 1] == set()
-    assert all(s == {"static"} for i, s in enumerate(skips, 1) if i % 10 and i > 1)
+    assert all(s == {"static"} for i, s in enumerate(skips, 1) if i % 10)
     assert _plan(memory, url, now=t + 8 * DAY) == set()  # a week without a full climb
 
 
