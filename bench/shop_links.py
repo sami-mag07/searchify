@@ -11,9 +11,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 
 from common import DATA, OUT
+
+os.environ.setdefault("SEARCHIFY_HOST_MEMORY", "0")  # a benchmark must not train the user's own memory
 
 
 def price_re(price: str) -> re.Pattern:

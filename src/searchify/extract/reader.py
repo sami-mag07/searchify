@@ -907,7 +907,8 @@ def _late_static(
     after a site failure they count, after a 404, a rate limit or a timeout they do not."""
     got: Dict[str, Dict] = {}
     lost: Dict[str, Dict] = {}
-    if fetch_static is not None and seconds >= 0.3:
+    ran = fetch_static is not None and seconds >= 0.3
+    if ran:
         found, missing = fetch_static([f["url"] for f, _t, _h in late], seconds)
         got = {d.get("url"): d for d in found}
         lost = {f.get("url"): f for f in missing}
@@ -924,7 +925,7 @@ def _late_static(
             fail.update(error=miss.get("error") or "page could not be loaded", reason=code)
         trace.append(f"static:{code}")
         pdf = bool(doc and "page_count" in doc)
-        if not pdf:
+        if ran and not pdf:  # a fetch that never ran teaches nothing
             events.append((url, "static", code))
         if code == "ok" or code in hosts_mod.FAILURES:
             events.extend(held)

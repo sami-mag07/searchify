@@ -467,15 +467,16 @@ JavaScript shell needs a browser, some shops only open in Camoufox. searchify re
 which rung worked and which failed and why, and the next call jumps over a rung that failed there
 three times in a row.
 
-- Only failures that belong to the site count (`blocked`, `challenge`, `thin_content`,
-  `no_main_text`, `unavailable`, `timeout`, a browser that got no page in its full time). Missing
-  pages, rate limits and wrong content types teach nothing. One success resets the count.
+- Only failures that belong to the site count (`blocked`, which includes a 406, `challenge`,
+  `thin_content`, `no_main_text`, a browser that got no page in its full time). Timeouts, network
+  errors and 5xx answers teach nothing, since they may be your own connection, and neither do
+  missing pages, rate limits and wrong content types. One success resets the count.
 - Every 10th visit of a host and the first visit a week after its last full climb try the whole
   ladder again, so a site that drops its bot protection gets cheap again.
 - It never lifts a limit: only rungs that the installation, `SEARCHIFY_MAX_STAGE` and the request
   allow are skipped. A skipped static fetch still runs last when every other rung failed, so a
-  page comes back as it would without the memory; with a tight `timeout` that last fetch only
-  gets the time that is left.
+  page comes back as it would without the memory (with a tight `timeout` that last fetch only
+  gets the time that is left), except on hosts where every rung is known to fail (next point).
 - On a host where every rung keeps failing (a login wall, a hard bot block), only the cheap
   static fetch runs until the next full climb, instead of several seconds of browser for nothing.
 - A page read after the memory skipped rungs carries `skipped` (for example `["static",

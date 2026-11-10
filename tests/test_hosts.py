@@ -47,8 +47,9 @@ def test_one_success_resets_the_streak(memory):
     assert _plan(memory, url) == set()
 
 
-@pytest.mark.parametrize("reason", ["not_found", "rate_limited", "address_blocked", "not_html",
-                                    "too_large", "extract_failed", "pdf_encrypted"])
+@pytest.mark.parametrize("reason", ["timeout", "unavailable", "not_found", "rate_limited",
+                                    "address_blocked", "not_html", "too_large", "extract_failed",
+                                    "pdf_encrypted"])
 def test_failures_that_are_not_the_sites_fault_teach_nothing(memory, reason):
     url = "https://slow.example/"
     _plan(memory, url)
@@ -261,11 +262,40 @@ def test_an_unknown_host_or_one_with_only_neutral_failures_is_not_stored(memory)
     assert sqlite3.connect(memory.path).execute("SELECT COUNT(*) FROM host").fetchone()[0] == 0
 
 
-def test_a_site_that_times_out_or_answers_406_teaches_like_a_block(memory):
-    url = "https://slow-shop.example/"
-    _fail(memory, url, reason="unavailable", times=2)
-    _fail(memory, url, reason="timeout", times=1)
-    assert _plan(memory, url) == {"static"}
+def test_a_406_counts_as_blocked():
+    from searchify.reasons import code_for
+
+    assert code_for("HTTP 406") == "blocked"
+
+
+def test_being_offline_teaches_nothing_and_the_page_renders_again_once_online(memory, monkeypatch):
+    from searchify.extract import htmltext
+
+    def offline(url, timeout, max_bytes=None, plain=False):
+        htmltext._note_failure("network error (ConnectError)")
+        return None
+    for _ in range(hosts.STREAK + 1):
+        install(monkeypatch, browser=True, stealth=True)
+        monkeypatch.setattr(reader.extract_mod, "fetch_url", offline)
+        monkeypatch.setattr(reader.render_mod, "try_render", lambda u, timeout=0: ("tried", None))
+        monkeypatch.setattr(reader.stealth_mod, "try_stealth", lambda u, timeout=0: ("tried", None))
+        snapshot(["https://wall.example/"])
+    assert memory.describe() == []
+    install(monkeypatch, browser=True, stealth=True)  # online again: static wall, browser renders
+    (doc,) = snapshot(["https://wall.example/"])["docs"]
+    assert doc["stage"] == "browser" and "skipped" not in doc
+
+
+def test_a_late_static_fetch_without_time_left_is_not_booked(monkeypatch):
+    monkeypatch.setattr(reader.render_mod, "enabled", lambda: True)
+    monkeypatch.setattr(reader.stealth_mod, "enabled", lambda: False)
+    monkeypatch.setattr(reader.render_mod, "try_render_direct", lambda url, timeout=0: ("tried", None))
+    url = "https://a.example/"
+    events = []
+    failed = [{"url": url, "error": "skipped", "reason": "skipped", "jumped": True}]
+    _docs, still = reader._render_failed([], failed, "text", [url], skips={url: {"static", "browser"}},
+                                         events=events, fetch_static=None)
+    assert still[0]["reason"] == "timeout" and events == []
 
 
 def test_a_host_where_everything_fails_only_gets_the_static_fetch(memory, monkeypatch):

@@ -10,9 +10,9 @@ worked and failed and why, so the next call jumps over the rungs that never work
   URL or page text. The list of hosts is still a browsing history, so the file is only
   readable by its owner and ``searchify hosts --clear`` deletes everything.
 - A rung is skipped on a host after it failed there ``STREAK`` times in a row. Only
-  failures that belong to the site count (`FAILURES`, timeouts and unreachable servers
-  included); missing pages, rate limits and wrong content types change nothing. One
-  success resets the streak.
+  failures that belong to the site count (`FAILURES`); timeouts, network errors and
+  5xx answers change nothing, as they may be the caller's own network, and neither do
+  missing pages, rate limits and wrong content types. One success resets the streak.
 - Every ``REPROBE_EVERY``-th visit of a host, and the first visit ``REPROBE_DAYS`` after
   its last full climb, climbs the whole ladder again, so a site that drops its bot
   protection gets cheap again.
@@ -39,8 +39,7 @@ from urllib.parse import urlparse
 log = logging.getLogger("searchify")
 
 RUNGS = ("static", "browser", "browser-direct", "stealth")  # ladder order
-FAILURES = frozenset({"blocked", "challenge", "thin_content", "no_main_text", "failed",
-                      "unavailable", "timeout"})
+FAILURES = frozenset({"blocked", "challenge", "thin_content", "no_main_text", "failed"})
 STREAK = 3  # failures in a row before a rung is skipped on that host
 REPROBE_EVERY = 10  # every 10th visit climbs the whole ladder
 REPROBE_DAYS = 7

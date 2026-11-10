@@ -45,7 +45,7 @@ _TEXT_RULES = (
 def _status_code(status: int) -> str:
     if status == 429:
         return "rate_limited"
-    if status in (401, 403, 451):
+    if status in (401, 403, 406, 451):  # 406: what servers answer bots that look wrong
         return "blocked"
     if status in (404, 410):  # the page is gone, not the server
         return "not_found"
