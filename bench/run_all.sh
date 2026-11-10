@@ -17,6 +17,7 @@ else
   export BENCH_OUT="${BENCH_OUT:-bench/out}"
   REC=(--gap 4 --until "${RECORD_UNTIL:-02:00}"); LAT=()
   SCO=(--until "${SCORES_UNTIL:-05:00}"); LOOP=(--until "${UNTIL:-07:30}")
+  if [ -n "${MODELS:-}" ]; then SCO+=(--models "$MODELS"); LAT+=(--models "$MODELS"); fi
 fi
 mkdir -p "$BENCH_OUT"
 
@@ -35,4 +36,4 @@ stage latency "$PY" bench/latency.py "${LAT[@]}"
 stage scores  "$PY" bench/scores.py "${SCO[@]}"
 stage loop    "$PY" bench/loop.py "${LOOP[@]}"
 echo "$(stamp) run.done report=$BENCH_OUT/report.md"
-# Stand: 02.11.2026
+# Stand: 10.11.2026

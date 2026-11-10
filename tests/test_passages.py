@@ -55,7 +55,8 @@ def test_without_rerank_paragraphs_keep_page_order_without_short_lines_and_repea
     out = passages("q", rerank=False)
     assert [p["content"].split()[0] for p in out] == ["alpha", "beta", "gamma"]
     assert all("rerank_score" not in p for p in out)
-    assert out[0] == {"title": "A", "url": "https://a.com/1", "content": f"alpha {LONG}".strip()}
+    assert out[0] == {"title": "A", "url": "https://a.com/1", "content": f"alpha {LONG}".strip(),
+                      "offset": len("short line\n")}
 
 
 def test_rerank_orders_best_first_and_adds_a_score(web):
@@ -142,3 +143,45 @@ def test_forced_rerank_without_the_extra_fails_before_searching(web, monkeypatch
         passages("q", rerank=True)
     assert "search" not in web
 # Stand: 02.11.2026
+
+
+# ------------------------------------------------------------ link-heavy lines and offsets
+NAV = "Laptops Gaming Zubehör Angebote Smartphones Fernseher Haushalt Kundenservice Mein Konto Warenkorb Hilfe"
+ARTICLE_LINE = ("The DGX Spark has 128 GB of unified memory, shared by the CPU and the GPU, "
+                "which is enough for models up to 200 billion parameters.")
+LINKED_PAGE = {
+    "url": "https://shop.example/p", "title": "P",
+    "content": f"{NAV}\n\n  {ARTICLE_LINE}\n{ARTICLE_LINE} More.",
+    "links": [{"text": t, "url": "https://shop.example/c"} for t in NAV.replace("Mein Konto", "Mein_Konto").split()]
+    + [{"text": "Mein Konto", "url": "https://shop.example/k"}, {"text": "unified memory", "url": "https://x"}],
+}
+
+
+def test_link_share_counts_whole_words_in_link_texts_ignoring_case():
+    index = core.anchor_index(["Mein Konto", "konto", "GPU"])
+    assert core.link_share("mein konto mein konto", index) == 1.0
+    assert core.link_share("the gpu and the cpu", index) == 0.2
+    assert core.link_share("gpus are not a gpu", index) == 0.2  # "gpus" is another word
+    assert core.link_share("anything", {}) == 0.0
+
+
+def test_lines_that_are_mostly_link_text_are_dropped_before_ranking():
+    kept = core.split_paragraphs([LINKED_PAGE], 5)
+    assert [p["content"] for p in kept] == [ARTICLE_LINE, f"{ARTICLE_LINE} More."]
+    everything = core.split_paragraphs([LINKED_PAGE], 5, max_link_share=1.0)
+    assert everything[0]["content"] == NAV
+
+
+def test_each_passage_knows_where_it_starts_in_the_page_text():
+    for p in core.split_paragraphs([LINKED_PAGE], 5, max_link_share=1.0):
+        assert LINKED_PAGE["content"][p["offset"]:].startswith(p["content"])
+
+
+def test_max_link_share_outside_zero_to_one_is_refused(web):
+    with pytest.raises(ValueError):
+        passages("q", rerank=False, max_link_share=1.5)
+
+
+def test_search_snippets_have_no_offset(web, monkeypatch):
+    monkeypatch.setattr(core, "extract_urls", lambda urls: [])
+    assert all("offset" not in p for p in passages("q", rerank=False))

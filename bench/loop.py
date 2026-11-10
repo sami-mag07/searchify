@@ -28,10 +28,14 @@ BUDGETS = (1500, 4800, 9600)  # characters a model reads; 4800 = today's 8 passa
 GOAL = 4800
 DEFAULT = {"search_form": "question", "rerank_form": "question", "chunking": "para",
            "model": "mminilm", "stage2": "", "max_results": 5, "min_words": 12,
-           "max_chars": 600, "per_site": 0, "per_page": 60}
+           "max_chars": 600, "per_site": 0, "per_page": 60, "max_link_share": 1.0,
+           "link_tables": False}
 NUMERIC = {"max_results": [3, 4, 5, 6, 8, 10], "min_words": [3, 5, 8, 12, 16, 20, 30],
            "max_chars": [200, 300, 400, 600, 800, 1000, 1500], "per_site": [0, 1, 2, 3],
-           "per_page": [20, 40, 60, 100, 1000]}
+           "per_page": [20, 40, 60, 100, 1000],
+           "max_link_share": [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2],
+           "link_tables": [False, True]}
+LINK_SHARES = NUMERIC["max_link_share"]
 STAGE2_TOP = (10, 20, 40)
 LOOP_FILE = OUT / "loop.jsonl"
 
@@ -105,6 +109,9 @@ def ranked(d: Data, q: Dict, c: Dict) -> Tuple[Tuple, List[int], int]:
     for i, it in enumerate(items):
         if it["rank"] >= c["max_results"] or it["words"] < c["min_words"]:
             continue
+        if it["link_share"] > c.get("max_link_share", 1.0) and (
+                c.get("link_tables") or not it["table"]):
+            continue  # link_tables False: table rows are data, they stay
         if per_url.get(it["url"], 0) >= c["per_page"]:
             continue
         per_url[it["url"]] = per_url.get(it["url"], 0) + 1
@@ -194,9 +201,11 @@ def search(d: Data, dev: List[Dict], args) -> Dict[str, Dict]:
             row = json.loads(line)
             seen[key(row["config"])] = row["dev"]
     rng, opts, end = random.Random(args.seed), options(d), deadline(args)
-    first = [DEFAULT] + [dict(DEFAULT, search_form=sf, rerank_form=rf, chunking=ch, model=m)
-                         for sf in FORMS for rf in FORMS for ch in CHUNKINGS
-                         for m in opts["model"]]
+    first = [DEFAULT] + [dict(DEFAULT, max_link_share=v, link_tables=t)
+                         for v in LINK_SHARES[1:] for t in (False, True)]
+    first += [dict(DEFAULT, search_form=sf, rerank_form=rf, chunking=ch, model=m)
+              for sf in FORMS for rf in FORMS for ch in CHUNKINGS
+              for m in opts["model"]]
     top = heapq.nlargest(20, ((objective(r, s), s) for s, r in seen.items()))
     tries = misses = 0
     with LOOP_FILE.open("a", encoding="utf-8") as out:
@@ -277,6 +286,15 @@ def report(d: Data, seen: Dict[str, Dict], dev: List[Dict], test: List[Dict]) ->
         for rf in FORMS:
             c = dict(DEFAULT, search_form=sf, rerank_form=rf)
             lines.append(line(f"Suche {sf}, Sortieren {rf}", c if valid(c, d) else None))
+    lines += ["", "## 4. Link-Filter (heutige Zahlen, nur max_link_share anders)", "", head]
+    for v in LINK_SHARES:
+        lines.append(line(f"max_link_share {v}, Tabellen bleiben", dict(DEFAULT, max_link_share=v)))
+    for v in LINK_SHARES[1:]:
+        lines.append(line(f"max_link_share {v}, Tabellen auch", dict(DEFAULT, max_link_share=v, link_tables=True)))
+    dropped = [it["link_share"] for k, items in d.cands.items() if k[2] == "para" for it in items]
+    for v in LINK_SHARES[1:]:
+        share = sum(x > v for x in dropped) / max(len(dropped), 1)
+        lines.append(f"- über {v}: {share:.1%} der Absätze fallen weg")
     lines += ["", "Obergrenze (Antwort steht irgendwo in den Top-5-Seiten), dev / test:"]
     for sf in FORMS:
         lines.append(f"- {sf}: {recall_ceiling(d, dev, sf, 5):.0%} / {recall_ceiling(d, test, sf, 5):.0%}")
@@ -315,4 +333,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-# Stand: 02.11.2026
+# Stand: 10.11.2026

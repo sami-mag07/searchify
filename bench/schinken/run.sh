@@ -58,7 +58,8 @@ else .venv/bin/pip install -q -e ".[rerank]"; fi
     wsl 'cd ~/searchify-bench && rm -rf bench/out-smoke && SMOKE=1 bench/run_all.sh 2>&1 | grep -vE "Loading weights|HF_TOKEN" | tail -25'
     ;;
   launch)
-    ps "\$a = New-ScheduledTaskAction -Execute 'wsl.exe' -Argument '-e bash -lc \"cd ~/searchify-bench && mkdir -p bench/out && UNTIL=$UNTIL bench/run_all.sh >> bench/out/run.log 2>&1\"'
+    envs="UNTIL=$UNTIL RECORD_UNTIL=${RECORD_UNTIL:-02:00} SCORES_UNTIL=${SCORES_UNTIL:-05:00} MODELS=${MODELS:-}"
+    ps "\$a = New-ScheduledTaskAction -Execute 'wsl.exe' -Argument '-e bash -lc \"cd ~/searchify-bench && mkdir -p bench/out && $envs bench/run_all.sh >> bench/out/run.log 2>&1\"'
 \$s = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours 16)
 Register-ScheduledTask -TaskName SearchifyBench -Action \$a -Settings \$s -Force | Out-Null
 Start-ScheduledTask -TaskName SearchifyBench
@@ -81,4 +82,4 @@ Unregister-ScheduledTask -TaskName SearchifyBench -Confirm:\$false
   *)
     sed -n '2,12p' "$0"; exit 1 ;;
 esac
-# Stand: 02.11.2026
+# Stand: 10.11.2026

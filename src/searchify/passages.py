@@ -16,7 +16,8 @@ from __future__ import annotations
 
 import importlib.util
 import logging
-from typing import Dict, List, Optional
+import re
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
 from . import limits as limits_mod
@@ -30,6 +31,8 @@ NO_RERANK_WARNING = ('passages come in page order, not ranked by relevance: inst
 log = logging.getLogger("searchify")
 _warned_no_rerank = False  # the warning comes at most once per process
 MAX_PER_PAGE = 60  # paragraphs scored per page, so long pages cannot stall the reranker
+MAX_LINK_SHARE = 0.5  # paragraphs with more of their words in link texts are menus or link boxes
+_WORD_RE = re.compile(r"\w+")
 
 
 def rerank_available() -> bool:
@@ -63,22 +66,87 @@ def trim(text: str, max_chars: int) -> str:
     return cut.rstrip() + " …"
 
 
+def _words(text: str) -> List[str]:
+    return _WORD_RE.findall(text.casefold())
+
+
+AnchorIndex = Dict[str, List[Tuple[str, ...]]]
+
+
+def anchor_index(link_texts: Iterable[str]) -> AnchorIndex:
+    """The page's link texts as word sequences, grouped by their first word, longest
+    first, so `link_share` finds the longest link text at each word of a paragraph."""
+    index: AnchorIndex = {}
+    for text in set(link_texts):
+        words = tuple(_words(text or ""))
+        if words:
+            index.setdefault(words[0], []).append(words)
+    for seqs in index.values():
+        seqs.sort(key=len, reverse=True)
+    return index
+
+
+def link_share(paragraph: str, index: AnchorIndex) -> float:
+    """Share of the paragraph's words that sit in one of the page's link texts.
+
+    A menu line or a box of related articles is mostly link text, a paragraph of an
+    article with a few links in it is not. Whole words, ignoring case; 0.0 without links."""
+    words = _words(paragraph)
+    if not words or not index:
+        return 0.0
+    covered = i = 0
+    while i < len(words):
+        step = 0
+        for seq in index.get(words[i], ()):
+            if tuple(words[i:i + len(seq)]) == seq:
+                step = len(seq)
+                break
+        if step:
+            covered += step
+            i += step
+        else:
+            i += 1
+    return covered / len(words)
+
+
+def _lines(content: str) -> Iterable[Tuple[int, str]]:
+    """(offset, line) for every line of the text, the offset counted at the first
+    character of the stripped line, so `content[offset:]` starts with it."""
+    pos = 0
+    for raw in content.split("\n"):
+        stripped = raw.strip()
+        if stripped:
+            yield pos + (len(raw) - len(raw.lstrip())), stripped
+        pos += len(raw) + 1
+
+
+def _link_texts(page: Dict) -> Sequence[str]:
+    return [link.get("text") or "" for link in page.get("links") or () if isinstance(link, dict)]
+
+
 def split_paragraphs(pages: List[Dict], min_words: int,
-                     per_page: Optional[int] = None) -> List[Dict]:
+                     per_page: Optional[int] = None,
+                     max_link_share: Optional[float] = None) -> List[Dict]:
     """Up to per_page (default MAX_PER_PAGE) paragraphs of each page, without short
-    lines and repeats."""
+    lines, repeats and lines that are mostly link text (more than `max_link_share`,
+    default MAX_LINK_SHARE, of their words; 1.0 keeps them all). Each paragraph keeps
+    its `offset`, the character in the page text where it starts, so a caller can read
+    on from there with `extract(..., offset=...)`."""
     per_page = per_page or MAX_PER_PAGE
+    limit = MAX_LINK_SHARE if max_link_share is None else max_link_share
     items: List[Dict] = []
     seen = set()
     for page in pages:
         kept = 0
-        for paragraph in (page.get("content") or "").split("\n"):
-            paragraph = paragraph.strip()
+        index = anchor_index(_link_texts(page)) if limit < 1 else {}
+        for offset, paragraph in _lines(page.get("content") or ""):
             if len(paragraph.split()) < min_words or paragraph in seen:
                 continue
             seen.add(paragraph)
+            if index and link_share(paragraph, index) > limit:
+                continue
             items.append({"title": page.get("title") or "", "url": page["url"],
-                          "content": paragraph})
+                          "content": paragraph, "offset": offset})
             kept += 1
             if kept == per_page:
                 break
@@ -114,11 +182,14 @@ def passages(query: str, max_results: int = 5, *, top_k: int = 8, min_words: int
              max_chars: int = 600, per_site: Optional[int] = None,
              rerank: Optional[bool] = None, backend: Optional[str] = None,
              max_stage: Optional[str] = None, budget: Optional[str] = None,
+             max_link_share: Optional[float] = None,
              **filters) -> List[Dict]:
     """Search, read the top `max_results` pages and return their best paragraphs.
 
-    Each passage is a dict with title, url and content; with reranking on it
-    also has a `rerank_score` and the list is ordered best first. Without
+    Each passage is a dict with title, url, content and `offset`, the character in
+    the page text (format text) where the paragraph starts: `extract([url],
+    offset=offset)` reads on from there. With reranking on it also has a
+    `rerank_score` and the list is ordered best first. Without
     reranking the passages keep page order. `rerank=None` reranks if the
     `[rerank]` extra is installed and otherwise logs one warning per process (logger
     "searchify"); `True` raises ImportError if it is not.
@@ -127,16 +198,22 @@ def passages(query: str, max_results: int = 5, *, top_k: int = 8, min_words: int
     instead. `max_stage` (plain, tls, browser, stealth) and `budget` (low, normal,
     high) limit how the pages are read, as for `extract_report`, always below the
     operator cap SEARCHIFY_MAX_STAGE; this function never reads the user profile.
+    Paragraphs that are mostly link text (menus, boxes of related articles) are
+    dropped before ranking; `max_link_share` (default MAX_LINK_SHARE, 1.0 keeps them)
+    sets how much of a paragraph may be link text.
     `filters` are the same as for `search`. Raises SearchBackendError like `search`
     does, and ValueError for an unknown stage or budget.
     """
     use_rerank = _use_rerank(rerank)
     limits_mod.resolve(max_stage, budget)  # an unknown stage or budget fails before searching
+    if max_link_share is not None and not 0 <= max_link_share <= 1:
+        raise ValueError(f"max_link_share must be between 0 and 1, not {max_link_share!r}")
     hits = web_search(query, max_results, backend=backend, **filters)
     if not hits:
         return []
     limits = {k: v for k, v in (("max_stage", max_stage), ("budget", budget)) if v is not None}
-    items = split_paragraphs(_read([h["url"] for h in hits], limits), min_words)
+    items = split_paragraphs(_read([h["url"] for h in hits], limits), min_words,
+                             max_link_share=max_link_share)
     if not items:  # no page could be read: fall back to what the search engine said
         items = [{"title": h.get("title") or "", "url": h["url"], "content": h["content"]}
                  for h in hits if h.get("content")]
@@ -150,5 +227,5 @@ def passages(query: str, max_results: int = 5, *, top_k: int = 8, min_words: int
     return best
 
 
-__all__ = ["passages", "rerank_available", "split_paragraphs", "trim"]
-# Stand: 02.11.2026
+__all__ = ["anchor_index", "link_share", "passages", "rerank_available", "split_paragraphs", "trim"]
+# Stand: 10.11.2026

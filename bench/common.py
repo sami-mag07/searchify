@@ -139,15 +139,22 @@ def chunk_page(content: str, chunking: str) -> List[str]:
 
 
 def candidates(q: Dict, search_form: str, chunking: str, max_results: int = MAX_HITS) -> List[Dict]:
-    """Every scorable chunk of the recorded top pages, in page order, without repeats."""
+    """Every scorable chunk of the recorded top pages, in page order, without repeats.
+    `link_share` is the share of the chunk's words in the page's link texts (0.0 for
+    pages recorded before the links were kept)."""
+    from searchify.passages import anchor_index, link_share
+
     items, seen = [], set()
     for rank, hit in enumerate(recorded_hits(search_form, q["id"])[:max_results]):
         page = recorded_page(hit["url"])
+        index = anchor_index(page.get("links") or [])
         for text in chunk_page(page.get("content") or "", chunking):
             if text in seen:
                 continue
             seen.add(text)
-            items.append({"url": hit["url"], "rank": rank, "text": text})
+            items.append({"url": hit["url"], "rank": rank, "text": text,
+                          "link_share": link_share(text, index),
+                          "table": text.lstrip().startswith("|")})
     return items
 
 
@@ -167,4 +174,4 @@ def stop_at(until: str) -> float:
 
 def load_models() -> List[Dict]:
     return json.loads((ROOT / "models.json").read_text(encoding="utf-8"))["models"]
-# Stand: 02.11.2026
+# Stand: 10.11.2026

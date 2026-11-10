@@ -47,7 +47,8 @@ def record_pages(urls) -> int:
     docs, failed = read_pages(todo, "text")
     for doc in docs:
         write_json(page_path(doc["url"]), {"url": doc["url"], "title": doc.get("title") or "",
-                                           "content": doc.get("content") or ""})
+                                           "content": doc.get("content") or "",
+                                           "links": [link.get("text") or "" for link in doc.get("links") or []]})
     for fail in failed:
         write_json(page_path(fail["url"]), {"url": fail["url"], "content": "",
                                             "error": str(fail.get("error"))[:200]})
@@ -92,4 +93,4 @@ def main() -> None:
 
 if __name__ == "__main__":  # extraction uses worker processes, so the guard is required
     main()
-# Stand: 02.11.2026
+# Stand: 10.11.2026
