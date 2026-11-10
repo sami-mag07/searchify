@@ -19,10 +19,12 @@ ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 OUT = Path(os.environ.get("BENCH_OUT", ROOT / "out"))
 REPLAY = OUT / "replay"
-FORMS = ("question", "keywords")
+# BENCH_FORMS / BENCH_CHUNKINGS narrow a run to fewer query forms or chunkings (comma lists),
+# e.g. "question" and "para" score only today's setting, a twentieth of the pairs.
+FORMS = tuple(os.environ.get("BENCH_FORMS", "question,keywords").split(","))
 MAX_HITS = 10          # recorded per search, the loop varies max_results up to this
 MIN_CHUNK_WORDS = 3    # shorter lines are never scored, so min_words below this is moot
-CHUNKINGS = ("para", "merge60", "merge120", "win60", "win120")
+CHUNKINGS = tuple(os.environ.get("BENCH_CHUNKINGS", "para,merge60,merge120,win60,win120").split(","))
 
 STOP = {
     "de": "der die das den dem des ein eine einer eines einem einen wer wie was wann wo "

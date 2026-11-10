@@ -59,6 +59,8 @@ else .venv/bin/pip install -q -e ".[rerank]"; fi
     ;;
   launch)
     envs="UNTIL=$UNTIL RECORD_UNTIL=${RECORD_UNTIL:-02:00} SCORES_UNTIL=${SCORES_UNTIL:-05:00} MODELS=${MODELS:-}"
+    [ -n "${BENCH_FORMS:-}" ] && envs="$envs BENCH_FORMS=$BENCH_FORMS"
+    [ -n "${BENCH_CHUNKINGS:-}" ] && envs="$envs BENCH_CHUNKINGS=$BENCH_CHUNKINGS"
     ps "\$a = New-ScheduledTaskAction -Execute 'wsl.exe' -Argument '-e bash -lc \"cd ~/searchify-bench && mkdir -p bench/out && $envs bench/run_all.sh >> bench/out/run.log 2>&1\"'
 \$s = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours 16)
 Register-ScheduledTask -TaskName SearchifyBench -Action \$a -Settings \$s -Force | Out-Null
