@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0
+
+- Host memory: searchify notes per host which rung of the load ladder worked and which failed and why, and the next call jumps over a rung that failed there three times in a row (only failures of the site count: `blocked`, `challenge`, `thin_content`, `no_main_text`, `unavailable`, `timeout`, a browser without a page in its full time). Every 10th visit and the first visit a week later climb the whole ladder again. It never lifts a limit; on a host where every rung keeps failing only the static fetch runs until the next full climb; a skipped static fetch still runs last when everything else failed, so a page comes back as it would without the memory (with a tight timeout that fetch gets only the time left). SQLite file in the user cache folder, host names and counters only, readable by the owner only; `searchify hosts` shows it, `--forget HOST` and `--clear` delete. `SEARCHIFY_HOST_MEMORY=0` turns it off, `SEARCHIFY_HOST_MEMORY_PATH` moves it. Without a browser stage nothing is written. Measured on 73 hard pages read five times: from the 4th run 114 s instead of 150 s for all of them, sites that fail on every rung 0.1 to 0.6 s instead of 8 to 10 s per visit, the same pages read (README, Benchmark).
+- Pages read after the memory skipped rungs carry `skipped`; a failed page that climbed the ladder carries `tried` (`["static:blocked", "browser:failed", "stealth:challenge"]`) in `read_pages_ex`, `extract_report`, `searchify extract` and `/extract` with `detail: true`.
+- `passages` drops lines that are mostly link text (menus, boxes of related articles) before ranking: more than `max_link_share` (default 0.5) of their words sit in the page's link texts. Table rows stay, their cells are often links and they are data. `max_link_share=1.0` keeps everything. Measured: on 28 shop pages it drops 64 of 432 scored lines (15 %: menus, related products, footers); on the 124-question passages benchmark the answers stay the same (answer in the first 4,800 characters for 100 % of the held-out questions, MRR 0.90) with about 3 % fewer pairs to rerank; stricter values (0.3, 0.2) lose answers.
+- Every passage carries `offset`, the character in the page text (format text) where it starts. `extract`, `extract_report`, `read_pages` and `read_pages_ex` take `offset` and `max_chars` and return that part of each page with `offset`, `total_chars` and, when more follows, `next_offset` and `truncated: true`; also `searchify extract --offset/--max-chars`, `offset`/`max_chars` in the `/extract` body and `offset` in the MCP `extract` tool. Without them every call is the call it was.
+- The ideas for the host memory, the offsets and the link filter come from feedback by @meewisseAI, after per-domain fetch routing, chunk offsets and link-density filtering in [private-search-4-agents](https://github.com/blakemartz/private-search-4-agents).
+
+### Changed
+
+- The MCP `extract` tool cuts a long page at `max_chars` and says `next_offset` instead of ending the text with " …".
+
 ## 0.3.0
 
 - Limit the load ladder per request: `max_stage` (plain, tls, browser, stealth), `budget` (low, normal, high) and `cloud_fallback`, in `read_pages`, `read_pages_ex`, `extract_report`, the HTTP `/extract` body and the CLI (`--max-stage`, `--budget`, `--no-cloud`); the MCP `extract` tool takes `max_stage` and `budget`. The effective stage is the lowest of the environment, the operator cap `SEARCHIFY_MAX_STAGE` and the request, so `READER_STEALTH=1` cannot override a request for `plain`. With nothing set the behaviour is unchanged.

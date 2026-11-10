@@ -66,10 +66,10 @@ instance or a cloud fallback.
 | Call | What it does |
 |---|---|
 | `search(query)` | Web results as `{title, url, content, engine}`. DuckDuckGo by default, or your own SearXNG instance, with an optional cloud fallback. |
-| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Compared with 0.2.0 a normal page only gains the small field `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags stay opt-in: they come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. |
+| `extract(urls)` | The clean article text of each page, without menus, footers or cookie banners. Starts with a fast fetch and only opens a browser when a page needs one. Compared with 0.2.0 a normal page only gains the small field `stage` (which rung of the ladder read it); shop pages also carry `product` (name, price, currency, availability, GTIN, SKU, brand from their JSON-LD). The raw JSON-LD and meta tags stay opt-in: they come only with `structured=True` / `--structured`. With the `pdf` extra, PDFs are read too. `offset` and `max_chars` return a part of a page instead, with `next_offset` to read on. |
 | `extract_report(urls)` | Like `extract`, plus `failed` (each page that didn't work, with its `error` text and a fixed `reason` code) and always `status` (`read`, `failed`, `thin`, `reasons`; after a clean run `failed` and `thin` are 0 and `reasons` is empty). |
 | `rerank(query, items)` | Reorders results or passages best-first with a multilingual cross-encoder (`mmarco-mMiniLMv2`). Point `RERANKER_MODEL` at your own model to swap it. |
-| `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL. Keeps what a model has to read small. |
+| `passages(query)` | The three above in one call: searches, reads the top pages and returns the paragraphs that answer the query, best first, each with its source URL and, when the page was read, its `offset` in the page text. Lines that are mostly link text (menus, boxes of related articles) are dropped before ranking; table rows stay. Keeps what a model has to read small; `extract([url], offset=...)` reads on around a passage. |
 | `POST /search`, `POST /extract`, `POST /passages` | The same as an HTTP service, see below. |
 | `searchify-mcp` | The same as tools for any MCP host, see below. |
 
@@ -85,7 +85,8 @@ Output is JSON by default (`{"results": [...]}`, errors as `{"error": ...}` with
 so agents and scripts can parse it. A search that found nothing because every backend failed
 (a DuckDuckGo rate limit, an unreachable SearXNG) reports that error instead of an empty list. Add `--no-json` for a readable view. `search` takes
 `-n`, `--backend`, `--language`, `--country` (with `--language nl` DuckDuckGo gets `nl-nl`, with `--country BE` `be-nl`; no language means worldwide, `any` too), `--time-range`, `--include-domain` and `--exclude-domain`;
-`extract` takes `--format text|markdown` and several URLs. `passages` takes the search options
+`extract` takes `--format text|markdown`, several URLs and `--offset`/`--max-chars` for a part of
+each page. `searchify hosts` shows what the host memory learned (see below). `passages` takes the search options
 plus `-k` (passages to return), `--per-site`, `--max-chars` and `--rerank/--no-rerank`; it
 reranks by default when the `rerank` extra is installed.
 
@@ -100,6 +101,9 @@ Every failed page keeps its human `error` text and gets one `reason`: `blocked` 
 `address_blocked` (a private or internal address, refused before any connection),
 `no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
 `pdf_too_large`. The command line and `extract_report` always put `reason` on each failed page.
+A page that climbed the ladder also says which way it went in `tried`, for example
+`["static:blocked", "browser:failed", "stealth:challenge"]` (`failed`: the browser got no page;
+`skipped`: the host memory left that rung out).
 The HTTP `/extract` lists failed pages with `url` and `error` only and adds `reason` to each of
 them with `detail: true` in the request body; it repeats the counts in `status` and in the
 `X-Searchify-Status` header, built from these codes only. On full success `/extract` adds neither
@@ -108,7 +112,9 @@ them with `detail: true` in the request body; it repeats the counts in `status` 
 ## MCP server
 
 `searchify-mcp` offers three tools to any MCP host: `passages` (start here for questions),
-`search` and `extract`. All of them only read from the web. The time filter offers models
+`search` and `extract`. All of them only read from the web. A page longer than `max_chars`
+comes back with `next_offset`; `extract` with that `offset` reads the next part, and a
+passage's `offset` reads on around it. The time filter offers models
 only `month` and `year`: with `day` or `week` they hide the answer to questions about past
 events.
 
@@ -223,6 +229,36 @@ the challenge only clears after roughly 5 seconds.
 Rules kept during tuning: no captcha solving, no result gaming (never remove real text just to
 raise a number), the safety limits never weakened. The run measured the default ladder below;
 the optional Camoufox stage (`READER_STEALTH=1`) was not part of it.
+
+### 0.4.0: the host memory
+
+73 hard pages (the failure and shop lists of `bench/data`, bot-protected sites, 404s, PDFs, JSON,
+redirects) read five times in a row, each run in a fresh process, once without and once with the
+host memory (`bench/host_bench.py`, 10 Nov 2026, Mac, browser stages and Camoufox on):
+
+| | Pages read | All 73 pages | p50 | p95 |
+|---|---:|---:|---:|---:|
+| without memory (median of 5 runs) | 56 to 58 | 150 s | 0.55 s | 8.9 s |
+| with memory, 4th and 5th run | 57 | 114 s | 0.45 s | 8.3 s |
+
+The memory learns in the first three runs and then cuts the time for all 73 pages by a quarter.
+Sites that fail on every rung (G2, Glassdoor, bol.com, Zeit, nu.nl) drop from 8 to 10 seconds per
+visit to under 0.6 seconds; gnu.org, whose static fetch kept failing, now starts at the browser
+(4.5 s to 2.1 s). The same pages come back. The price: bol.com got through Camoufox in one of the
+five runs without memory; with it, such a site only gets the full ladder on every 10th visit. p95
+barely moves, because the slowest pages are 404s, JSON and image addresses and rate limits, and
+the memory deliberately learns nothing from those.
+
+### 0.4.0: the link filter
+
+On 28 shop pages `passages` now drops 64 of 432 scored lines before ranking (15 %), nearly all of
+them menus, lists of related products and footers (`bench/shop_links.py`). On the 124-question
+passages benchmark, recorded fresh on 10 Nov 2026, nothing changes for the answers: the answer is in
+the first 4,800 characters for 100 % of the 74 held-out questions with and without the filter,
+MRR 0.90, and the reranker scores about 3 % fewer pairs. Stricter thresholds (0.3, 0.2) start to
+lose answers, so the default is 0.5. A loop over 211,633 settings found nothing that beats the
+defaults on the held-out questions. On shop pages the price rarely sits in a passage (2 of 28),
+since price lines are short; ask `extract` for the page's `product` instead.
 
 ### 0.3.0 against 0.2.0
 
@@ -349,9 +385,13 @@ the request asks for it with `"structured": true`:
 - `product` appears only on product pages: `name`, `price`, `priceCurrency`, `availability`, `gtin` (list), `sku`, `brand`, taken from the page's JSON-LD (also inside `@graph`, with offers as list or `AggregateOffer`). `structured` is left out when the page has no JSON-LD and no namespaced meta.
 - `stage` says which rung read the page: `static`, `browser`, `browser-direct`, `stealth` or
   `tavily`.
+- `skipped` appears when the host memory left rungs out for that page (see Host memory).
+- `"offset"` and `"max_chars"` in the body return a part of each page; such a result also has
+  `offset`, `total_chars` and, when more text follows, `next_offset` and `truncated: true`.
 - `failed` lists each page that could not be read with its `error` text: `HTTP 403, also after retry`,
   `not HTML: application/pdf`, `timeout`, `address not public or not resolvable`, and so on. The
-  fixed `reason` code per entry comes with `"detail": true`.
+  fixed `reason` code per entry, and `tried` for a page that climbed the ladder, come with
+  `"detail": true`.
 
 `/search` answers `{"results": [...], "error": ..., "backend": ...}`: `backend` is the one that
 answered, and `error` is the first backend error (null when a query simply has no hits). In
@@ -420,11 +460,40 @@ operator cap. The HTTP service and the MCP server never read the profile. `--reg
 search region, but no search reads it yet; profiles with a region from an older version load as
 before.
 
+## Host memory
+
+Many sites fail the same rung every time: bot protection answers the static fetch with 403, a
+JavaScript shell needs a browser, some shops only open in Camoufox. searchify remembers per host
+which rung worked and which failed and why, and the next call jumps over a rung that failed there
+three times in a row.
+
+- Only failures that belong to the site count (`blocked`, `challenge`, `thin_content`,
+  `no_main_text`, `unavailable`, `timeout`, a browser that got no page in its full time). Missing
+  pages, rate limits and wrong content types teach nothing. One success resets the count.
+- Every 10th visit of a host and the first visit a week after its last full climb try the whole
+  ladder again, so a site that drops its bot protection gets cheap again.
+- It never lifts a limit: only rungs that the installation, `SEARCHIFY_MAX_STAGE` and the request
+  allow are skipped. A skipped static fetch still runs last when every other rung failed, so a
+  page comes back as it would without the memory; with a tight `timeout` that last fetch only
+  gets the time that is left.
+- On a host where every rung keeps failing (a login wall, a hard bot block), only the cheap
+  static fetch runs until the next full climb, instead of several seconds of browser for nothing.
+- A page read after the memory skipped rungs carries `skipped` (for example `["static",
+  "browser", "browser-direct"]`).
+- The file holds host names and counters, no addresses and no text, and is readable by you only:
+  macOS `~/Library/Caches/searchify/hosts.sqlite3`, Linux `$XDG_CACHE_HOME/searchify` or
+  `~/.cache/searchify`, Windows `%LOCALAPPDATA%\searchify\Cache`. Hosts unseen for 30 days are
+  dropped, at most 5,000 are kept. It is still a list of the sites you read: `searchify hosts`
+  shows it, `--forget HOST` and `--clear` delete from it.
+- `SEARCHIFY_HOST_MEMORY=0` turns it off, `SEARCHIFY_HOST_MEMORY_PATH` moves the file. Without a
+  browser stage installed there is nothing to skip and no file is written.
+
 ## Configuration
 
 Every setting is optional and read from the environment (see `.env.example`):
 `SEARCH_BACKEND`, `SEARCH_FALLBACK`, `SEARXNG_URL`, `SERPER_API_KEY`, `TAVILY_API_KEY`,
-`RERANKER_MODEL`, `FETCH_TIMEOUT`, `SEARCHIFY_USER_AGENT`. No key is ever read from code.
+`RERANKER_MODEL`, `FETCH_TIMEOUT`, `SEARCHIFY_USER_AGENT`, `SEARCHIFY_HOST_MEMORY`,
+`SEARCHIFY_HOST_MEMORY_PATH`. No key is ever read from code.
 
 ## Tests
 
@@ -443,4 +512,4 @@ pytest
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
-<!-- Stand: 02.11.2026 -->
+<!-- Stand: 10.11.2026 -->

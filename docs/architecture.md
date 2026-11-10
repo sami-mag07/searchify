@@ -26,10 +26,13 @@ the pages it could not read with a reason (`fetch_failure()` keeps the reason of
 last fetch per thread). On request (`structured=True`) documents also carry
 `structured`: the page's JSON-LD objects and namespaced meta tags, unchanged, for
 callers that want price, availability or identifiers without reading the text.
+`extract/hosts.py` keeps the host memory: per host and rung the successes, failures in a
+row and the last reason, so `read_pages_ex` can skip a rung that keeps failing on a site
+(see the README section Host memory).
 
 ## Reranking
 
 `rerank(query, items)` scores each candidate with a cross-encoder and reorders
 best-first. The default is a public MiniLM, downloaded on first use. Set
 `RERANKER_MODEL` to another Hugging Face name or a local directory to use your own.
-<!-- Stand: 24.10.2026 -->
+<!-- Stand: 10.11.2026 -->
