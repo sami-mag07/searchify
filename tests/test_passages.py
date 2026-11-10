@@ -185,3 +185,12 @@ def test_max_link_share_outside_zero_to_one_is_refused(web):
 def test_search_snippets_have_no_offset(web, monkeypatch):
     monkeypatch.setattr(core, "extract_urls", lambda urls: [])
     assert all("offset" not in p for p in passages("q", rerank=False))
+
+
+def test_table_rows_stay_even_when_their_cells_are_links():
+    row = "| ICE 11 | Berlin Gesundbrunnen – Berlin Hbf – Leipzig – Erfurt – Fulda – Frankfurt |"
+    page = {"url": "https://w.example/", "title": "W", "content": row,
+            "links": [{"text": t} for t in ["ICE 11", "Berlin Gesundbrunnen", "Berlin Hbf", "Leipzig",
+                                             "Erfurt", "Fulda", "Frankfurt"]]}
+    assert core.link_share(row, core.anchor_index(link["text"] for link in page["links"])) > 0.9
+    assert [p["content"] for p in core.split_paragraphs([page], 5)] == [row]

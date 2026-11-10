@@ -129,7 +129,8 @@ def split_paragraphs(pages: List[Dict], min_words: int,
                      max_link_share: Optional[float] = None) -> List[Dict]:
     """Up to per_page (default MAX_PER_PAGE) paragraphs of each page, without short
     lines, repeats and lines that are mostly link text (more than `max_link_share`,
-    default MAX_LINK_SHARE, of their words; 1.0 keeps them all). Each paragraph keeps
+    default MAX_LINK_SHARE, of their words; 1.0 keeps them all). Table rows ("| ... |")
+    always stay, as their cells are often links and they are data. Each paragraph keeps
     its `offset`, the character in the page text where it starts, so a caller can read
     on from there with `extract(..., offset=...)`."""
     per_page = per_page or MAX_PER_PAGE
@@ -143,8 +144,8 @@ def split_paragraphs(pages: List[Dict], min_words: int,
             if len(paragraph.split()) < min_words or paragraph in seen:
                 continue
             seen.add(paragraph)
-            if index and link_share(paragraph, index) > limit:
-                continue
+            if index and not paragraph.startswith("|") and link_share(paragraph, index) > limit:
+                continue  # table rows stay: their cells are often links, and they are data
             items.append({"title": page.get("title") or "", "url": page["url"],
                           "content": paragraph, "offset": offset})
             kept += 1
