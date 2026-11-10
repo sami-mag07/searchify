@@ -182,7 +182,7 @@ async def test_mcp_extract_passes_limits_and_never_reads_the_profile(monkeypatch
     async with Client(mcp_server.server, raise_exceptions=True) as c:
         await c.call_tool("extract", {"urls": ["https://a.example/"],
                                       "max_stage": "tls", "budget": "low"})
-        assert seen == {"max_stage": "tls", "budget": "low"}
+        assert seen == {"max_stage": "tls", "budget": "low", "max_chars": 6000}  # cut within the budget
         seen.clear()
         await c.call_tool("extract", {"urls": ["https://a.example/"]})
         assert seen == {}  # nothing set: the call is the old one

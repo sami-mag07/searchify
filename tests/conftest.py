@@ -17,3 +17,10 @@ def _own_config_dir(tmp_path, monkeypatch):
     profile.reset_cache()
     yield
     profile.reset_cache()
+
+
+@pytest.fixture(autouse=True)
+def _no_host_memory(monkeypatch):
+    """Tests climb the ladder without a host memory, so one test cannot teach the next;
+    the host memory tests switch it on with their own file."""
+    monkeypatch.setenv("SEARCHIFY_HOST_MEMORY", "0")

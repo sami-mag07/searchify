@@ -36,11 +36,21 @@
    {
     "error": "HTTP 403",
     "reason": "blocked",
+    "tried": [
+     "static:blocked",
+     "browser:failed",
+     "browser-direct:failed"
+    ],
     "url": "https://blocked.example/"
    },
    {
     "error": "HTTP 403",
     "reason": "blocked",
+    "tried": [
+     "static:blocked",
+     "browser:failed",
+     "browser-direct:failed"
+    ],
     "url": "https://cloud.example/"
    }
   ],

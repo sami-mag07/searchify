@@ -18,8 +18,9 @@ from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from . import __version__
-from .extract import read_pages
-from .passages import passages as best_passages, trim
+from .extract import read_pages, window_args
+from .extract.reader import window
+from .passages import passages as best_passages
 from .reasons import code_for
 from .search import SearchBackendError, search as web_search
 
@@ -65,7 +66,8 @@ def passages(
     exclude_domains: Domains = None,
 ) -> dict[str, Any]:  # builtin dict: the SDK sends it unwrapped
     """Search the web, read the top pages and return the paragraphs that answer the
-    question, best first, each with its source URL."""
+    question, best first, each with its source URL and its offset in the page text.
+    To read on around a passage, call extract with its url and offset."""
     try:
         found = best_passages(query, max_results, top_k=top_k, per_site=per_site,
                               **_filters(language, time_range, include_domains, exclude_domains))
@@ -98,6 +100,9 @@ def extract(
                                      description="Addresses of the pages to read.")],
     max_chars: Annotated[int, Field(ge=500, le=20000,
                                     description="Trim each page's text to this length.")] = 6000,
+    offset: Annotated[int, Field(ge=0, description=(
+        "Start at this character of the page text (format text): a passage's offset, "
+        "or the next_offset of an earlier call to read the next part."))] = 0,
     format: Literal["text", "markdown"] = "text",
     max_stage: Annotated[Optional[Literal["plain", "tls", "browser", "stealth"]], Field(
         description="Highest way to load a page: plain (fast fetch only), tls, browser or "
@@ -106,18 +111,33 @@ def extract(
         description="low: shorter waits, shorter pages. high: longer waits. Leave empty "
         "for normal.")] = None,
 ) -> dict[str, Any]:
-    """Read web pages and return their clean main text. Pages that fail are listed
-    under failed with the error text and the reason (a fixed code such as blocked,
-    rate_limited, not_found or timeout)."""
+    """Read web pages and return their clean main text. A page longer than max_chars
+    comes with next_offset: call again with offset=next_offset for the next part.
+    Pages that fail are listed under failed with the error text and the reason (a
+    fixed code such as blocked, rate_limited, not_found or timeout)."""
     limits = {k: v for k, v in {"max_stage": max_stage, "budget": budget}.items() if v}
-    docs, failed = read_pages(urls, format, **limits)
+    if offset or limits:  # the window is cut from the full text, within the budget's length
+        docs, failed = read_pages(urls, format, **window_args(offset, max_chars), **limits)
+    else:
+        docs, failed = read_pages(urls, format, **limits)
+        docs = [window(d, 0, max_chars) for d in docs]
     return {
-        "results": [{"url": d.get("url"), "title": d.get("title"),
-                     "published": d.get("published"),
-                     "content": trim(d.get("content") or "", max_chars)} for d in docs],
+        "results": [_page(d) for d in docs],
         "failed": [{"url": f.get("url"), "error": f.get("error"),
                     "reason": f.get("reason") or code_for(f.get("error"))} for f in failed],
     }
+
+
+def _page(doc: Dict) -> Dict[str, Any]:
+    """The fields a model needs; where the part sits only when it is not the whole page."""
+    out = {"url": doc.get("url"), "title": doc.get("title"), "published": doc.get("published"),
+           "content": doc.get("content") or ""}
+    if doc.get("offset"):
+        out["offset"] = doc["offset"]
+    if doc.get("next_offset") is not None:
+        out["next_offset"] = doc["next_offset"]
+        out["total_chars"] = doc.get("total_chars")
+    return out
 
 
 def main() -> None:  # extraction uses worker processes, so entry points need a real main
@@ -126,4 +146,4 @@ def main() -> None:  # extraction uses worker processes, so entry points need a 
 
 if __name__ == "__main__":
     main()
-# Stand: 02.11.2026
+# Stand: 10.11.2026

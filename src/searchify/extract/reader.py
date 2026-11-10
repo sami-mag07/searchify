@@ -19,6 +19,7 @@ import re
 import time
 from typing import Callable, Dict, List, Optional, Tuple
 
+from . import hosts as hosts_mod
 from . import htmltext as extract_mod
 from . import pages as pages_mod
 from . import pdf as pdf_mod
@@ -533,6 +534,7 @@ def read_pages_ex(
     progress: Optional[Callable[[int, int, int, Dict[str, int]], None]] = None,
     *, max_stage: Optional[str] = None, budget: Optional[str] = None,
     cloud_fallback: Optional[bool] = None, structured: bool = False,
+    offset: int = 0, max_chars: Optional[int] = None,
 ) -> Tuple[List[Dict], List[Dict], Dict[str, str]]:
     """Wie `read_pages`, plus ein Wörterbuch {url: grund} der gelieferten Seiten,
     die nur duennen Text haben ("gelesen, aber duenn": thin_content oder challenge).
@@ -544,7 +546,9 @@ def read_pages_ex(
     schaltet Tavily. Alles gilt unterhalb der Betreiber-Obergrenze SEARCHIFY_MAX_STAGE
     und unterhalb dessen, was Umgebung und Installation hergeben (siehe limits.py).
     Ohne Angaben bleibt alles wie bisher; der Cache haelt immer den vollen Text.
-    Das rohe `structured` (JSON-LD, og:/twitter:-Meta) liefert nur `structured=True`."""
+    Das rohe `structured` (JSON-LD, og:/twitter:-Meta) liefert nur `structured=True`.
+    `offset` und `max_chars` schneiden ein Fenster aus dem vollen Text (siehe `window`),
+    etwa ab der `offset` einer Passage; ohne `max_chars` gilt beim Budget low dessen Laenge."""
     fmt = "markdown" if fmt == "markdown" else "text"
     limits = limits_mod.resolve(max_stage, budget, cloud_fallback)
     scaled = limits.budget != limits_mod.DEFAULT_BUDGET
@@ -555,10 +559,21 @@ def read_pages_ex(
     if scaled and not fetch_timeout:
         fetch_timeout = limits.scaled(float(pages_mod.get_settings().fetch_timeout))
     extra: Dict = {"plain": True} if not limits.allows("tls") else {}
+    rungs = ladder(limits)
+    memory = hosts_mod.open_memory() if len(rungs) > 1 else None  # one rung: nothing to skip
+    skips: Dict[str, set] = hosts_mod.safely(memory, "plan", urls, rungs, default={})
+    # A cached page needs no ladder, and it taught the memory when it was fetched.
+    cached = {u for u in urls if pages_mod._docs().get(f"{_PREFIX}{fmt}|{u}")} if memory else set()
+    jump = [u for u in urls if "static" in skips.get(u, ()) and u not in cached]
+    if jump and progress is not None:
+        report = progress
+        progress = lambda done, total, read, reasons: report(done, total + len(jump), read, reasons)  # noqa: E731
     docs, failed = pages_mod.read_pages(
-        urls, fmt, fetch_timeout, extractor=reader_document, cache_prefix=_PREFIX,
+        [u for u in urls if u not in jump] if jump else urls, fmt, fetch_timeout,
+        extractor=reader_document, cache_prefix=_PREFIX,
         max_bytes=READER_MAX_BYTES, progress=progress, **extra,
     )
+    events: List[Tuple[str, str, str]] = []
     thin_map: Dict[str, str] = {}
     if render_mod.enabled() or stealth_mod.enabled():
         # Duenne Ergebnisse (JS-Huelle, "Skip to main content", Challenge-Seite) zaehlen
@@ -569,17 +584,45 @@ def read_pages_ex(
             failed = failed + [{"url": d.get("url"), "error": "Zu wenig Text",
                                 "reason": _thin_code(d.get("content") or ""), "static": d}
                                for d in thin]
+        if memory:
+            events += [(d.get("url"), "static", "ok") for d in docs
+                       if d.get("stage") == "static" and d.get("url") not in cached]
+            events += [(f.get("url"), "static", f.get("reason") or code_for(f.get("error")))
+                       for f in failed if f.get("url") not in cached and not pdf_mod.is_pdf_failure(f)]
+        failed += [{"url": u, "error": "skipped", "reason": "skipped", "jumped": True} for u in jump]
         if failed:
+
+            def fetch_static(late: List[str], seconds: float) -> Tuple[List[Dict], List[Dict]]:
+                return pages_mod.read_pages(late, fmt, seconds, extractor=reader_document,
+                                            cache_prefix=_PREFIX, max_bytes=READER_MAX_BYTES, **extra)
+
             docs, failed = _render_failed(docs, failed, fmt, urls, deadline, thin=thin_map,
-                                          limits=limits)
+                                          limits=limits, skips=skips, events=events,
+                                          fetch_static=fetch_static)
+    hosts_mod.safely(memory, "record", events)
     if failed and limits.cloud and get_settings().tavily_api_key:
         docs, failed = _tavily_failed(docs, failed, fmt, urls, deadline, limits=limits)
-    if limits.max_chars:
+    if offset or max_chars:
+        size = min((n for n in (max_chars, limits.max_chars) if n), default=None)
+        docs = [window(d, offset, size) for d in docs]
+    elif limits.max_chars:
         docs = [_trimmed(d, limits.max_chars) for d in docs]  # a copy: the cache keeps the full text
     if not structured:  # Kopie ohne den Schluessel, das gecachte Objekt bleibt wie es ist
         docs = [{k: v for k, v in d.items() if k != "structured"} if "structured" in d else d
                 for d in docs]
     return docs, failed, thin_map
+
+
+def ladder(limits: Limits) -> List[str]:
+    """The rungs this call may climb, in order: what the limits allow and is switched on."""
+    rungs = ["static"]
+    if limits.allows("browser") and render_mod.enabled():
+        rungs.append("browser")
+        if render_mod.direct_enabled():
+            rungs.append("browser-direct")
+    if limits.allows("stealth") and stealth_mod.enabled():
+        rungs.append("stealth")
+    return rungs
 
 
 def _trimmed(doc: Dict, max_chars: int) -> Dict:
@@ -589,15 +632,55 @@ def _trimmed(doc: Dict, max_chars: int) -> Dict:
     return dict(doc, content=limits_mod.trim_text(content, max_chars), truncated=True)
 
 
+def window(doc: Dict, offset: int = 0, max_chars: Optional[int] = None) -> Dict:
+    """A copy of `doc` whose content is the part from `offset` on, at most `max_chars`
+    long and cut at whitespace. It starts exactly at `offset` (after any whitespace there),
+    so `next_offset` continues where the part ended; only a single word longer than
+    `max_chars` is cut inside the word, and the next part goes on with the rest of it.
+    The copy says where it is: `offset` (where the part starts), `total_chars` (length
+    of the whole text) and, when more text follows, `next_offset` (where the next part
+    starts) and `truncated: true`. Offsets count characters of this format's text, so a
+    passage's `offset` fits the format text."""
+    content = doc.get("content") or ""
+    total = len(content)
+    start = min(max(int(offset or 0), 0), total)
+    while start < total and content[start].isspace():
+        start += 1
+    end = total if not max_chars else min(total, start + max(int(max_chars), 1))
+    if end < total and not content[end].isspace():
+        cut = end
+        while cut > start and not content[cut - 1].isspace():
+            cut -= 1
+        end = cut if cut > start else end  # one word longer than max_chars: cut inside it
+    piece = content[start:end].rstrip()
+    out = dict(doc, content=piece or None, offset=start, total_chars=total)
+    rest = end
+    while rest < total and content[rest].isspace():
+        rest += 1
+    if rest < total:
+        out["next_offset"] = rest
+        out["truncated"] = True
+    return out
+
+
+def window_args(offset: int = 0, max_chars: Optional[int] = None) -> Dict[str, int]:
+    """`offset` and `max_chars` as keyword arguments, only the ones that are set, so a
+    call without a window stays exactly the call it was before."""
+    return {k: v for k, v in (("offset", offset), ("max_chars", max_chars)) if v}
+
+
 def read_pages(
     urls: List[str], fmt: str = "markdown", timeout: Optional[float] = None,
     *, max_stage: Optional[str] = None, budget: Optional[str] = None,
     cloud_fallback: Optional[bool] = None, structured: bool = False,
+    offset: int = 0, max_chars: Optional[int] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """app.pages.read_pages mit dem Lese-Modus (eigener Cache-Schluessel, 4 MB).
-    `max_stage`, `budget`, `cloud_fallback` und `structured` wie bei `read_pages_ex`."""
+    `max_stage`, `budget`, `cloud_fallback`, `structured`, `offset` und `max_chars`
+    wie bei `read_pages_ex`."""
     docs, failed, _thin = read_pages_ex(urls, fmt, timeout, max_stage=max_stage, budget=budget,
-                                        cloud_fallback=cloud_fallback, structured=structured)
+                                        cloud_fallback=cloud_fallback, structured=structured,
+                                        **window_args(offset, max_chars))
     return docs, failed
 
 
@@ -673,7 +756,9 @@ def _thin_code(content: str) -> str:
 def _render_failed(
     docs: List[Dict], failed: List[Dict], fmt: str, urls: List[str],
     deadline: Optional[float] = None, thin: Optional[Dict[str, str]] = None,
-    limits: Optional[Limits] = None,
+    limits: Optional[Limits] = None, skips: Optional[Dict[str, set]] = None,
+    events: Optional[List[Tuple[str, str, str]]] = None,
+    fetch_static: Optional[Callable[[List[str], float], Tuple[List[Dict], List[Dict]]]] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Reserve-Stufen fuer Fehlschlaege, jede nur, wenn die vorige scheitert:
     Stufe 2 rendert im geteilten Browser (alle Anfragen ueber httpx), Stufe 3 laesst
@@ -683,66 +768,169 @@ def _render_failed(
     Mit `deadline` (monotonic, aus x-timeout) bekommt jede Stufe nur die Restzeit;
     ist ein Render-Platz belegt, wird nach kurzer Wartezeit uebersprungen.
     Behaelt eine Seite nur ihren duennen statischen Text, steht ihr Grund in `thin`.
-    `limits` (limits.py) sperrt Stufen oberhalb der Obergrenze und skaliert die Zeitlimits."""
+    `limits` (limits.py) sperrt Stufen oberhalb der Obergrenze und skaliert die Zeitlimits.
+    `skips` ({url: stufen}) kommt aus dem Website-Gedaechtnis (hosts.py): diese Stufen
+    werden uebersprungen. Eintraege mit `jumped` haben die statische Stufe ausgelassen;
+    scheitert dort alles andere, laedt `fetch_static` sie am Ende doch noch, alle
+    zusammen und parallel (billig). Jeder Versuch landet als (url, stufe, "ok" oder grund)
+    in `events`; ein endgueltiger Fehlschlag traegt in `tried` den Weg ("static:blocked",
+    "browser:skipped", ...)."""
     if limits is None:
         limits = limits_mod.resolve()
+    skips = skips or {}
+    events = events if events is not None else []
     still: List[Dict] = []
+    late: List[Tuple[Dict, List[str], List[Tuple[str, str, str]]]] = []  # jumped, all else failed
     tried = 0  # echte Render-Versuche (Zeitlimit-Fehler und belegter Platz zaehlen nicht)
     stealth_tried = 0
     busy = not (limits.allows("browser") and render_mod.enabled())
+    direct_busy = False  # only consulted when the memory skips the shared browser
     stealth_busy = not (limits.allows("stealth") and stealth_mod.enabled())
 
     def rest(cap: float) -> float:
         cap = limits.scaled(cap)
         return cap if deadline is None else min(cap, deadline - time.monotonic())
 
-    def give_up(fail: Dict) -> None:
+    def finish(fail: Dict, trace: List[str]) -> None:
         static = fail.pop("static", None)
         if static and (static.get("content") or "").strip():
             docs.append(static)  # duenner Text ist besser als nichts
-            if thin is not None and fail.get("url"):
+            if thin is not None and fail.get("url") and _poor(static.get("content") or ""):
                 thin[fail["url"]] = _thin_code(static.get("content") or "")
         else:
+            if len(trace) > 1:
+                fail["tried"] = trace
             still.append(fail)
 
-    def good(html: Optional[str], url: str, stage: str) -> Optional[Dict]:
+    def give_up(fail: Dict, trace: List[str], held: List[Tuple[str, str, str]]) -> None:
+        if fail.pop("jumped", False):
+            late.append((fail, trace, held))  # the skipped static fetch comes after the loop
+        else:
+            finish(fail, trace)
+
+    def good(html: Optional[str], url: str, stage: str, full: bool, trace: List[str],
+             learn: bool, out: List[Tuple[str, str, str]]) -> Optional[Dict]:
+        """The rescued page or None. A failure teaches the host memory only when the page
+        failed statically for a reason of the site (`learn`): after a 404 or a rate limit
+        the browser failing says nothing about the browser on that site."""
         doc = reader_document(html, url, fmt) if html else None
         if doc and not _poor(doc.get("content") or ""):
             doc["stage"] = stage
+            out.append((url, stage, "ok"))
             return doc
+        code = _thin_code(doc.get("content") or "") if doc else "failed"
+        if learn and (doc or full):  # a browser without a page counts only with its full time
+            out.append((url, stage, code))
+        trace.append(f"{stage}:{code}")
         return None
 
+    # Seiten mit bekanntem Weg zuerst: Render- und Stealth-Plaetze sind je Anfrage knapp.
+    failed = sorted(failed, key=lambda f: 0 if skips.get(f.get("url")) else 1)
     for fail in failed:
+        skip = skips.get(fail.get("url"), set())
+        jumped = bool(fail.get("jumped"))
+        static_code = fail.get("reason") or code_for(fail.get("error"))
+        trace = ["static:skipped"] if jumped else [f"static:{static_code}"]
+        learn = jumped or static_code in hosts_mod.FAILURES
+        held: List[Tuple[str, str, str]] = []  # a jumped page's events wait for its late static fetch
+        out = held if jumped else events
         if (fail.get("error") == "Zeitlimit" or pdf_mod.is_pdf_failure(fail)
                 or rest(RENDER_TIMEOUT_S) < RENDER_MIN_REST_S):
-            give_up(fail)
+            give_up(fail, trace, held)
             continue
         doc = None
-        if not busy and tried < RENDER_MAX:
-            status, html = render_mod.try_render(fail["url"], timeout=rest(RENDER_TIMEOUT_S))
-            if status == "tried":
-                tried += 1
-                doc = good(html, fail["url"], "browser")
-                if doc is None and rest(DIRECT_TIMEOUT_S) >= DIRECT_MIN_REST_S:
-                    status, html = render_mod.try_render_direct(fail["url"], timeout=rest(DIRECT_TIMEOUT_S))
-                    doc = good(html, fail["url"], "browser-direct") if status == "tried" else None
+        if not busy and tried < RENDER_MAX and not {"browser", "browser-direct"} <= skip:
+            rendered = True
+            if "browser" in skip:
+                trace.append("browser:skipped")
+                rendered = not direct_busy
             else:
-                # Platz belegt: die uebrigen nicht auch noch je 1 s warten lassen.
-                busy = status in ("busy", "off")
-        if (doc is None and not stealth_busy and stealth_tried < STEALTH_MAX
+                cap = rest(RENDER_TIMEOUT_S)
+                status, html = render_mod.try_render(fail["url"], timeout=cap)
+                if status == "tried":
+                    tried += 1
+                    doc = good(html, fail["url"], "browser", cap >= limits.scaled(RENDER_TIMEOUT_S),
+                               trace, learn, out)
+                else:
+                    # Platz belegt: die uebrigen nicht auch noch je 1 s warten lassen.
+                    busy = status in ("busy", "off")
+                    rendered = False
+            if (doc is None and rendered and "browser-direct" not in skip
+                    and rest(DIRECT_TIMEOUT_S) >= DIRECT_MIN_REST_S):
+                cap = rest(DIRECT_TIMEOUT_S)
+                status, html = render_mod.try_render_direct(fail["url"], timeout=cap)
+                if status == "tried":
+                    tried += "browser" in skip  # without the shared browser this is the render try
+                    doc = good(html, fail["url"], "browser-direct", cap >= limits.scaled(DIRECT_TIMEOUT_S),
+                               trace, learn, out)
+                elif "browser" in skip:
+                    direct_busy = status in ("busy", "off")  # the next pages do not wait for it
+            elif doc is None and "browser-direct" in skip:
+                trace.append("browser-direct:skipped")
+        elif not busy and {"browser", "browser-direct"} <= skip:
+            trace += ["browser:skipped", "browser-direct:skipped"]
+        if doc is None and "stealth" in skip:
+            trace.append("stealth:skipped")
+        elif (doc is None and not stealth_busy and stealth_tried < STEALTH_MAX
                 and rest(STEALTH_TIMEOUT_S) >= STEALTH_MIN_REST_S):
-            status, html = stealth_mod.try_stealth(fail["url"], timeout=rest(STEALTH_TIMEOUT_S))
+            cap = rest(STEALTH_TIMEOUT_S)
+            status, html = stealth_mod.try_stealth(fail["url"], timeout=cap)
             if status == "tried":
                 stealth_tried += 1
-                doc = good(html, fail["url"], "stealth")
+                doc = good(html, fail["url"], "stealth", cap >= limits.scaled(STEALTH_TIMEOUT_S),
+                           trace, learn, out)
             else:
                 stealth_busy = status in ("busy", "off")
         if doc is None:
-            give_up(fail)
+            give_up(fail, trace, held)
             continue
+        events.extend(held)  # the page came back: what the rungs did stands
         pages_mod._docs().put(f"{_PREFIX}{fmt}|{fail['url']}", doc)
-        docs.append(doc)
+        skipped = [t.split(":")[0] for t in trace if t.endswith(":skipped")]
+        docs.append(dict(doc, skipped=skipped) if skipped else doc)
+    if late:
+        _late_static(late, fetch_static, rest(float(pages_mod.get_settings().fetch_timeout)),
+                     events, finish)
     order = {u: i for i, u in enumerate(urls)}
     docs.sort(key=lambda d: order.get(d.get("url"), len(order)))
+    still.sort(key=lambda f: order.get(f.get("url"), len(order)))
     return docs, still
-# Stand: 24.10.2026
+
+
+def _late_static(
+    late: List[Tuple[Dict, List[str], List[Tuple[str, str, str]]]],
+    fetch_static: Optional[Callable[[List[str], float], Tuple[List[Dict], List[Dict]]]],
+    seconds: float, events: List[Tuple[str, str, str]], finish: Callable[[Dict, List[str]], None],
+) -> None:
+    """The static fetch the host memory skipped, for every page that failed on all other
+    rungs, in one parallel call. Its result decides what the held browser events teach:
+    after a site failure they count, after a 404, a rate limit or a timeout they do not."""
+    got: Dict[str, Dict] = {}
+    lost: Dict[str, Dict] = {}
+    if fetch_static is not None and seconds >= 0.3:
+        found, missing = fetch_static([f["url"] for f, _t, _h in late], seconds)
+        got = {d.get("url"): d for d in found}
+        lost = {f.get("url"): f for f in missing}
+    for fail, trace, held in late:
+        url = fail["url"]
+        doc = got.get(url)
+        if doc is not None:
+            poor = _poor(doc.get("content") or "")
+            code = _thin_code(doc.get("content") or "") if poor else "ok"
+            fail["static"] = doc
+        else:
+            miss = lost.get(url) or {"error": "Zeitlimit", "reason": "timeout"}
+            code = miss.get("reason") or code_for(miss.get("error"))
+            fail.update(error=miss.get("error") or "page could not be loaded", reason=code)
+        trace.append(f"static:{code}")
+        pdf = bool(doc and "page_count" in doc)
+        if not pdf:
+            events.append((url, "static", code))
+        if code == "ok" or code in hosts_mod.FAILURES:
+            events.extend(held)
+        else:
+            events.extend(e for e in held if e[2] == "ok")
+        finish(fail, trace)
+
+
+# Stand: 10.11.2026

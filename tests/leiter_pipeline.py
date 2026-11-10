@@ -31,6 +31,7 @@ def install(monkeypatch, *, browser=True, stealth=False, tavily=False, calls=Non
 
     def fetch(url, timeout, max_bytes=None, plain=False):
         calls.append(("fetch", url, round(timeout, 3), plain))
+        htmltext._reset_failure()  # like the real fetch_url: no reason left over from an earlier test
         html = PAGES.get(url)
         if html is None:
             htmltext._note_failure("HTTP 403")

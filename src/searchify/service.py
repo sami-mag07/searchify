@@ -14,7 +14,7 @@ from typing import List, Literal, Optional
 from fastapi import FastAPI, Response
 from pydantic import BaseModel, Field
 
-from .extract import read_pages_ex
+from .extract import read_pages_ex, window_args
 from .passages import passages as best_passages
 from .reasons import code_for, extract_header, search_header, status_for
 from .search import SearchBackendError, search_report
@@ -48,6 +48,9 @@ class ExtractRequest(BaseModel):
     budget: Optional[Literal["low", "normal", "high"]] = None
     cloud_fallback: Optional[bool] = None
     structured: bool = False
+    # A part of each page: from this character on (a passage's offset), at most max_chars.
+    offset: int = Field(0, ge=0)
+    max_chars: Optional[int] = Field(None, ge=1, le=1_000_000)
 
 
 class PassagesRequest(SearchRequest):
@@ -97,14 +100,18 @@ def extract_endpoint(req: ExtractRequest, response: Response) -> dict:
     X-Searchify-Status repeats the reason counts. ``max_stage`` (plain, tls, browser,
     stealth), ``budget`` (low, normal, high) and ``cloud_fallback`` limit the load of
     this request; a trimmed page carries ``truncated: true``. The raw ``structured``
-    block comes only with ``structured: true``."""
+    block comes only with ``structured: true``. ``offset`` and ``max_chars`` return a
+    part of each page with ``offset``, ``total_chars`` and, when more follows,
+    ``next_offset``."""
     limits = req.model_dump(include={"max_stage", "budget", "cloud_fallback"}, exclude_none=True)
-    docs, failed, thin = read_pages_ex(req.urls, req.fmt, structured=req.structured, **limits)
+    docs, failed, thin = read_pages_ex(req.urls, req.fmt, structured=req.structured,
+                                       **window_args(req.offset, req.max_chars), **limits)
     body = {
         "results": docs,
         "failed": [
             {"url": f.get("url"), "error": f.get("error"),
-             **({"reason": f.get("reason") or code_for(f.get("error"))} if req.detail else {})}
+             **({"reason": f.get("reason") or code_for(f.get("error"))} if req.detail else {}),
+             **({"tried": f["tried"]} if req.detail and f.get("tried") else {})}
             for f in failed
         ],
     }
@@ -134,4 +141,4 @@ def passages_endpoint(req: PassagesRequest) -> dict:
     except ImportError:
         return {"error": RERANK_UNAVAILABLE, "results": []}
     return {"results": found}
-# Stand: 02.11.2026
+# Stand: 10.11.2026

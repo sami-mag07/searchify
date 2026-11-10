@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import sqlite3
 import sys
 import threading
 from typing import Dict, List, Optional
@@ -140,6 +141,10 @@ def extract(
     no_cloud: bool = typer.Option(False, "--no-cloud", help="Never ask Tavily (it costs credits)."),
     no_input: bool = NO_INPUT_OPT,
     structured: bool = typer.Option(False, "--structured", help="Add the raw JSON-LD and meta tags."),
+    offset: int = typer.Option(0, "--offset", min=0,
+                               help="Start at this character of the text, e.g. a passage's offset."),
+    max_chars: Optional[int] = typer.Option(None, "--max-chars", min=1,
+                                            help="At most this many characters per page."),
     as_json: bool = JSON_OPT,
 ) -> None:
     """Fetch pages and print their clean article text.
@@ -154,7 +159,7 @@ def extract(
         _fail(f"unknown format {fmt!r}, use text or markdown", as_json)
     from . import limits as limits_mod
     from . import profile as profile_mod
-    from .extract import read_pages_ex
+    from .extract import read_pages_ex, window_args
     from .interview import first_run
     from .reasons import code_for
 
@@ -167,19 +172,23 @@ def extract(
     ticker = _Ticker() if _ticker_allowed(quiet) else None
     try:
         docs, failed, _thin = read_pages_ex(urls, fmt, progress=ticker.update if ticker else None,
-                                            structured=structured, **wanted)
+                                            structured=structured,
+                                            **window_args(offset, max_chars), **wanted)
     finally:
         if ticker:
             ticker.clear()
     failed = [{"url": f.get("url"), "error": f.get("error"),
-               "reason": f.get("reason") or code_for(f.get("error"))} for f in failed]
+               "reason": f.get("reason") or code_for(f.get("error")),
+               **({"tried": f["tried"]} if f.get("tried") else {})} for f in failed]
     if as_json:
         _emit({"results": docs, "failed": failed})
     else:
         for doc in docs:
             typer.secho(doc.get("title") or doc.get("url", ""), bold=True)
             typer.echo(doc.get("url", ""))
-            typer.echo(f"\n{doc.get('content', '')}\n")
+            typer.echo(f"\n{doc.get('content') or ''}\n")
+            if doc.get("next_offset") is not None:
+                typer.echo(f"(more text: --offset {doc['next_offset']} of {doc.get('total_chars')})\n")
         for f in failed:
             typer.secho(f"failed: {f['url']} ({f['error']})", fg=typer.colors.RED, err=True)
     if failed and not docs:
@@ -300,6 +309,44 @@ def config(
     _print_config(as_json)
 
 
+@app.command()
+def hosts(
+    forget: Optional[str] = typer.Option(None, "--forget", help="Forget one host, e.g. shop.example."),
+    clear: bool = typer.Option(False, "--clear", help="Forget every host."),
+    as_json: bool = JSON_OPT,
+) -> None:
+    """Show which way of loading works for which website (the host memory).
+
+    searchify notes per host which rung of the ladder worked and which failed and why,
+    and skips a rung after it failed three times in a row there. Only host names and
+    counters are stored, no addresses or text. SEARCHIFY_HOST_MEMORY=0 turns it off.
+    """
+    from .extract import hosts as hosts_mod
+
+    path = hosts_mod.memory_path()
+    try:
+        memory = hosts_mod.Memory.open(path) if path.exists() else None
+        removed = memory.forget(None if clear else forget) if memory and (clear or forget) else None
+        rows = memory.describe() if memory else []
+    except (OSError, sqlite3.Error) as exc:
+        _fail(f"host memory unusable: {path} ({type(exc).__name__})", as_json)
+    if as_json:
+        _emit({"path": str(path), "enabled": hosts_mod.enabled(), "hosts": rows,
+               **({"removed": removed} if removed is not None else {})})
+        return
+    if removed is not None:
+        typer.echo(f"forgot {removed} host(s)")
+    if not hosts_mod.enabled():
+        typer.echo("host memory is off (SEARCHIFY_HOST_MEMORY=0)")
+    for row in rows:
+        typer.secho(f"{row['host']}  starts at {row['starts_at']}", bold=True)
+        for rung, r in row["rungs"].items():
+            last = "works" if not r["streak"] else f"failed {r['streak']}x in a row ({r['reason']})"
+            typer.echo(f"   {rung:<15} {last}, {r['ok']} ok / {r['fail']} failed")
+    if not rows:
+        typer.echo(f"nothing remembered yet ({path})")
+
+
 def _save_profile(values: dict, as_json: bool) -> None:
     from . import profile as profile_mod
 
@@ -349,4 +396,4 @@ def mcp_main() -> None:
 
 if __name__ == "__main__":
     main()
-# Stand: 02.11.2026
+# Stand: 10.11.2026
