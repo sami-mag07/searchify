@@ -47,8 +47,8 @@ def test_one_success_resets_the_streak(memory):
     assert _plan(memory, url) == set()
 
 
-@pytest.mark.parametrize("reason", ["timeout", "not_found", "unavailable", "rate_limited",
-                                    "address_blocked", "not_html", "pdf_encrypted"])
+@pytest.mark.parametrize("reason", ["not_found", "rate_limited", "address_blocked", "not_html",
+                                    "too_large", "extract_failed", "pdf_encrypted"])
 def test_failures_that_are_not_the_sites_fault_teach_nothing(memory, reason):
     url = "https://slow.example/"
     _plan(memory, url)
@@ -65,16 +65,16 @@ def test_every_tenth_visit_and_a_week_later_the_whole_ladder_is_climbed_again(me
     assert _plan(memory, url, now=t + 8 * DAY) == set()  # a week without a full climb
 
 
-def test_only_allowed_rungs_count_and_never_all_of_them(memory):
+def test_only_allowed_rungs_count_and_the_static_fetch_always_stays(memory):
     url = "https://hard.example/"
-    _plan(memory, url)
     for rung in ALL:
         _fail(memory, url, rung=rung, reason="challenge")
-    assert _plan(memory, url) == set()  # everything fails: try everything, as before
+    # everything fails there: only the cheap static fetch, no browser, until the next full climb
+    assert _plan(memory, url) == {"browser", "browser-direct", "stealth"}
     assert _plan(memory, url, rungs=["static"]) == set()  # a cap of plain or tls: nothing to skip
     memory.record([(url, "stealth", "ok")])
     assert _plan(memory, url) == {"static", "browser", "browser-direct"}
-    assert _plan(memory, url, rungs=["static", "browser"]) == set()  # stealth not allowed now
+    assert _plan(memory, url, rungs=["static", "browser"]) == {"browser"}  # stealth not allowed now
 
 
 def test_old_hosts_are_forgotten_and_the_file_has_a_cap(memory, monkeypatch):
@@ -257,6 +257,31 @@ def test_skipped_static_fetches_run_together_in_one_parallel_call(monkeypatch):
 
 def test_an_unknown_host_or_one_with_only_neutral_failures_is_not_stored(memory):
     memory.plan(["https://new.example/"], ALL)
-    memory.record([("https://slow.example/", "static", "timeout")])
+    memory.record([("https://gone.example/", "static", "not_found")])
     assert sqlite3.connect(memory.path).execute("SELECT COUNT(*) FROM host").fetchone()[0] == 0
+
+
+def test_a_site_that_times_out_or_answers_406_teaches_like_a_block(memory):
+    url = "https://slow-shop.example/"
+    _fail(memory, url, reason="unavailable", times=2)
+    _fail(memory, url, reason="timeout", times=1)
+    assert _plan(memory, url) == {"static"}
+
+
+def test_a_host_where_everything_fails_only_gets_the_static_fetch(memory, monkeypatch):
+    calls = []
+    install(monkeypatch, browser=True, stealth=True, calls=calls)
+    monkeypatch.setattr(reader.stealth_mod, "try_stealth",
+                        lambda u, timeout=0: calls.append(("stealth", u)) or ("tried", None))
+    url = "https://cloud.example/"  # 403 statically, no page in any browser
+    for _ in range(hosts.STREAK):
+        install(monkeypatch, browser=True, stealth=True, calls=calls)
+        monkeypatch.setattr(reader.stealth_mod, "try_stealth",
+                            lambda u, timeout=0: calls.append(("stealth", u)) or ("tried", None))
+        snapshot([url])
+    calls.clear()
+    snap = snapshot([url])
+    assert [c[0] for c in calls] == ["fetch"]
+    assert snap["failed"][0]["tried"] == ["static:blocked", "browser:skipped",
+                                          "browser-direct:skipped", "stealth:skipped"]
 # Stand: 10.11.2026

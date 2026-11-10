@@ -10,14 +10,15 @@ worked and failed and why, so the next call jumps over the rungs that never work
   URL or page text. The list of hosts is still a browsing history, so the file is only
   readable by its owner and ``searchify hosts --clear`` deletes everything.
 - A rung is skipped on a host after it failed there ``STREAK`` times in a row. Only
-  failures that belong to the site count (`FAILURES`); timeouts, network errors and
-  missing pages change nothing. One success resets the streak.
+  failures that belong to the site count (`FAILURES`, timeouts and unreachable servers
+  included); missing pages, rate limits and wrong content types change nothing. One
+  success resets the streak.
 - Every ``REPROBE_EVERY``-th visit of a host, and the first visit ``REPROBE_DAYS`` after
   its last full climb, climbs the whole ladder again, so a site that drops its bot
   protection gets cheap again.
 - It never lifts a limit. Only the rungs that the installation, the operator cap
-  ``SEARCHIFY_MAX_STAGE`` and the request allow are considered, and when every one of
-  them is known to fail, all are tried as before.
+  ``SEARCHIFY_MAX_STAGE`` and the request allow are considered. When every one of them
+  is known to fail on a host, only the cheap static fetch runs until the next full climb.
 - Hosts not seen for ``FORGET_DAYS`` days are deleted; at most ``MAX_HOSTS`` are kept.
 - On by default. ``SEARCHIFY_HOST_MEMORY=0`` turns it off, ``SEARCHIFY_HOST_MEMORY_PATH``
   names the file. Any trouble with the file turns the memory off for that call: reading
@@ -38,7 +39,8 @@ from urllib.parse import urlparse
 log = logging.getLogger("searchify")
 
 RUNGS = ("static", "browser", "browser-direct", "stealth")  # ladder order
-FAILURES = frozenset({"blocked", "challenge", "thin_content", "no_main_text", "failed"})
+FAILURES = frozenset({"blocked", "challenge", "thin_content", "no_main_text", "failed",
+                      "unavailable", "timeout"})
 STREAK = 3  # failures in a row before a rung is skipped on that host
 REPROBE_EVERY = 10  # every 10th visit climbs the whole ladder
 REPROBE_DAYS = 7
@@ -126,8 +128,9 @@ class Memory:
     def plan(self, urls: Sequence[str], rungs: Sequence[str],
              now: Optional[float] = None) -> Dict[str, Set[str]]:
         """{url: rungs to skip} for one call, counting the visit of each URL's host.
-        `rungs` are the rungs this call may use; only those can be skipped, and never
-        all of them. A reprobe visit (see the module text) skips nothing."""
+        `rungs` are the rungs this call may use; only those can be skipped. The static
+        rung always stays when every rung is known to fail. A reprobe visit (see the
+        module text) skips nothing."""
         now = time.time() if now is None else now
         allowed = [r for r in RUNGS if r in rungs]
         out: Dict[str, Set[str]] = {}
@@ -151,7 +154,9 @@ class Memory:
                 bad = {r for r, in con.execute(
                     "SELECT rung FROM rung WHERE host = ? AND streak >= ?", (host, STREAK))}
                 skip = bad & set(allowed)
-                if skip and skip != set(allowed):
+                if skip == set(allowed):  # nothing works there: only the cheap fetch, no browser
+                    skip.discard("static")
+                if skip:
                     out[url] = skip
         return out
 
