@@ -96,7 +96,7 @@ again, so for many questions in a row the HTTP service or the MCP server is fast
 
 ### Why a page failed
 
-Every failed page keeps its human `error` text and gets one `reason`: `blocked` (401/403/451),
+Every failed page keeps its human `error` text and gets one `reason`: `blocked` (401/403/406/451),
 `rate_limited` (429), `not_found` (404/410), `unavailable`, `timeout`, `not_html`, `too_large`,
 `address_blocked` (a private or internal address, refused before any connection),
 `no_main_text`, `extract_failed`, `thin_content`, `challenge`, `pdf_encrypted`, `pdf_no_text`,
@@ -239,15 +239,14 @@ host memory (`bench/host_bench.py`, 10 Nov 2026, Mac, browser stages and Camoufo
 | | Pages read | All 73 pages | p50 | p95 |
 |---|---:|---:|---:|---:|
 | without memory (median of 5 runs) | 56 to 58 | 150 s | 0.55 s | 8.9 s |
-| with memory, 4th and 5th run | 57 | 114 s | 0.45 s | 8.3 s |
+| with memory, 4th and 5th run | 57 | 112 to 117 s | 0.45 s | 7.7 s |
 
-The memory learns in the first three runs and then cuts the time for all 73 pages by a quarter.
-Sites that fail on every rung (G2, Glassdoor, bol.com, Zeit, nu.nl) drop from 8 to 10 seconds per
-visit to under 0.6 seconds; gnu.org, whose static fetch kept failing, now starts at the browser
-(4.5 s to 2.1 s). The same pages come back. The price: bol.com got through Camoufox in one of the
-five runs without memory; with it, such a site only gets the full ladder on every 10th visit. p95
-barely moves, because the slowest pages are 404s, JSON and image addresses and rate limits, and
-the memory deliberately learns nothing from those.
+The memory learns in the first three runs and then cuts the time for all 73 pages by about a
+fifth. Sites that fail on every rung (G2, Glassdoor, bol.com, Zeit, nu.nl) drop from 8 to 10
+seconds per visit to under 0.6 seconds. The same pages come back. The price: bol.com got through
+Camoufox in one of the five runs without memory; with it, such a site only gets the full ladder
+on every 10th visit. p95 moves little, because the slowest pages are 404s, JSON and image
+addresses and rate limits, and the memory deliberately learns nothing from those.
 
 ### 0.4.0: the link filter
 
