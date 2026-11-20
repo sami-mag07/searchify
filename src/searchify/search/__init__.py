@@ -7,6 +7,7 @@ Backends, in order of preference:
 - ``serper``: optional cloud fallback (Google via Serper), only if ``SERPER_API_KEY`` is set.
 - ``tavily``: last safety net, only if ``TAVILY_API_KEY`` is set. It runs only when
   every backend in the chain failed or found nothing.
+- ``parallel``: opt-in, keyless search via the MCP endpoint in ``PARALLEL_MCP_URL``.
 
 Pick the primary with ``SEARCH_BACKEND`` and an optional fallback with
 ``SEARCH_FALLBACK``. The default is local only: DuckDuckGo, then SearXNG if set.
@@ -20,6 +21,7 @@ from ..reasons import REASONS, code_for, leading_code
 from ._common import SearchBackendError
 from .cloud import serper_search, tavily_search
 from .duckduckgo import ddgs_search
+from .parallel import parallel_search
 from .searxng import searxng_search
 
 BACKENDS = {
@@ -27,6 +29,7 @@ BACKENDS = {
     "searxng": searxng_search,
     "serper": serper_search,
     "tavily": tavily_search,
+    "parallel": parallel_search,
 }
 
 
@@ -35,7 +38,8 @@ def _chain() -> List[str]:
     chain = [s.search_backend]
     fb = s.search_fallback
     # The fallback only joins when it is usable; a pinned primary keeps its own error.
-    configured = {"searxng": bool(s.searxng_url), "serper": bool(s.serper_api_key)}
+    configured = {"searxng": bool(s.searxng_url), "serper": bool(s.serper_api_key),
+                  "parallel": bool(s.parallel_mcp_url)}
     if fb and fb != s.search_backend and configured.get(fb, True):
         chain.append(fb)
     return [b for b in chain if b in BACKENDS]
