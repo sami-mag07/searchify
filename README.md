@@ -285,9 +285,15 @@ ports. Details: [`docs/architecture.md`](docs/architecture.md).
 | `searxng` | no | Your own instance. Fast and private; set `SEARXNG_URL`. |
 | `serper` | yes | Optional Google fallback. Off unless `SERPER_API_KEY` is set. |
 | `tavily` | yes | Last safety net. Off unless `TAVILY_API_KEY` is set, and then only asked when every other backend found nothing. |
+| `parallel` | no | Optional hosted search. Set `PARALLEL_MCP_URL` to the anonymous Parallel Streamable HTTP MCP endpoint and select `--backend parallel`. |
 
 Choose the primary with `SEARCH_BACKEND` and a fallback with `SEARCH_FALLBACK`.
 The default chain is local only: DuckDuckGo, then SearXNG if configured.
+
+With `parallel` selected, searchify sends the query and any included domains to Parallel's
+`web_search` tool. It applies the domain filters and result limit locally and keeps the source
+URLs. Language, country and time range are unsupported by this backend. The request includes
+the searchify User-Agent so Parallel can measure aggregate free MCP usage.
 
 With `TAVILY_API_KEY` set, Tavily becomes the last step in two places: in search when
 every backend came back empty, and in reading when every local stage (static fetch,
@@ -423,7 +429,7 @@ before.
 ## Configuration
 
 Every setting is optional and read from the environment (see `.env.example`):
-`SEARCH_BACKEND`, `SEARCH_FALLBACK`, `SEARXNG_URL`, `SERPER_API_KEY`, `TAVILY_API_KEY`,
+`SEARCH_BACKEND`, `SEARCH_FALLBACK`, `SEARXNG_URL`, `SERPER_API_KEY`, `TAVILY_API_KEY`, `PARALLEL_MCP_URL`,
 `RERANKER_MODEL`, `FETCH_TIMEOUT`, `SEARCHIFY_USER_AGENT`. No key is ever read from code.
 
 ## Tests

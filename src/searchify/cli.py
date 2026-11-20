@@ -87,7 +87,7 @@ class _Ticker:
 def search(
     query: str = typer.Argument(..., help="What to search for."),
     max_results: int = typer.Option(10, "--max-results", "-n", min=1, max=50),
-    backend: Optional[str] = typer.Option(None, help="duckduckgo, searxng, serper or tavily."),
+    backend: Optional[str] = typer.Option(None, help="duckduckgo, searxng, serper, tavily or parallel."),
     language: Optional[str] = typer.Option(None, help="Result language, e.g. en, or any for none."),
     country: Optional[str] = typer.Option(None, "--country", help="Country code, e.g. BE (with --language nl: Belgian Dutch)."),
     time_range: Optional[str] = typer.Option(None, "--time-range", help="e.g. day, week, month, year."),
@@ -198,7 +198,7 @@ def passages(
     rerank: Optional[bool] = typer.Option(
         None, "--rerank/--no-rerank",
         help="Rank by relevance. Default: on if the [rerank] extra is installed."),
-    backend: Optional[str] = typer.Option(None, help="duckduckgo, searxng, serper or tavily."),
+    backend: Optional[str] = typer.Option(None, help="duckduckgo, searxng, serper, tavily or parallel."),
     language: Optional[str] = typer.Option(None, help="Result language, e.g. en."),
     country: Optional[str] = typer.Option(None, "--country", help="Country code, e.g. BE (with --language nl: Belgian Dutch)."),
     time_range: Optional[str] = typer.Option(None, "--time-range", help="e.g. day, week, month, year."),

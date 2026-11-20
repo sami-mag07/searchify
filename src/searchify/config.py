@@ -39,6 +39,8 @@ class Settings:
 
     # Networking
     fetch_timeout: int
+    # Operator-provided endpoint for the optional Parallel search backend.
+    parallel_mcp_url: str = ""
 
 
 def get_settings() -> Settings:
@@ -51,5 +53,6 @@ def get_settings() -> Settings:
         tavily_api_key=_get("TAVILY_API_KEY", ""),
         reranker_model=_get("RERANKER_MODEL", "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"),
         fetch_timeout=_get_int("FETCH_TIMEOUT", 15),
+        parallel_mcp_url=_get("PARALLEL_MCP_URL").strip(),
     )
 # Stand: 24.10.2026

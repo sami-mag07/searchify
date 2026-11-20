@@ -12,7 +12,8 @@ search_pkg = sys.modules["searchify.search"]
 
 @pytest.fixture(autouse=True)
 def _env(monkeypatch):
-    for k in ("SEARCH_BACKEND", "SEARCH_FALLBACK", "SEARXNG_URL", "SERPER_API_KEY", "TAVILY_API_KEY"):
+    for k in ("SEARCH_BACKEND", "SEARCH_FALLBACK", "SEARXNG_URL", "SERPER_API_KEY",
+              "TAVILY_API_KEY", "PARALLEL_MCP_URL"):
         monkeypatch.delenv(k, raising=False)
 
 
@@ -76,3 +77,13 @@ def test_chain_skips_unconfigured_fallbacks(monkeypatch):
     assert search_pkg._chain() == ["duckduckgo"]
     monkeypatch.setenv("SERPER_API_KEY", "k")
     assert search_pkg._chain() == ["duckduckgo", "serper"]
+
+
+def test_parallel_endpoint_alone_does_not_change_the_default_chain(monkeypatch):
+    monkeypatch.setenv("SEARXNG_URL", "http://searx.test")
+    monkeypatch.setenv("PARALLEL_MCP_URL", "https://mcp.example/mcp")
+    assert search_pkg._chain() == ["duckduckgo", "searxng"]
+    monkeypatch.setenv("SEARCH_FALLBACK", "parallel")
+    assert search_pkg._chain() == ["duckduckgo", "parallel"]
+    monkeypatch.delenv("PARALLEL_MCP_URL")
+    assert search_pkg._chain() == ["duckduckgo"]
